@@ -28,72 +28,67 @@
             width: 80px;
             height: 50px;
         }
-	tr.selected {
-      	//background-color: yellow;
-    	}
+        tr.selected {
+            //background-color: yellow;
+        }
     </style>
 </head>
 <body>
     <h1>Melbourne Live TV Guide</h1>
     <table>
         <tr>
-           <th>Channel</th> 
-	   <th> </th>
+            <th>Channel</th> 
+            <th> </th>
             <th>What's Playing</th>
             <th>Start Time</th>
             <th>End Time</th>
-	   <th>What's Up Next</th>
+            <th>What's Up Next</th>
             <th>Start Time</th>
             <th>End Time</th>
-
         </tr>
 
         <script>
-     	const tableRows = document.querySelectorAll('table tr');
-         const xmlData = "https://i.mjh.nz/au/Melbourne/epg.xml";
-      
-
-
- 	   // Map of channel IDs to their desired names
+            const tableRows = document.querySelectorAll('table tr');
+            const xmlData = "https://i.mjh.nz/au/Melbourne/epg.xml";
+	    const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
+            // Map of channel IDs to their desired names
             const channelMap = {
-                "mjh-7-mel1": "Seven",
-                "mjh-7-mel2": "7two",
-	        "mjh-7-mel3": "7mate",
-                "mjh-7-mel6": "7flix",
-		"mjh-channel-9-vic": "Channel 9",
-                "mjh-gem-vic": "9Gem",
-	        "mjh-go-vic": "9Go",
-                "mjh-life-vic": "9Life",
-		"mjh-rush-vic": "9Rush",
                 "mjh-abc-vic": "ABC",
-	        "mjh-10-vic": "Channel 10",
-                "mjh-10bold-vic": "10Bold",
-		"mjh-10peach-vic": "10Peach",
-                "mjh-10shake-vic": "10Shake",
-	        "mjh-c31": "Channel 31",
-                "mjh-sbs": "SBS",
-		"mjh-sbs-viceland": "SBS Viceland",
-                "mjh-sbs-food": "SBS Food",
-		"mjh-sbs-world-movies": "SBS World Movies",
-                "mjh-sbs-nitv": "NITV",
-		"mjh-7-rac": "Horse Racing",
-                "mjh-7-per1ml": "Seven Subtitled",
-                "mjh-7-per3ml": "7Mate Subtitled",
-                "mjh-fox-sports-news": "Fox Sports News",
+		"mjh-seven-mel": "Seven",
+                "mjh-7two-mel": "7two",
+                "mjh-7mate-mel": "7mate",
+                "mjh-7flix-mel": "7flix",
+                "mjh-channel-9-vic": "Channel 9",
+                "mjh-gem-vic": "9Gem",
+                "mjh-go-vic": "9Go",
+                "mjh-life-vic": "9Life",
+                "mjh-rush-vic": "9Rush",
                 
-                };
-// Map of channel IDs to their desired links
+                "mjh-10-vic": "Channel 10",
+                "mjh-10bold-vic": "10Bold",
+                "mjh-10peach-vic": "10Peach",
+                "mjh-10shake-vic": "10Shake",
+                "mjh-sbs": "SBS",
+                "mjh-sbs-viceland": "SBS Viceland",
+                "mjh-sbs-food": "SBS Food",
+                "mjh-sbs-world-movies": "SBS World Movies",
+                "mjh-sbs-nitv": "NITV",
+                "mjh-c31": "Channel 31",
+                
+            };
+
+            // Map of channel IDs to their desired links
             const channelLinkMap = {
-                "mjh-7-mel1": "https://i.mjh.nz/7-mel1.m3u8",
-                "mjh-7-mel2": "https://i.mjh.nz/7-mel2.m3u8",
-                "mjh-7-mel3": "https://i.mjh.nz/7-mel3.m3u8",
-                "mjh-7-mel6": "https://i.mjh.nz/7-mel6.m3u8",
+                "mjh-seven-mel": "https://i.mjh.nz/seven-mel.m3u8",
+                "mjh-7two-mel": "https://i.mjh.nz/7two-mel.m3u8",
+                "mjh-7mate-mel": "https://i.mjh.nz/7mate-mel.m3u8",
+                "mjh-7flix-mel": "https://i.mjh.nz/7flix-mel.m3u8",
                 "mjh-channel-9-vic": "https://i.mjh.nz/channel-9-vic-alt.m3u8",
                 "mjh-gem-vic": "https://i.mjh.nz/gem-vic-alt.m3u8",
                 "mjh-go-vic": "https://i.mjh.nz/go-vic.m3u8",
-		"mjh-life-vic": "https://i.mjh.nz/life-vic.m3u8",
-		"mjh-rush-vic": "https://i.mjh.nz/rush-vic.m3u8",
-            "mjh-abc-vic": "https://c.mjh.nz/abc-vic.m3u8",
+                "mjh-life-vic": "https://i.mjh.nz/life-vic.m3u8",
+                "mjh-rush-vic": "https://i.mjh.nz/rush-vic.m3u8",
+                "mjh-abc-vic": "https://c.mjh.nz/abc-vic.m3u8",
                 "mjh-sbs": "https://i.mjh.nz/sbs-vic.m3u8",
                 "mjh-sbs-vic-hd": "https://i.mjh.nz/sbs-vic-hd.m3u8",
                 "mjh-sbs-viceland": "https://i.mjh.nz/sbs-vic-viceland.m3u8",
@@ -102,18 +97,14 @@
                 "mjh-10-vic": "https://i.mjh.nz/10-vic.m3u8",
                 "mjh-10peach-vic": "https://i.mjh.nz/10peach-vic.m3u8",
                 "mjh-10bold-vic": "https://i.mjh.nz/10bold-vic.m3u8",
-		"mjh-10shake-vic": "https://i.mjh.nz/10shake-vic.m3u8",
+                "mjh-10shake-vic": "https://i.mjh.nz/10shake-vic.m3u8",
                 "mjh-eleven-vic": "https://i.mjh.nz/eleven-vic.m3u8",
                 "mjh-one-vic": "https://i.mjh.nz/one-vic.m3u8",
                 "mjh-sky-news-aus": "https://i.mjh.nz/sky-news-aus.m3u8",
                 "mjh-fox-sports-news": "https://i.mjh.nz/fox-sports-news.m3u8",
-		"mjh-c31": "https://i.mjh.nz/c31.m3u8",
-		"mjh-7-rac": "https://i.mjh.nz/7-rac.m3u8",
-                "mjh-7-per1ml": "https://i.mjh.nz/7-per1ml.m3u8",
-                "mjh-7-per3ml": "https://i.mjh.nz/7-per3ml.m3u8",
-                "mjh-fox-sports-news": "Fox Sports News",
+                "mjh-c31": "https://i.mjh.nz/c31.m3u8",
+                
             };
-
 
             fetch(xmlData)
                 .then(response => response.text())
@@ -121,383 +112,94 @@
                 .then(data => {
                     const programs = data.getElementsByTagName("programme");
                     const currentTime = new Date();
-		   const timezoneOffsetInMinutes = -600; // EST timezone offset
-        		   currentTime.setTime(currentTime.getTime() + (timezoneOffsetInMinutes * 60 * 1000));
-		   const options = { hour12: true, hour: "numeric", minute: "numeric" };
+                    currentTime.setTime(currentTime.getTime() + (timezoneOffsetInMinutes * 60 * 1000));
+                    const options = { hour12: true, hour: "numeric", minute: "numeric" };
 
- // Find the program element for SBS at the target time
-        let sbsProgram;
-        for (let i = 0; i < data.getElementsByTagName("programme").length; i++) {
-          const sprogram = data.getElementsByTagName("programme")[i];
-	const nsprogram = data.getElementsByTagName("programme")[i+1];
-	
-          if (sprogram.getAttribute("channel") === "mjh-sbs") {
-            const sstartTime = new Date(sprogram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-            const sstopTime = new Date(sprogram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-            if (currentTime >= sstartTime && currentTime <= sstopTime) {
-              sbsProgram = sprogram;
-              
-             nsbsProgram = nsprogram;
+                    // Sort the channels based on their order in the channelMap
+                    const sortedChannels = Object.keys(channelMap).sort((a, b) => {
+                        return Object.keys(channelMap).indexOf(a) - Object.keys(channelMap).indexOf(b);
+                    });
+
+                    // Loop through the sorted channels and generate table rows accordingly
+sortedChannels.forEach(channelID => {
+    // Find the programs associated with the current channelID
+    const channelPrograms = Array.from(programs).filter(program => program.getAttribute("channel") === channelID);
+
+    // Proceed with generating table rows for each program in the channelPrograms
+    channelPrograms.forEach((program, index) => { // Added 'index' to get the next program
+        // Fill the table with the channels
+        const channel = channelID;
+        const title = program.getElementsByTagName("title")[0].childNodes[0].nodeValue;
+        const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+        const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+        const icon = program.getElementsByTagName("icon")[0].getAttribute("src");
+
+        // Map the channel ID to its desired name
+        const mappedChannel = channelMap[channel] || channel;
+        const mappedChannelLink = channelLinkMap[channel] || channel;
+
+        // Only show currently playing programs
+        if (currentTime >= start && currentTime <= end) {
+            const row = document.createElement("tr");
+
+            const channelCell = document.createElement("td");
+            channelCell.appendChild(document.createTextNode(mappedChannel));
+            row.appendChild(channelCell);
+
+            const iconCell = document.createElement("td");
+            const iconImg = document.createElement("img");
+            iconImg.src = icon;
+            iconImg.addEventListener("click", function() {
+                window.open(mappedChannelLink)
+            });
+            iconCell.appendChild(iconImg);
+            row.appendChild(iconCell);
+
+            const titleCell = document.createElement("td");
+            titleCell.appendChild(document.createTextNode(title));
+            row.appendChild(titleCell);
+
+            const startCell = document.createElement("td");
+            const adjustedStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+            startCell.appendChild(document.createTextNode(adjustedStart.toLocaleTimeString("en-AU", options)));
+            row.appendChild(startCell);
+
+            const endCell = document.createElement("td");
+            const adjustedEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the end time
+            endCell.appendChild(document.createTextNode(adjustedEnd.toLocaleTimeString("en-AU", options)));
+            row.appendChild(endCell);
+
+            // Get details of the next program
+            const nextProgram = channelPrograms[index + 1]; // Get the next program
+            if (nextProgram) { // Check if next program exists
+                const Ntitle = nextProgram.getElementsByTagName("title")[0].childNodes[0].nodeValue;
+                const Nstart = new Date(nextProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+                const Nend = new Date(nextProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+
+                // Add cells for the next show
+                const NtitleCell = document.createElement("td");
+                NtitleCell.appendChild(document.createTextNode(Ntitle));
+                row.appendChild(NtitleCell);
+
+                const nextStartCell = document.createElement("td");
+                const adjustedNextStart = new Date(Nstart.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+                nextStartCell.appendChild(document.createTextNode(adjustedNextStart.toLocaleTimeString("en-AU", options)));
+                row.appendChild(nextStartCell);
+
+                const nextEndCell = document.createElement("td");
+                const adjustedNextEnd = new Date(Nend.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+                nextEndCell.appendChild(document.createTextNode(adjustedNextEnd.toLocaleTimeString("en-AU", options)));
+                row.appendChild(nextEndCell);
             }
-          }
+
+            document.querySelector("table").appendChild(row);
         }
+    });
+});
 
-// Find the program element for SBS-Viceland at the target time
-        let sbsVProgram;
-        for (let i = 0; i < data.getElementsByTagName("programme").length; i++) {
-          const sVprogram = data.getElementsByTagName("programme")[i];
-	const nsVprogram = data.getElementsByTagName("programme")[i+1];
-	
-          if (sVprogram.getAttribute("channel") === "mjh-sbs-viceland") {
-            const sVstartTime = new Date(sVprogram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-            const sVstopTime = new Date(sVprogram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-            if (currentTime >= sVstartTime && currentTime <= sVstopTime) {
-              sbsVProgram = sVprogram;
-              
-             nsbsVProgram = nsVprogram;
-            }
-          }
-        }
-
-// Find the program element for SBS-Food at the target time
-        let sbsFProgram;
-        for (let i = 0; i < data.getElementsByTagName("programme").length; i++) {
-          const sFprogram = data.getElementsByTagName("programme")[i];
-	 const nsFprogram = data.getElementsByTagName("programme")[i+1];
-	
-          if (sFprogram.getAttribute("channel") === "mjh-sbs-food") {
-            const sFstartTime = new Date(sFprogram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-            const sFstopTime = new Date(sFprogram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-            if (currentTime >= sFstartTime && currentTime <= sFstopTime) {
-              sbsFProgram = sFprogram;
-              
-             nsbsFProgram = nsFprogram;
-            }
-          }
-        }
-// Find the program element for SBS-world-movies at the target time
-        let sbsWProgram;
-        for (let i = 0; i < data.getElementsByTagName("programme").length; i++) {
-          const sWprogram = data.getElementsByTagName("programme")[i];
-	 const nsWprogram = data.getElementsByTagName("programme")[i+1];
-	
-          if (sWprogram.getAttribute("channel") === "mjh-sbs-world-movies") {
-            const sWstartTime = new Date(sWprogram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-            const sWstopTime = new Date(sWprogram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-            if (currentTime >= sWstartTime && currentTime <= sWstopTime) {
-              sbsWProgram = sWprogram;
-              
-             nsbsWProgram = nsWprogram;
-            }
-          }
-        }
-
-
-// Add new row and icons for SBS
-			const rowSBS = document.createElement("tr");
-				
-                            const channelCell = document.createElement("td");
-                            channelCell.appendChild(document.createTextNode("SBS"));
-                            rowSBS.appendChild(channelCell);
-
-			   const iconCell = document.createElement("td");
-			   const iconImg = document.createElement("img");
-			   iconImg.src = "https://i.mjh.nz/.images/sbs.png";
-			   iconImg.addEventListener("click", function() {window.open("https://i.mjh.nz/sbs.m3u8")});
-			   iconCell.appendChild(iconImg);
-			   rowSBS.appendChild(iconCell);
-
-                          const titleCell = document.createElement("td");
-			const stitle = sbsProgram.getElementsByTagName("title")[0].textContent;
-                          titleCell.appendChild(document.createTextNode(stitle));
-                            rowSBS.appendChild(titleCell);
-
-                            const startCell = document.createElement("td");
-			const sstartTime = new Date(sbsProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const sadjustedStart = new Date(sstartTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			startCell.appendChild(document.createTextNode(sadjustedStart.toLocaleTimeString("en-US", options)));
-			   rowSBS.appendChild(startCell);
-
-                            const endCell = document.createElement("td");
-			const sendTime = new Date(sbsProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const sadjustedStop = new Date(sendTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			endCell.appendChild(document.createTextNode(sadjustedStop.toLocaleTimeString("en-US", options)));
-			
-                            rowSBS.appendChild(endCell);
-
-			// Add cells for the next show
-    			   const NtitleCell = document.createElement("td");
-			   const sntitle = nsbsProgram.getElementsByTagName("title")[0].textContent;
-                            NtitleCell.appendChild(document.createTextNode(sntitle));
-    			   rowSBS.appendChild(NtitleCell);
-
-    			   const nextStartCell = document.createElement("td");
-			const nsstartTime = new Date(nsbsProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const nsadjustedStart = new Date(nsstartTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			nextStartCell.appendChild(document.createTextNode(nsadjustedStart.toLocaleTimeString("en-US", options)));
-    			   rowSBS.appendChild(nextStartCell);
-
-    			   const nextEndCell = document.createElement("td");
-    			const nsendTime = new Date(nsbsProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const nsadjustedStop = new Date(nsendTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			nextEndCell.appendChild(document.createTextNode(nsadjustedStop.toLocaleTimeString("en-US", options)));
-    			   rowSBS.appendChild(nextEndCell);
-
-			document.querySelector("table").appendChild(rowSBS);
-
-
-// Add new row and icons for SBS-viceland
-
-			const rowSBSV = document.createElement("tr");
-				
-                            const SVchannelCell = document.createElement("td");
-                            SVchannelCell.appendChild(document.createTextNode("SBS Viceland"));
-                            rowSBSV.appendChild(SVchannelCell);
-
-			   const SViconCell = document.createElement("td");
-			   const SViconImg = document.createElement("img");
-			   SViconImg.src = "https://i.mjh.nz/.images/sbs-viceland.png";
-			   SViconImg.addEventListener("click", function() {window.open("https://i.mjh.nz/sbs-viceland.m3u8")});
-			   SViconCell.appendChild(SViconImg);
-			   rowSBSV.appendChild(SViconCell);
-
-            		const SVtitleCell = document.createElement("td");
-			const SVtitle = sbsVProgram.getElementsByTagName("title")[0].textContent;
-                            SVtitleCell.appendChild(document.createTextNode(SVtitle));
-                            rowSBSV.appendChild(SVtitleCell);
-			
-			const SVstartCell = document.createElement("td");
-			const SVstartTime = new Date(sbsVProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SVadjustedStart = new Date(SVstartTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SVstartCell.appendChild(document.createTextNode(SVadjustedStart.toLocaleTimeString("en-US", options)));
-			   rowSBSV.appendChild(SVstartCell);
-
-
-                         const SVendCell = document.createElement("td");
-			const SVendTime = new Date(sbsVProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SVadjustedStop = new Date(SVendTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SVendCell.appendChild(document.createTextNode(SVadjustedStop.toLocaleTimeString("en-US", options)));
-			
-                            rowSBSV.appendChild(SVendCell);
-
-// Add cells for the next show
-    			   const SVNtitleCell = document.createElement("td");
-			   const SVNtitle = nsbsVProgram.getElementsByTagName("title")[0].textContent;
-                            SVNtitleCell.appendChild(document.createTextNode(SVNtitle));
-    			   rowSBSV.appendChild(SVNtitleCell);
-
-    			   const SVNStartCell = document.createElement("td");
-			const SVNstartTime = new Date(nsbsVProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SVNadjustedStart = new Date(SVNstartTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SVNStartCell.appendChild(document.createTextNode(SVNadjustedStart.toLocaleTimeString("en-US", options)));
-    			   rowSBSV.appendChild(SVNStartCell);
-
-    			   const SVNEndCell = document.createElement("td");
-    			const SVNendTime = new Date(nsbsVProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SVNadjustedStop = new Date(SVNendTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SVNEndCell.appendChild(document.createTextNode(SVNadjustedStop.toLocaleTimeString("en-US", options)));
-    			   rowSBSV.appendChild(SVNEndCell);
-
-                          
-
-
-			document.querySelector("table").appendChild(rowSBSV);
-
-// Add new row and icons for SBS-Food
-
-
-			const rowSBSF = document.createElement("tr");
-				
-                            const SFchannelCell = document.createElement("td");
-                            SFchannelCell.appendChild(document.createTextNode("SBS Food"));
-                            rowSBSF.appendChild(SFchannelCell);
-
-			   const SFiconCell = document.createElement("td");
-			   const SFiconImg = document.createElement("img");
-			   SFiconImg.src = "https://i.mjh.nz/.images/sbs-food.png";
-			   SFiconImg.addEventListener("click", function() {window.open("https://i.mjh.nz/sbs-food.m3u8")});
-			   SFiconCell.appendChild(SFiconImg);
-			   rowSBSF.appendChild(SFiconCell);
-
-            		const SFtitleCell = document.createElement("td");
-			const SFtitle = sbsFProgram.getElementsByTagName("title")[0].textContent;
-                            SFtitleCell.appendChild(document.createTextNode(SFtitle));
-                            rowSBSF.appendChild(SFtitleCell);
-			
-			const SFstartCell = document.createElement("td");
-			const SFstartTime = new Date(sbsFProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SFadjustedStart = new Date(SFstartTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SFstartCell.appendChild(document.createTextNode(SFadjustedStart.toLocaleTimeString("en-US", options)));
-			   rowSBSF.appendChild(SFstartCell);
-
-
-                         const SFendCell = document.createElement("td");
-			const SFendTime = new Date(sbsFProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SFadjustedStop = new Date(SVendTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SFendCell.appendChild(document.createTextNode(SFadjustedStop.toLocaleTimeString("en-US", options)));
-			
-                            rowSBSF.appendChild(SFendCell);
-
-// Add cells for the next show
-    			   const SFNtitleCell = document.createElement("td");
-			   const SFNtitle = nsbsFProgram.getElementsByTagName("title")[0].textContent;
-                            SFNtitleCell.appendChild(document.createTextNode(SFNtitle));
-    			   rowSBSF.appendChild(SFNtitleCell);
-
-    			   const SFNStartCell = document.createElement("td");
-			const SFNstartTime = new Date(nsbsFProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SFNadjustedStart = new Date(SFNstartTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SFNStartCell.appendChild(document.createTextNode(SFNadjustedStart.toLocaleTimeString("en-US", options)));
-    			   rowSBSF.appendChild(SFNStartCell);
-
-    			   const SFNEndCell = document.createElement("td");
-    			const SFNendTime = new Date(nsbsFProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SFNadjustedStop = new Date(SFNendTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SFNEndCell.appendChild(document.createTextNode(SFNadjustedStop.toLocaleTimeString("en-US", options)));
-    			   rowSBSF.appendChild(SFNEndCell);
-
-                          
-
-
-			document.querySelector("table").appendChild(rowSBSF);
-
-// Add new row and icons for SBS-World-movies
-
-
-			const rowSBSW = document.createElement("tr");
-				
-                            const SWchannelCell = document.createElement("td");
-                            SWchannelCell.appendChild(document.createTextNode("SBS World Movies"));
-                            rowSBSW.appendChild(SWchannelCell);
-
-			   const SWiconCell = document.createElement("td");
-			   const SWiconImg = document.createElement("img");
-			   SWiconImg.src = "https://i.mjh.nz/.images/sbs-world-movies.png";
-			   SWiconImg.addEventListener("click", function() {window.open("https://i.mjh.nz/sbs-world-movies.m3u8")});
-			   SWiconCell.appendChild(SWiconImg);
-			   rowSBSW.appendChild(SWiconCell);
-
-            		const SWtitleCell = document.createElement("td");
-			const SWtitle = sbsWProgram.getElementsByTagName("title")[0].textContent;
-                            SWtitleCell.appendChild(document.createTextNode(SWtitle));
-                            rowSBSW.appendChild(SWtitleCell);
-			
-			const SWstartCell = document.createElement("td");
-			const SWstartTime = new Date(sbsWProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SWadjustedStart = new Date(SWstartTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SWstartCell.appendChild(document.createTextNode(SWadjustedStart.toLocaleTimeString("en-US", options)));
-			   rowSBSW.appendChild(SWstartCell);
-
-
-                         const SWendCell = document.createElement("td");
-			const SWendTime = new Date(sbsWProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SWadjustedStop = new Date(SWendTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SWendCell.appendChild(document.createTextNode(SWadjustedStop.toLocaleTimeString("en-US", options)));
-			
-                            rowSBSW.appendChild(SWendCell);
-
-// Add cells for the next show
-    			   const SWNtitleCell = document.createElement("td");
-			   const SWNtitle = nsbsWProgram.getElementsByTagName("title")[0].textContent;
-                            SWNtitleCell.appendChild(document.createTextNode(SWNtitle));
-    			   rowSBSW.appendChild(SWNtitleCell);
-
-    			   const SWNStartCell = document.createElement("td");
-			const SWNstartTime = new Date(nsbsWProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SWNadjustedStart = new Date(SWNstartTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SWNStartCell.appendChild(document.createTextNode(SWNadjustedStart.toLocaleTimeString("en-US", options)));
-    			   rowSBSW.appendChild(SWNStartCell);
-
-    			   const SWNEndCell = document.createElement("td");
-    			const SWNendTime = new Date(nsbsWProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-			const SWNadjustedStop = new Date(SWNendTime.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
-			SWNEndCell.appendChild(document.createTextNode(SWNadjustedStop.toLocaleTimeString("en-US", options)));
-    			 //SWNEndCell.appendChild(document.createTextNode(redirectUrl);
-    			    rowSBSW.appendChild(SWNEndCell);
-
-                          
-
-
-			document.querySelector("table").appendChild(rowSBSW);
-
-
-
-// Fill the table with the other channels		  
-
-
-
-			for (let i = 0; i < programs.length; i++) {
-                        
-			const channel = programs[i].getAttribute("channel");
-			if (channel === "mjh-7-rac") {program.remove();}
-                        const title = programs[i].getElementsByTagName("title")[0].childNodes[0].nodeValue;
-                        const start = new Date(programs[i].getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-                        const end = new Date(programs[i].getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-
-
-		       const icon = programs[i].getElementsByTagName("icon")[0].getAttribute("src");
-			const Ntitle = programs[i + 1].getElementsByTagName("title")[0].childNodes[0].nodeValue;
- 			const Nstart = new Date(programs[i + 1].getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-                        const Nend = new Date(programs[i + 1].getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));	
-    		       
-			// Map the channel ID to its desired name
-                        const mappedChannel = channelMap[channel] || channel;
-			const mappedChannelLink = channelLinkMap[channel] || channel;
-
-                        // Only show currently playing programs
-			
-                        if (currentTime >= start && currentTime <= end) {
-                            const row = document.createElement("tr");
-
-                            const channelCell = document.createElement("td");
-                            channelCell.appendChild(document.createTextNode(mappedChannel));
-                            row.appendChild(channelCell);
-
-			   const iconCell = document.createElement("td");
-			   const iconImg = document.createElement("img");
-			   iconImg.src = icon;
-			   //iconImg.addEventListener("click", function() {window.location.href = mappedChannelLink});
-			   iconImg.addEventListener("click", function() {window.open(mappedChannelLink)});
-			   iconCell.appendChild(iconImg);
-			   row.appendChild(iconCell);
-
-                            const titleCell = document.createElement("td");
-                            titleCell.appendChild(document.createTextNode(title));
-                            row.appendChild(titleCell);
-
-                            const startCell = document.createElement("td");
-                         const adjustedStart = new Date(start.getTime() + 11 * 60 * 60 * 1000); // add 11 hours to the start time
-			startCell.appendChild(document.createTextNode(adjustedStart.toLocaleTimeString("en-US", options)));   
-			   row.appendChild(startCell);
-
-                            const endCell = document.createElement("td");
-                            const adjustedEnd = new Date(end.getTime() + 11 * 60 * 60 * 1000); // add 101hours to the end time
-			endCell.appendChild(document.createTextNode(adjustedEnd.toLocaleTimeString("en-US", options)));
-                            row.appendChild(endCell);
-
-
-   			// Add cells for the next show
-    			   const NtitleCell = document.createElement("td");
-    			   NtitleCell.appendChild(document.createTextNode(Ntitle));
-    			   row.appendChild(NtitleCell);
-
-    			   const nextStartCell = document.createElement("td");
-    			   const adjustednextStart = new Date(Nstart.getTime() + 11 * 60 * 60 * 1000); // add 11 hours to the start time
-			nextStartCell.appendChild(document.createTextNode(adjustednextStart.toLocaleTimeString("en-US", options)));
-    			   row.appendChild(nextStartCell);
-
-    			   const nextEndCell = document.createElement("td");
-    			   const adjustednextEnd = new Date(Nend.getTime() + 11 * 60 * 60 * 1000); // add 11 hours to the start time
-			nextEndCell.appendChild(document.createTextNode(adjustednextEnd.toLocaleTimeString("en-US", options)));
-    			   row.appendChild(nextEndCell);
-
-			document.querySelector("table").appendChild(row);
-
-                        } 
-  		
-			}
                 });
-		tableRows[0].classList.add('selected');
+
+
         </script>
     </table>
 </body>
