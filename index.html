@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="800">
+    <meta http-equiv="refresh" content="300">
     <title>Melbourne Live TV Guide</title>
     <style>
         body {
@@ -29,7 +29,8 @@
             height: 50px;
         }
         tr.selected {
-            //background-color: yellow;
+            background-color: #ffcc00; /* Yellow background color */
+            color: black; /* Black text color */
         }
     </style>
 </head>
@@ -48,13 +49,63 @@
         </tr>
 
         <script>
-            const tableRows = document.querySelectorAll('table tr');
+            // Variable to keep track of the currently selected row
+            let selectedRowIndex = -1;
+
+            // Function to handle key presses
+            document.addEventListener("keydown", function(event) {
+event.preventDefault(); // Prevent default scrolling behavior
+                const tableRows = document.querySelectorAll('table tr');
+
+                // Check if up arrow key is pressed
+                if (event.key === "ArrowUp") {
+                    if (selectedRowIndex > 0) {
+                        tableRows[selectedRowIndex].classList.remove("selected");
+                        selectedRowIndex--;
+                        tableRows[selectedRowIndex].classList.add("selected");
+                        scrollSelectedRowIntoView();
+                    }
+                }
+
+                // Check if down arrow key is pressed
+                else if (event.key === "ArrowDown") {
+                    if (selectedRowIndex < tableRows.length - 1) {
+                        if (selectedRowIndex !== -1) {
+                            tableRows[selectedRowIndex].classList.remove("selected");
+                        }
+                        selectedRowIndex++;
+                        tableRows[selectedRowIndex].classList.add("selected");
+                        scrollSelectedRowIntoView();
+                    }
+                }
+
+                // Check if enter key is pressed
+                else if (event.key === "Enter") {
+                    if (selectedRowIndex !== -1) {
+                        const selectedRow = tableRows[selectedRowIndex];
+                        const image = selectedRow.querySelector('img');
+                        const channelLink = image.dataset.channelLink;
+                        window.open(channelLink);
+                    }
+                }
+            });
+
+            // Function to scroll the selected row into view
+            function scrollSelectedRowIntoView() {
+                const tableRows = document.querySelectorAll('table tr');
+                const selectedRow = tableRows[selectedRowIndex];
+                selectedRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            const table = document.querySelector('table');
+
             const xmlData = "https://i.mjh.nz/au/Melbourne/epg.xml";
-	    const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
+            const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
+
             // Map of channel IDs to their desired names
             const channelMap = {
                 "mjh-abc-vic": "ABC",
-		"mjh-seven-mel": "Seven",
+                "mjh-seven-mel": "Seven",
                 "mjh-7two-mel": "7two",
                 "mjh-7mate-mel": "7mate",
                 "mjh-7flix-mel": "7flix",
@@ -63,7 +114,6 @@
                 "mjh-go-vic": "9Go",
                 "mjh-life-vic": "9Life",
                 "mjh-rush-vic": "9Rush",
-                
                 "mjh-10-vic": "Channel 10",
                 "mjh-10bold-vic": "10Bold",
                 "mjh-10peach-vic": "10Peach",
@@ -74,7 +124,6 @@
                 "mjh-sbs-world-movies": "SBS World Movies",
                 "mjh-sbs-nitv": "NITV",
                 "mjh-c31": "Channel 31",
-                
             };
 
             // Map of channel IDs to their desired links
@@ -103,7 +152,6 @@
                 "mjh-sky-news-aus": "https://i.mjh.nz/sky-news-aus.m3u8",
                 "mjh-fox-sports-news": "https://i.mjh.nz/fox-sports-news.m3u8",
                 "mjh-c31": "https://i.mjh.nz/c31.m3u8",
-                
             };
 
             fetch(xmlData)
@@ -121,85 +169,88 @@
                     });
 
                     // Loop through the sorted channels and generate table rows accordingly
-sortedChannels.forEach(channelID => {
-    // Find the programs associated with the current channelID
-    const channelPrograms = Array.from(programs).filter(program => program.getAttribute("channel") === channelID);
+                    sortedChannels.forEach(channelID => {
+                        // Find the programs associated with the current channelID
+                        const channelPrograms = Array.from(programs).filter(program => program.getAttribute("channel") === channelID);
 
-    // Proceed with generating table rows for each program in the channelPrograms
-    channelPrograms.forEach((program, index) => { // Added 'index' to get the next program
-        // Fill the table with the channels
-        const channel = channelID;
-        const title = program.getElementsByTagName("title")[0].childNodes[0].nodeValue;
-        const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-        const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-        const icon = program.getElementsByTagName("icon")[0].getAttribute("src");
+                        // Proceed with generating table rows for each program in the channelPrograms
+                        channelPrograms.forEach((program, index) => { // Added 'index' to get the next program
+                            // Fill the table with the channels
+                            const channel = channelID;
+                            const title = program.getElementsByTagName("title")[0].childNodes[0].nodeValue;
+                            const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+                            const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+                            const icon = program.getElementsByTagName("icon")[0].getAttribute("src");
 
-        // Map the channel ID to its desired name
-        const mappedChannel = channelMap[channel] || channel;
-        const mappedChannelLink = channelLinkMap[channel] || channel;
+                            // Map the channel ID to its desired name
+                            const mappedChannel = channelMap[channel] || channel;
+                            const mappedChannelLink = channelLinkMap[channel] || channel;
 
-        // Only show currently playing programs
-        if (currentTime >= start && currentTime <= end) {
-            const row = document.createElement("tr");
+                            // Only show currently playing programs
+                            if (currentTime >= start && currentTime <= end) {
+                                const row = document.createElement("tr");
 
-            const channelCell = document.createElement("td");
-            channelCell.appendChild(document.createTextNode(mappedChannel));
-            row.appendChild(channelCell);
+                                const channelCell = document.createElement("td");
+                                channelCell.appendChild(document.createTextNode(mappedChannel));
+                                row.appendChild(channelCell);
 
-            const iconCell = document.createElement("td");
-            const iconImg = document.createElement("img");
-            iconImg.src = icon;
-            iconImg.addEventListener("click", function() {
-                window.open(mappedChannelLink)
-            });
-            iconCell.appendChild(iconImg);
-            row.appendChild(iconCell);
+                                const iconCell = document.createElement("td");
+                                const iconImg = document.createElement("img");
+                                iconImg.src = icon;
+                                iconImg.addEventListener("click", function() {
+                                    window.open(mappedChannelLink);
+                                });
+                                iconImg.dataset.channelLink = mappedChannelLink; // Store channel link in dataset
+                                iconCell.appendChild(iconImg);
+                                row.appendChild(iconCell);
 
-            const titleCell = document.createElement("td");
-            titleCell.appendChild(document.createTextNode(title));
-            row.appendChild(titleCell);
+                                const titleCell = document.createElement("td");
+                                titleCell.appendChild(document.createTextNode(title));
+                                row.appendChild(titleCell);
 
-            const startCell = document.createElement("td");
-            const adjustedStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
-            startCell.appendChild(document.createTextNode(adjustedStart.toLocaleTimeString("en-AU", options)));
-            row.appendChild(startCell);
+                                const startCell = document.createElement("td");
+                                const adjustedStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+                                startCell.appendChild(document.createTextNode(adjustedStart.toLocaleTimeString("en-AU", options)));
+                                row.appendChild(startCell);
 
-            const endCell = document.createElement("td");
-            const adjustedEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the end time
-            endCell.appendChild(document.createTextNode(adjustedEnd.toLocaleTimeString("en-AU", options)));
-            row.appendChild(endCell);
+                                const endCell = document.createElement("td");
+                                const adjustedEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the end time
+                                endCell.appendChild(document.createTextNode(adjustedEnd.toLocaleTimeString("en-AU", options)));
+                                row.appendChild(endCell);
 
-            // Get details of the next program
-            const nextProgram = channelPrograms[index + 1]; // Get the next program
-            if (nextProgram) { // Check if next program exists
-                const Ntitle = nextProgram.getElementsByTagName("title")[0].childNodes[0].nodeValue;
-                const Nstart = new Date(nextProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-                const Nend = new Date(nextProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+                                // Get details of the next program
+                                const nextProgram = channelPrograms[index + 1]; // Get the next program
+                                if (nextProgram) { // Check if next program exists
+                                    const Ntitle = nextProgram.getElementsByTagName("title")[0].childNodes[0].nodeValue;
+                                    const Nstart = new Date(nextProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+                                    const Nend = new Date(nextProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
 
-                // Add cells for the next show
-                const NtitleCell = document.createElement("td");
-                NtitleCell.appendChild(document.createTextNode(Ntitle));
-                row.appendChild(NtitleCell);
+                                    // Add cells for the next show
+                                    const NtitleCell = document.createElement("td");
+                                    NtitleCell.appendChild(document.createTextNode(Ntitle));
+                                    row.appendChild(NtitleCell);
 
-                const nextStartCell = document.createElement("td");
-                const adjustedNextStart = new Date(Nstart.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
-                nextStartCell.appendChild(document.createTextNode(adjustedNextStart.toLocaleTimeString("en-AU", options)));
-                row.appendChild(nextStartCell);
+                                    const nextStartCell = document.createElement("td");
+                                    const adjustedNextStart = new Date(Nstart.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+                                    nextStartCell.appendChild(document.createTextNode(adjustedNextStart.toLocaleTimeString("en-AU", options)));
+                                    row.appendChild(nextStartCell);
 
-                const nextEndCell = document.createElement("td");
-                const adjustedNextEnd = new Date(Nend.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
-                nextEndCell.appendChild(document.createTextNode(adjustedNextEnd.toLocaleTimeString("en-AU", options)));
-                row.appendChild(nextEndCell);
-            }
+                                    const nextEndCell = document.createElement("td");
+                                    const adjustedNextEnd = new Date(Nend.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+                                    nextEndCell.appendChild(document.createTextNode(adjustedNextEnd.toLocaleTimeString("en-AU", options)));
+                                    row.appendChild(nextEndCell);
+                                }
 
-            document.querySelector("table").appendChild(row);
-        }
-    });
-});
+                                table.appendChild(row);
+                            }
+                        });
+                    });
 
+                    // Highlight the first row initially
+                    table.querySelector('tr').classList.add("selected");
+                    selectedRowIndex = 0;
+                    scrollSelectedRowIntoView();
                 });
-
-
         </script>
     </table>
 </body>
