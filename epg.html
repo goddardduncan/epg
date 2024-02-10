@@ -466,12 +466,12 @@
                             row.appendChild(titleCell);
 
                             const startCell = document.createElement("td");
-                         const adjustedStart = new Date(start.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
+                         const adjustedStart = new Date(start.getTime() + 11 * 60 * 60 * 1000); // add 11 hours to the start time
 			startCell.appendChild(document.createTextNode(adjustedStart.toLocaleTimeString("en-US", options)));   
 			   row.appendChild(startCell);
 
                             const endCell = document.createElement("td");
-                            const adjustedEnd = new Date(end.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the end time
+                            const adjustedEnd = new Date(end.getTime() + 11 * 60 * 60 * 1000); // add 101hours to the end time
 			endCell.appendChild(document.createTextNode(adjustedEnd.toLocaleTimeString("en-US", options)));
                             row.appendChild(endCell);
 
@@ -482,12 +482,12 @@
     			   row.appendChild(NtitleCell);
 
     			   const nextStartCell = document.createElement("td");
-    			   const adjustednextStart = new Date(Nstart.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
+    			   const adjustednextStart = new Date(Nstart.getTime() + 11 * 60 * 60 * 1000); // add 11 hours to the start time
 			nextStartCell.appendChild(document.createTextNode(adjustednextStart.toLocaleTimeString("en-US", options)));
     			   row.appendChild(nextStartCell);
 
     			   const nextEndCell = document.createElement("td");
-    			   const adjustednextEnd = new Date(Nend.getTime() + 10 * 60 * 60 * 1000); // add 10 hours to the start time
+    			   const adjustednextEnd = new Date(Nend.getTime() + 11 * 60 * 60 * 1000); // add 11 hours to the start time
 			nextEndCell.appendChild(document.createTextNode(adjustednextEnd.toLocaleTimeString("en-US", options)));
     			   row.appendChild(nextEndCell);
 
