@@ -23,6 +23,9 @@
             background-color: #333;
             font-size: 20px;
             font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 2;
         }
         img {
             width: 80px;
@@ -54,7 +57,7 @@
 
             // Function to handle key presses
             document.addEventListener("keydown", function(event) {
-event.preventDefault(); // Prevent default scrolling behavior
+                event.preventDefault(); // Prevent default scrolling behavior
                 const tableRows = document.querySelectorAll('table tr');
 
                 // Check if up arrow key is pressed
@@ -94,7 +97,14 @@ event.preventDefault(); // Prevent default scrolling behavior
             function scrollSelectedRowIntoView() {
                 const tableRows = document.querySelectorAll('table tr');
                 const selectedRow = tableRows[selectedRowIndex];
-                selectedRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const stickyRowHeight = document.querySelector('th').offsetHeight; // Get the height of the sticky row
+                const selectedRowTop = selectedRow.getBoundingClientRect().top; // Get the top position of the selected row relative to the viewport
+                const offset = selectedRowTop - stickyRowHeight; // Calculate the offset to scroll to
+
+                window.scrollBy({
+                    top: offset,
+                    behavior: 'smooth'
+                });
             }
 
             const table = document.querySelector('table');
