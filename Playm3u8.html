@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLS Video Player</title>
+    <style>
+        html, body, #video-container {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <video id="video" autoplay controls></video>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        // Function to get URL parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
+        // Get the 'url' parameter from the URL
+        var urlParameter = getUrlParameter('url');
+
+        if (Hls.isSupported() && urlParameter) {
+            var video = document.getElementById('video');
+            var hls = new Hls();
+            hls.loadSource(urlParameter);
+            hls.attachMedia(video);
+
+            // Add event listener for key press to the window object
+            window.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    video.play();
+                } else if (event.key === 'Escape') {
+                    // Prevent default action associated with Escape key
+                    event.preventDefault();
+                    // Navigate back when Escape key is pressed
+                    window.history.back();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
