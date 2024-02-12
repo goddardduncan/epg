@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLS Video Player</title>
+    <style>
+        html, body, #video-container {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <video id="video" autoplay controls></video>
+    </div>
+    <script src="player.js"></script>
+    <script>
+        // Function to get URL parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
+        // Get the 'url' parameter from the URL
+        var urlParameter = getUrlParameter('url');
+
+        if (Hls.isSupported() && urlParameter) {
+            var video = document.getElementById('video');
+            var hls = new Hls();
+            hls.loadSource(urlParameter);
+            hls.attachMedia(video);
+
+            // Play the video as soon as it's ready
+            video.oncanplaythrough = function() {
+                video.play();
+                setTimeout(function() {
+                    video.muted = false; // Unmute the video after a delay
+                }, 1000); // Adjust the delay as needed
+            };
+        }
+    </script>
+</body>
+</html>
