@@ -42,13 +42,17 @@
             hls.loadSource(urlParameter);
             hls.attachMedia(video);
 
-            // Play the video as soon as it's ready
-            video.oncanplaythrough = function() {
-                video.play();
-                setTimeout(function() {
-                    video.muted = false; // Unmute the video after a delay
-                }, 1000); // Adjust the delay as needed
-            };
+            // Add event listener for key press to the window object
+            window.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    video.play();
+                } else if (event.key === 'Escape') {
+                    // Prevent default action associated with Escape key
+                    event.preventDefault();
+                    // Navigate back when Escape key is pressed
+                    window.history.back();
+                }
+            });
         }
     </script>
 </body>
