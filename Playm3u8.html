@@ -46,57 +46,14 @@
             var storedChannel = localStorage.getItem('selectedChannel');
             // Create array of channel IDs in the order presented in the EPG
             var channelsOrder = [
-                {"id": "mjh-abc-vic", "name": "ABC"},
-                {"id": "mjh-seven-mel", "name": "Seven"},
-                {"id": "mjh-7two-mel", "name": "7two"},
-                {"id": "mjh-7mate-mel", "name": "7mate"},
-                {"id": "mjh-7flix-mel", "name": "7flix"},
-                {"id": "mjh-channel-9-vic", "name": "Channel 9"},
-                {"id": "mjh-gem-vic", "name": "9Gem"},
-                {"id": "mjh-go-vic", "name": "9Go"},
-                {"id": "mjh-life-vic", "name": "9Life"},
-                {"id": "mjh-rush-vic", "name": "9Rush"},
-                {"id": "mjh-10-vic", "name": "Channel 10"},
-                {"id": "mjh-10bold-vic", "name": "10Bold"},
-                {"id": "mjh-10peach-vic", "name": "10Peach"},
-                {"id": "mjh-10shake-vic", "name": "10Shake"},
-                {"id": "mjh-sbs", "name": "SBS"},
-                {"id": "mjh-sbs-viceland", "name": "SBS Viceland"},
-                {"id": "mjh-sbs-food", "name": "SBS Food"},
-                {"id": "mjh-sbs-world-movies", "name": "SBS World Movies"},
-                {"id": "mjh-sbs-nitv", "name": "NITV"},
-                {"id": "mjh-c31", "name": "Channel 31"}
+                // Your channel IDs here
             ];
             // Get index of storedChannel in channelsOrder
             var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
 
             // Map of channel IDs to their desired links
             var channelLinkMap = {
-                "mjh-seven-mel": "Playm3u8.html?url=https://i.mjh.nz/seven-mel.m3u8",
-                "mjh-7two-mel": "Playm3u8.html?url=https://i.mjh.nz/7two-mel.m3u8",
-                "mjh-7mate-mel": "Playm3u8.html?url=https://i.mjh.nz/7mate-mel.m3u8",
-                "mjh-7flix-mel": "Playm3u8.html?url=https://i.mjh.nz/7flix-mel.m3u8",
-                "mjh-channel-9-vic": "Playm3u8.html?url=https://i.mjh.nz/channel-9-vic-alt.m3u8",
-                "mjh-gem-vic": "Playm3u8.html?url=https://i.mjh.nz/gem-vic-alt.m3u8",
-                "mjh-go-vic": "Playm3u8.html?url=https://i.mjh.nz/go-vic.m3u8",
-                "mjh-life-vic": "Playm3u8.html?url=https://i.mjh.nz/life-vic.m3u8",
-                "mjh-rush-vic": "Playm3u8.html?url=https://i.mjh.nz/rush-vic.m3u8",
-                "mjh-abc-vic": "https://c.mjh.nz/abc-vic.m3u8",
-                "mjh-sbs": "Playm3u8.html?url=https://i.mjh.nz/sbs.m3u8",
-                "mjh-sbs-vic-hd": "Playm3u8.html?url=https://i.mjh.nz/sbs-vic-hd.m3u8",
-                "mjh-sbs-viceland": "Playm3u8.html?url=https://i.mjh.nz/sbs-viceland.m3u8",
-                "mjh-sbs-food": "Playm3u8.html?url=https://i.mjh.nz/sbs-food.m3u8",
-                "mjh-sbs-world-movies": "Playm3u8.html?url=https://i.mjh.nz/sbs-world-movies.m3u8",
-                "mjh-sbs-nitv": "Playm3u8.html?url=https://i.mjh.nz/sbs-nitv.m3u8",
-                "mjh-10-vic": "Playm3u8.html?url=https://i.mjh.nz/10-vic.m3u8",
-                "mjh-10peach-vic": "Playm3u8.html?url=https://i.mjh.nz/10peach-vic.m3u8",
-                "mjh-10bold-vic": "Playm3u8.html?url=https://i.mjh.nz/10bold-vic.m3u8",
-                "mjh-10shake-vic": "Playm3u8.html?url=https://i.mjh.nz/10shake-vic.m3u8",
-                "mjh-eleven-vic": "Playm3u8.html?url=https://i.mjh.nz/eleven-vic.m3u8",
-                "mjh-one-vic": "Playm3u8.html?url=https://i.mjh.nz/one-vic.m3u8",
-                "mjh-sky-news-aus": "Playm3u8.html?url=https://i.mjh.nz/sky-news-aus.m3u8",
-                "mjh-fox-sports-news": "Playm3u8.html?url=https://i.mjh.nz/fox-sports-news.m3u8",
-                "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8"
+                // Your channel ID mappings here
             };
 
             // Add event listener for key press to the window object
@@ -106,7 +63,7 @@
                 } else if (event.key === 'Escape') {
                     // Prevent default action associated with Escape key
                     event.preventDefault();
-                    // Navigate back to index.html when Escape key is pressed
+                    // Navigate to the homepage
                     window.location.href = 'https://goddardduncan.github.io/epg/';
                 } else if (event.key === 'ArrowLeft') {
                     // Navigate to previous channel
