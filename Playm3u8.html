@@ -23,7 +23,7 @@
     <div id="video-container">
         <video id="video" autoplay controls></video>
     </div>
-    <script src="hls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
         // Function to get URL parameters
         function getUrlParameter(name) {
@@ -31,7 +31,7 @@
             var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        }
+        };
 
         // Get the 'url' parameter from the URL
         var urlParameter = getUrlParameter('url');
@@ -42,20 +42,6 @@
             hls.loadSource(urlParameter);
             hls.attachMedia(video);
 
-            // Get channel ID from localStorage
-            var storedChannel = localStorage.getItem('selectedChannel');
-            // Create array of channel IDs in the order presented in the EPG
-            var channelsOrder = [
-                // Your channel IDs here
-            ];
-            // Get index of storedChannel in channelsOrder
-            var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
-
-            // Map of channel IDs to their desired links
-            var channelLinkMap = {
-                // Your channel ID mappings here
-            };
-
             // Add event listener for key press to the window object
             window.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
@@ -63,28 +49,8 @@
                 } else if (event.key === 'Escape') {
                     // Prevent default action associated with Escape key
                     event.preventDefault();
-                    // Navigate to the homepage
-                    window.location.href = 'https://goddardduncan.github.io/epg/';
-                } else if (event.key === 'ArrowLeft') {
-                    // Navigate to previous channel
-                    var previousIndex = currentIndex - 1;
-                    if (previousIndex < 0) {
-                        previousIndex = channelsOrder.length - 1;
-                    }
-                    var previousChannel = channelsOrder[previousIndex];
-                    var previousChannelLink = channelLinkMap[previousChannel.id];
-                    localStorage.setItem('selectedChannel', previousChannel.id); // Update storedChannel in localStorage
-                    window.location.href = previousChannelLink;
-                } else if (event.key === 'ArrowRight') {
-                    // Navigate to next channel
-                    var nextIndex = currentIndex + 1;
-                    if (nextIndex >= channelsOrder.length) {
-                        nextIndex = 0;
-                    }
-                    var nextChannel = channelsOrder[nextIndex];
-                    var nextChannelLink = channelLinkMap[nextChannel.id];
-                    localStorage.setItem('selectedChannel', nextChannel.id); // Update storedChannel in localStorage
-                    window.location.href = nextChannelLink;
+                    // Navigate back when Escape key is pressed
+                    window.history.back();
                 }
             });
         }
