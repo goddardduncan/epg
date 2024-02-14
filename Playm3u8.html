@@ -98,17 +98,18 @@
                 "mjh-fox-sports-news": "Playm3u8.html?url=https://i.mjh.nz/fox-sports-news.m3u8",
                 "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8"
             };
+
             // Add event listener for key press to the window object
             window.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
                     video.play();
-                } else if (event.key === 'Escape') {
-                    // Prevent default action associated with Escape key
+                } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey)) {
+                    // Prevent default action associated with Escape key or Meta + Left Arrow
                     event.preventDefault();
-                    // Navigate back to index.html when Escape key is pressed
+                    // Navigate back to index.html when Escape key or Meta + Left Arrow is pressed
                     window.location.href = 'http://goddardduncan.github.io/epg';
                 } else if (event.key === 'ArrowLeft') {
-                    // Navigate to previous channel
+                    // Navigate to previous channel when only Left Arrow is pressed
                     var previousIndex = currentIndex - 1;
                     if (previousIndex < 0) {
                         previousIndex = channelsOrder.length - 1;
