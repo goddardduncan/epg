@@ -134,7 +134,17 @@
 
             // Store the match result in localStorage
             localStorage.setItem('Matchey', isMatch.toString());
-
+		
+	// Function to toggle subtitles
+	function toggleSubtitles() {
+    	var tracks = player.tracks;
+    	for (var i = 0; i < tracks.length; i++) {
+        var track = tracks[i];
+        if (track.kind === 'subtitles') {
+            track.enabled = !track.enabled;
+        }
+    }
+}
             window.addEventListener('contextmenu', function(event) {
                 event.preventDefault(); // Prevent default context menu behavior
 		// Toggle subtitles
