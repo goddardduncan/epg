@@ -155,9 +155,9 @@
                 if (event.key === 'Enter') {
                     video.play();
                 } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey)) {
-                    // Prevent default action associated with Escape key or Meta + Left Arrow or ContextMenu
+                    // Prevent default action associated with Escape key or Meta + Left Arrow
                     event.preventDefault();
-                    // Navigate back to index.html when Escape key or Meta + Left Arrow or ContextMenu is pressed
+                    // Navigate back to index.html when Escape key or Meta + Left Arrow is pressed
                     window.location.href = 'http://goddardduncan.github.io/epg';
                 } else if (event.key === 'ArrowLeft') {
                     // Navigate to previous channel when only Left Arrow is pressed
