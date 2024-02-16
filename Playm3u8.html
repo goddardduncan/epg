@@ -44,10 +44,7 @@
 
             // Get channel ID from localStorage
             var storedChannel = localStorage.getItem('selectedChannel');
-            // If storedChannel doesn't match the current channel URL, update storedChannel
-            if (storedChannel !== urlParameter) {
-                localStorage.setItem('selectedChannel', urlParameter);
-            }
+
             // Create array of channel IDs in the order presented in the EPG
             var channelsOrder = [
                 {"id": "mjh-abc-vic", "name": "ABC"},
@@ -71,8 +68,6 @@
                 {"id": "mjh-sbs-nitv", "name": "NITV"},
                 {"id": "mjh-c31", "name": "Channel 31"}
             ];
-            // Get index of storedChannel in channelsOrder
-            var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
 
             // Map of channel IDs to their desired links
             var channelLinkMap = {
@@ -139,6 +134,15 @@
                     window.location.href = nextChannelLink;
                 }
             });
+
+            // Check if urlParameter matches any channel ID and update selectedChannel
+            var matchingChannel = Object.keys(channelLinkMap).find(function(channelID) {
+                return channelLinkMap[channelID] === urlParameter;
+            });
+
+            if (matchingChannel) {
+                localStorage.setItem('selectedChannel', matchingChannel);
+            }
         }
     </script>
 </body>
