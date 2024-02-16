@@ -282,6 +282,29 @@
                         scrollSelectedRowIntoView();
                     }
                 });
+
+            // Wake lock implementation
+            let wakeLock = null;
+
+            const requestWakeLock = async () => {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Screen wake lock is active');
+                } catch (err) {
+                    console.error(`${err.name}, ${err.message}`);
+                }
+            };
+
+            const handleVisibilityChange = () => {
+                if (wakeLock !== null && document.visibilityState === 'visible') {
+                    requestWakeLock();
+                }
+            };
+
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+
+            // Request a wake lock
+            requestWakeLock();
         </script>
     </table>
 </body>
