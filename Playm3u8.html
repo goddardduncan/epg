@@ -118,6 +118,19 @@
                 }
             }
 
+		// If there is no match, find the channel ID that matches the URL parameter
+		if (!isMatch && urlParameterCheck) {
+    		for (var channelId in channelLinkMap) {
+       		 if (channelLinkMap.hasOwnProperty(channelId)) {
+          	  if (channelLinkMap[channelId] === urlParameterCheck) {
+                storedChannel = channelId;
+                localStorage.setItem('selectedChannel', storedChannel);
+                break;
+            	}
+       	}
+    }
+}
+
             // Store the match result in localStorage
             localStorage.setItem('Matchey', isMatch.toString());
 
