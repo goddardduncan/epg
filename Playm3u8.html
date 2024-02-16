@@ -137,10 +137,13 @@
 		
 	// Function to toggle subtitles
         function toggleSubtitles(hls) {
-            var tracks = hls.subtitleTracks;
+            var tracks = video.textTracks;
             for (var i = 0; i < tracks.length; i++) {
                 var track = tracks[i];
                 track.enabled = !track.enabled;
+		    if (track.kind === 'subtitles') {
+                    track.mode = track.mode === 'showing' ? 'disabled' : 'showing';
+                }
             }
         }
 
