@@ -44,10 +44,9 @@
 
             // Get channel ID from localStorage
             var storedChannel = localStorage.getItem('selectedChannel');
-            var currentChannelId = (new URLSearchParams(window.location.search)).get('url');
             // If storedChannel doesn't match the current channel URL, update storedChannel
-            if (storedChannel !== currentChannelId) {
-                localStorage.setItem('selectedChannel', currentChannelId);
+            if (storedChannel !== urlParameter) {
+                localStorage.setItem('selectedChannel', urlParameter);
             }
             // Create array of channel IDs in the order presented in the EPG
             var channelsOrder = [
