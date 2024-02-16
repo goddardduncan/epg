@@ -138,17 +138,8 @@
             window.addEventListener('contextmenu', function(event) {
                 event.preventDefault(); // Prevent default context menu behavior
 		// Toggle subtitles
-                var tracks = video.textTracks;
-                for (var i = 0; i < tracks.length; i++) {
-                    var track = tracks[i];
-                    if (track.kind === 'subtitles' || track.kind === 'captions') {
-                        if (track.mode === 'showing') {
-                            track.mode = 'hidden';
-                        } else {
-                            track.mode = 'showing';
-                        }
-                    }
-                }
+                toggleSubtitles();
+                
             });
 
             // Add event listener for key press to the window object
@@ -156,9 +147,9 @@
                 if (event.key === 'Enter') {
                     video.play();
                 } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey)) {
-                    // Prevent default action associated with Escape key or Meta + Left Arrow
+                    // Prevent default action associated with Escape key or Meta + Left Arrow or ContextMenu
                     event.preventDefault();
-                    // Navigate back to index.html when Escape key or Meta + Left Arrow is pressed
+                    // Navigate back to index.html when Escape key or Meta + Left Arrow or ContextMenu is pressed
                     window.location.href = 'http://goddardduncan.github.io/epg';
                 } else if (event.key === 'ArrowLeft') {
                     // Navigate to previous channel when only Left Arrow is pressed
