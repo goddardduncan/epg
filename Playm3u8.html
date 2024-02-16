@@ -138,9 +138,10 @@
             window.addEventListener('contextmenu', function(event) {
                 event.preventDefault(); // Prevent default context menu behavior
 		// Toggle subtitles
-                if (video.textTracks && video.textTracks.length > 0) {
-                    for (var i = 0; i < video.textTracks.length; i++) {
-                        var track = video.textTracks[i];
+                var tracks = video.textTracks;
+                for (var i = 0; i < tracks.length; i++) {
+                    var track = tracks[i];
+                    if (track.kind === 'subtitles' || track.kind === 'captions') {
                         if (track.mode === 'showing') {
                             track.mode = 'hidden';
                         } else {
