@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -136,13 +137,24 @@
 
             window.addEventListener('contextmenu', function(event) {
                 event.preventDefault(); // Prevent default context menu behavior
+		// Toggle subtitles
+                if (video.textTracks && video.textTracks.length > 0) {
+                    for (var i = 0; i < video.textTracks.length; i++) {
+                        var track = video.textTracks[i];
+                        if (track.mode === 'showing') {
+                            track.mode = 'hidden';
+                        } else {
+                            track.mode = 'showing';
+                        }
+                    }
+                }
             });
 
             // Add event listener for key press to the window object
             window.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
                     video.play();
-                } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey) || (event.key === 'ContextMenu')) {
+                } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey)) {
                     // Prevent default action associated with Escape key or Meta + Left Arrow or ContextMenu
                     event.preventDefault();
                     // Navigate back to index.html when Escape key or Meta + Left Arrow or ContextMenu is pressed
