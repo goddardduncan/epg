@@ -136,21 +136,21 @@
             localStorage.setItem('Matchey', isMatch.toString());
 		
 	// Function to toggle subtitles
-	function toggleSubtitles() {
-    	var tracks = hls.tracks;
-    	for (var i = 0; i < tracks.length; i++) {
-        var track = tracks[i];
-        if (track.kind === 'subtitles') {
-            track.enabled = !track.enabled;
+        function toggleSubtitles(hls) {
+            var tracks = hls.subtitleTracks;
+            for (var i = 0; i < tracks.length; i++) {
+                var track = tracks[i];
+                track.enabled = !track.enabled;
+            }
         }
-    }
-}
-            window.addEventListener('contextmenu', function(event) {
-                event.preventDefault(); // Prevent default context menu behavior
-		// Toggle subtitles
-                toggleSubtitles();
-                
-            });
+
+        // Add event listener for key press to the window object
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 's' || event.key === 'S') {
+                // Toggle subtitles when 's' or 'S' is pressed
+                toggleSubtitles(hls);
+            }
+        });
 
             // Add event listener for key press to the window object
             window.addEventListener('keydown', function(event) {
