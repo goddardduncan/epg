@@ -87,72 +87,65 @@
         ];
 
         // Function to check if the stored channel matches the associated link
-        function isStoredChannelMatchingLink(storedChannel, urlParameter, channelLinkMap) {
+        function isStoredChannelMatchingLink(storedChannel, urlParameter) {
             return channelLinkMap[storedChannel] === urlParameter;
         }
 
-        // Check if HLS is supported and the URL parameter is present
-        if (Hls.isSupported()) {
-            var urlParameter = getUrlParameter('url');
-            if (urlParameter) {
-                var storedChannel = localStorage.getItem('selectedChannel');
+        // Get the 'url' parameter from the URL
+        var urlParameter = getUrlParameter('url');
 
-                // If the stored channel does not match the associated link, update it
-                if (!isStoredChannelMatchingLink(storedChannel, urlParameter, channelLinkMap)) {
-                    for (var channel in channelLinkMap) {
-                        if (channelLinkMap[channel] === urlParameter) {
-                            localStorage.setItem('selectedChannel', channel);
-                            storedChannel = channel; // Update storedChannel
-                            break;
-                        }
+        if (Hls.isSupported() && urlParameter) {
+            var storedChannel = localStorage.getItem('selectedChannel');
+
+            var video = document.getElementById('video');
+            var hls = new Hls();
+            hls.loadSource(urlParameter);
+            hls.attachMedia(video);
+
+            // If the stored channel does not match the associated link, update it
+            if (!isStoredChannelMatchingLink(storedChannel, urlParameter)) {
+                for (var channel in channelLinkMap) {
+                    if (channelLinkMap[channel] === urlParameter) {
+                        localStorage.setItem('selectedChannel', channel);
+                        storedChannel = channel; // Update storedChannel
+                        break;
                     }
                 }
-
-                var video = document.getElementById('video');
-                var hls = new Hls();
-                hls.loadSource(urlParameter);
-                hls.attachMedia(video);
-
-                // Get index of storedChannel in channelsOrder
-                var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
-
-                // Rest of the script...
-                window.addEventListener('contextmenu', function(event) {
-                    event.preventDefault(); // Prevent default context menu behavior
-                });
-
-                // Add event listener for key press to the window object
-                window.addEventListener('keydown', function(event) {
-                    if (event.key === 'Enter') {
-                        video.play();
-                    } else if (event.key === 'Escape' || event.key === 'ContextMenu') {
-                        // Prevent default action associated with Escape key or ContextMenu
-                        event.preventDefault();
-                        // Navigate back to index.html when Escape key or ContextMenu is pressed
-                        window.location.href = 'http://goddardduncan.github.io/epg';
-                    } else if (event.key === 'ArrowLeft' && !event.metaKey) {
-                        // Navigate to previous channel when only Left Arrow is pressed
-                        var previousIndex = currentIndex - 1;
-                        if (previousIndex < 0) {
-                            previousIndex = channelsOrder.length - 1;
-                        }
-                        var previousChannel = channelsOrder[previousIndex];
-                        var previousChannelLink = channelLinkMap[previousChannel.id];
-                        localStorage.setItem('selectedChannel', previousChannel.id); // Update storedChannel in localStorage
-                        window.location.href = previousChannelLink;
-                    } else if (event.key === 'ArrowRight' && !event.metaKey) {
-                        // Navigate to next channel
-                        var nextIndex = currentIndex + 1;
-                        if (nextIndex >= channelsOrder.length) {
-                            nextIndex = 0;
-                        }
-                        var nextChannel = channelsOrder[nextIndex];
-                        var nextChannelLink = channelLinkMap[nextChannel.id];
-                        localStorage.setItem('selectedChannel', nextChannel.id); // Update storedChannel in localStorage
-                        window.location.href = nextChannelLink;
-                    }
-                });
             }
+
+            // Get index of storedChannel in channelsOrder
+            var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
+
+            window.addEventListener('contextmenu', function(event) {
+                event.preventDefault(); // Prevent default context menu behavior
+            });
+
+            window.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    video.play();
+                } else if (event.key === 'Escape' || event.key === 'ContextMenu') {
+                    event.preventDefault();
+                    window.location.href = 'http://goddardduncan.github.io/epg';
+                } else if (event.key === 'ArrowLeft' && !event.metaKey) {
+                    var previousIndex = currentIndex - 1;
+                    if (previousIndex < 0) {
+                        previousIndex = channelsOrder.length - 1;
+                    }
+                    var previousChannel = channelsOrder[previousIndex];
+                    var previousChannelLink = channelLinkMap[previousChannel.id];
+                    localStorage.setItem('selectedChannel', previousChannel.id);
+                    window.location.href = previousChannelLink;
+                } else if (event.key === 'ArrowRight' && !event.metaKey) {
+                    var nextIndex = currentIndex + 1;
+                    if (nextIndex >= channelsOrder.length) {
+                        nextIndex = 0;
+                    }
+                    var nextChannel = channelsOrder[nextIndex];
+                    var nextChannelLink = channelLinkMap[nextChannel.id];
+                    localStorage.setItem('selectedChannel', nextChannel.id);
+                    window.location.href = nextChannelLink;
+                }
+            });
         }
     </script>
 </body>
