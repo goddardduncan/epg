@@ -166,7 +166,7 @@
                     // Prevent default action associated with Escape key or Meta + Left Arrow
                     event.preventDefault();
                     // Navigate back to previously EPG selected channel when Escape key or Meta + Left Arrow is pressed
-                    var backIndex = (backChannelIndex) % channelsOrder.length;
+                    var backIndex = currentIndex;
                     var backbuttonChannel = channelsOrder[backIndex];
                     var backChannelLink = channelLinkMap[backbuttonChannel.id];
                     localStorage.setItem('prevChannel', backbuttonChannel.id); // Update prevChannel in localStorage
