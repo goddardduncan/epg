@@ -108,8 +108,8 @@
                 "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8"
             };
 		// Get stored channel for back button press
-		var storedChannel = localStorage.getItem('selectedChannel');
-            	var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
+		var backChannel = localStorage.getItem('selectedChannel');
+            	var currentIndex = channelsOrder.findIndex(channel => channel.id === backChannel);
 		var currIndex = (currentIndex) % channelsOrder.length;
 		var currChannel = channelsOrder[currIndex];
 		var currChannelLink = channelLinkMap[currChannel.id];
