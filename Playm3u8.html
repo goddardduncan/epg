@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -106,7 +107,12 @@
                 "mjh-fox-sports-news": "Playm3u8.html?url=https://i.mjh.nz/fox-sports-news.m3u8",
                 "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8"
             };
-
+		// Get stored channel for back button press
+		var storedChannel = localStorage.getItem('selectedChannel');
+            	var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
+		var currIndex = (currentIndex) % channelsOrder.length;
+		var currChannel = channelsOrder[currIndex];
+		var currChannelLink = channelLinkMap[currChannel.id];
             // Check if there is a match between the omnibox URL and the stored channel URL
             var isMatch = false;
             if (storedChannel && channelLinkMap.hasOwnProperty(storedChannel)) {
@@ -161,8 +167,8 @@
                 } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey)) {
                     // Prevent default action associated with Escape key or Meta + Left Arrow
                     event.preventDefault();
-                    // Navigate back to index.html when Escape key or Meta + Left Arrow is pressed
-                    window.location.href = 'http://goddardduncan.github.io/epg';
+                    // Navigate back to previous channel when Escape key or Meta + Left Arrow is pressed
+                    window.location.href = currChannelLink;
                 } else if (event.key === 'ArrowLeft') {
                     // Navigate to previous channel when only Left Arrow is pressed
                     var previousIndex = currentIndex - 1;
