@@ -132,6 +132,9 @@
 	// Get index of storedChannel in channelsOrder
             var storedChannel = localStorage.getItem('selectedChannel');
             var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
+	// Get index of prevChannel in channelsOrder
+            var backChannel = localStorage.getItem('prevChannel');
+            var backChannelIndex = channelsOrder.findIndex(channel => channel.id === backChannel);
 
             // Store the match result in localStorage
             localStorage.setItem('Matchey', isMatch.toString());
@@ -163,7 +166,11 @@
                     // Prevent default action associated with Escape key or Meta + Left Arrow
                     event.preventDefault();
                     // Navigate back to index.html when Escape key or Meta + Left Arrow is pressed
-                    window.location.href = 'http://goddardduncan.github.io/epg';
+                    var backIndex = (backChannelIndex) % channelsOrder.length;
+                    var backbuttonChannel = channelsOrder[backChannelIndex];
+                    var backChannelLink = channelLinkMap[backbuttonChannel.id];
+                    localStorage.setItem('prevChannel', backbuttonChannel.id); // Update prevChannel in localStorage
+                    window.location.href = backChannelLink;
                 } else if (event.key === 'ArrowLeft') {
                     // Navigate to previous channel when only Left Arrow is pressed
                     var previousIndex = currentIndex - 1;
