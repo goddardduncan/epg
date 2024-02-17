@@ -169,7 +169,7 @@
                     var backIndex = currentIndex;
                     var backbuttonChannel = channelsOrder[backIndex];
                     var backChannelLink = channelLinkMap[backbuttonChannel.id];
-                    localStorage.setItem('prevChannel', backbuttonChannel.id); // Update prevChannel in localStorage
+                    //localStorage.setItem('prevChannel', backbuttonChannel.id); // Update prevChannel in localStorage
                     window.location.href = backChannelLink;
                 } else if (event.key === 'ArrowLeft') {
                     // Navigate to previous channel when only Left Arrow is pressed
