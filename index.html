@@ -216,9 +216,6 @@
                                 iconImg.addEventListener("click", function() {
                                     //window.open(mappedChannelLink);
                                     window.location.href = mappedChannelLink;
-                                    const channelId = image.dataset.channelId;
-                                    localStorage.setItem('selectedChannel', channelId);
-                                    localStorage.setItem('prevChannel', channelId);
                                 });
                                 iconImg.dataset.channelLink = mappedChannelLink; // Store channel link in dataset
                                 iconImg.dataset.channelId = channel; // Store channel ID in dataset
