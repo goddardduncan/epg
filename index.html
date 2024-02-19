@@ -52,6 +52,12 @@
         </tr>
 
         <script>
+        // Check if the page is being shown from the bfcache (back-forward cache)
+  	    window.addEventListener('pageshow', function(event) {
+  	        if (event.persisted) { 
+	            location.reload();
+		        }
+	        });
          // Variable to keep track of the currently selected row
             let selectedRowIndex = -1;
 
