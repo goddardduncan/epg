@@ -214,7 +214,10 @@
                                 const iconImg = document.createElement("img");
                                 iconImg.src = icon;
                                 iconImg.addEventListener("click", function() {
-                                    window.open(mappedChannelLink);
+                                    //window.open(mappedChannelLink);
+                                    window.location.href = mappedChannelLink;
+                        		  // Store the selected channel in localStorage
+                        		localStorage.setItem('selectedChannel', channelID);
                                 });
                                 iconImg.dataset.channelLink = mappedChannelLink; // Store channel link in dataset
                                 iconImg.dataset.channelId = channel; // Store channel ID in dataset
