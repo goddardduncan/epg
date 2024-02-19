@@ -218,6 +218,7 @@
                                     window.location.href = mappedChannelLink;
                         		  // Store the selected channel in localStorage
                         		localStorage.setItem('selectedChannel', channelID);
+                                localStorage.setItem('prevChannel', channelId);
                                 });
                                 iconImg.dataset.channelLink = mappedChannelLink; // Store channel link in dataset
                                 iconImg.dataset.channelId = channel; // Store channel ID in dataset
