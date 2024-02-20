@@ -30,6 +30,8 @@
             padding: 10px;
             box-sizing: border-box;
             display: none; /* Initially hidden */
+            font-family: 'Roboto', sans-serif; /* Custom font */
+            font-size: 1.25em;
         }
     </style>
 </head>
@@ -220,7 +222,6 @@
                                     const desc = program.getElementsByTagName("desc")[0]?.textContent || 'No description available';
                                     localStorage.setItem('descripto', desc);
                                     document.getElementById('video-description').textContent = desc;
-                                    //document.getElementById('video-description').style.display = 'block';
                                     break;
                                 }
                             }
