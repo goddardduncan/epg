@@ -11,61 +11,44 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            position: relative; /* Ensure the container is relative for absolute positioning of description */
         }
-
         #video {
             width: 100%;
             height: 100%;
-        }
-
-        #video-description {
-            position: absolute;
-            bottom: 20px; /* Adjust based on your needs */
-            left: 0;
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-            color: #fff; /* White text color */
-            text-align: center;
-            padding: 10px;
-            box-sizing: border-box;
-            display: none; /* Initially hidden */
-	   font-family: 'Roboto', sans-serif; /* Custom font */
-	   font-size: 1.25em;
         }
     </style>
 </head>
 <body>
     <div id="video-container">
         <video id="video" autoplay controls></video>
-        <div id="video-description">Description goes here</div>
     </div>
     <script src="hls.js"></script>
     <script>
+        // Function to get URL parameters
         function getUrlParameterCheck(name, url) {
+            // Extract everything after 'https://goddardduncan.github.io/epg/'
             var startIndex = url.indexOf('https://goddardduncan.github.io/epg/') + 'https://goddardduncan.github.io/epg/'.length;
             return url.slice(startIndex);
         }
-
+	// Function to get URL parameters
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
             var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
-
+        // Get the 'url' parameter from the URL
         var urlParameter = getUrlParameter('url');
+        
+	// Get the 'url' parameter from the URL
         var url = window.location.href;
         var urlParameterCheck = getUrlParameterCheck('url', url);
-
         if (Hls.isSupported() && urlParameter) {
             var video = document.getElementById('video');
             var hls = new Hls();
             hls.loadSource(urlParameter);
             hls.attachMedia(video);
-
-           
-             // Create array of channel IDs in the order presented in the EPG
+            // Create array of channel IDs in the order presented in the EPG
             var channelsOrder = [
                 {"id": "mjh-abc-vic", "name": "ABC"},
                 {"id": "mjh-seven-mel", "name": "Seven"},
@@ -89,7 +72,7 @@
                 {"id": "mjh-c31", "name": "Channel 31"}
             ];
             
-             // Map of channel IDs to their desired links
+            // Map of channel IDs to their desired links
             var channelLinkMap = {
                 "mjh-seven-mel": "Playm3u8.html?url=https://i.mjh.nz/seven-mel.m3u8",
                 "mjh-7two-mel": "Playm3u8.html?url=https://i.mjh.nz/7two-mel.m3u8",
@@ -117,122 +100,87 @@
                 "mjh-fox-sports-news": "Playm3u8.html?url=https://i.mjh.nz/fox-sports-news.m3u8",
                 "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8"
             };
-
-            
-
+            // Check if there is a match between the omnibox URL and the stored channel URL
             var isMatch = false;
-            var storedChannel = localStorage.getItem('selectedChannel');
             if (storedChannel && channelLinkMap.hasOwnProperty(storedChannel)) {
                 var desiredChannelUrl = channelLinkMap[storedChannel];
                 if (urlParameterCheck === desiredChannelUrl) {
                     isMatch = true;
                 }
             }
-
-            if (!isMatch && urlParameterCheck) {
-                for (var channelId in channelLinkMap) {
-                    if (channelLinkMap.hasOwnProperty(channelId)) {
-                        if (channelLinkMap[channelId] === urlParameterCheck) {
-                            storedChannel = channelId;
-                            localStorage.setItem('selectedChannel', storedChannel);
-                            break;
-                        }
-                    }
-                }
-            }
-
+		// If there is no match, find the channel ID that matches the URL parameter
+		if (!isMatch && urlParameterCheck) {
+    		for (var channelId in channelLinkMap) {
+       		 if (channelLinkMap.hasOwnProperty(channelId)) {
+          	  if (channelLinkMap[channelId] === urlParameterCheck) {
+                storedChannel = channelId;
+                localStorage.setItem('selectedChannel', storedChannel);
+                break;
+            	}
+       	}
+    }
+}
+	// Get index of storedChannel in channelsOrder
+            var storedChannel = localStorage.getItem('selectedChannel');
             var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
+	// Get index of prevChannel in channelsOrder
             var backChannel = localStorage.getItem('prevChannel');
             var backChannelIndex = channelsOrder.findIndex(channel => channel.id === backChannel);
-
+            // Store the match result in localStorage
             localStorage.setItem('Matchey', isMatch.toString());
-
-            function toggleSubtitles() {
-                var tracks = video.textTracks;
-                for (var i = 0; i < tracks.length; i++) {
-                    var track = tracks[i];
-                    track.enabled = !track.enabled;
-                    if (track.kind === 'subtitles') {
-                        track.mode = track.mode === 'showing' ? 'disabled' : 'showing';
-                    }
+		
+	// Function to toggle subtitles
+        function toggleSubtitles() {
+            var tracks = video.textTracks;
+            for (var i = 0; i < tracks.length; i++) {
+                var track = tracks[i];
+                track.enabled = !track.enabled;
+		    if (track.kind === 'subtitles') {
+                    track.mode = track.mode === 'showing' ? 'disabled' : 'showing';
                 }
             }
-
-            video.addEventListener('contextmenu', function(event) {
-                event.preventDefault();
-                toggleSubtitles();
-            });
-
+        }
+        // Add event listener for context menu button press
+        video.addEventListener('contextmenu', function(event) {
+            event.preventDefault(); // Prevent default context menu behavior
+            // Toggle subtitles
+            toggleSubtitles();
+        });
+            // Add event listener for key press to the window object
             window.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
                     video.play();
                 } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey)) {
+                    // Prevent default action associated with Escape key or Meta + Left Arrow
                     event.preventDefault();
+                    // Navigate back to previously EPG selected channel when Escape key or Meta + Left Arrow is pressed
+                    var backIndex = currentIndex;
                     var backIndex = (backChannelIndex) % channelsOrder.length;
                     var backbuttonChannel = channelsOrder[backIndex];
                     var backChannelLink = channelLinkMap[backbuttonChannel.id];
-                    localStorage.setItem('prevChannel', backbuttonChannel.id);
+                    //localStorage.setItem('prevChannel', backbuttonChannel.id); // Update prevChannel in localStorage
+                    localStorage.setItem('prevChannel', backbuttonChannel.id); // Update prevChannel in localStorage
                     window.location.href = backChannelLink;
                 } else if (event.key === 'ArrowLeft') {
+                    // Navigate to previous channel when only Left Arrow is pressed
                     var previousIndex = currentIndex - 1;
                     if (previousIndex < 0) {
                         previousIndex = channelsOrder.length - 1;
                     }
                     var previousChannel = channelsOrder[previousIndex];
                     var previousChannelLink = channelLinkMap[previousChannel.id];
-                    localStorage.setItem('selectedChannel', previousChannel.id);
+                    localStorage.setItem('selectedChannel', previousChannel.id); // Update storedChannel in localStorage
                     window.location.href = previousChannelLink;
                 } else if (event.key === 'ArrowRight') {
+                    // Navigate to next channel
                     var nextIndex = (currentIndex + 1) % channelsOrder.length;
                     var nextChannel = channelsOrder[nextIndex];
                     var nextChannelLink = channelLinkMap[nextChannel.id];
-                    localStorage.setItem('selectedChannel', nextChannel.id);
+                    localStorage.setItem('selectedChannel', nextChannel.id); // Update storedChannel in localStorage
                     window.location.href = nextChannelLink;
-                } else if (event.key === 'ArrowUp') {
-                    var videoDescription = document.getElementById('video-description');
-                    if (videoDescription.style.display === 'none' || videoDescription.style.display === '') {
-                        videoDescription.style.display = 'block';
-                    } else {
-                        videoDescription.style.display = 'none';
-                    }
                 }
             });
         }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const xmlData = "https://i.mjh.nz/au/Melbourne/epg.xml";
-            const selectedChannelId = localStorage.getItem('selectedChannel');
-
-            if (selectedChannelId) {
-                fetch(xmlData)
-                    .then(response => response.text())
-                    .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
-                    .then(data => {
-                        const currentTime = new Date();
-                        const timezoneOffsetInMinutes = currentTime.getTimezoneOffset();
-                        currentTime.setTime(currentTime.getTime() + (timezoneOffsetInMinutes * 60 * 1000));
-                        const programmes = data.getElementsByTagName("programme");
-
-                        for (let program of programmes) {
-                            if (program.getAttribute("channel") === selectedChannelId) {
-                                const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-                                const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-
-                                if (currentTime >= start && currentTime <= end) {
-                                    const desc = program.getElementsByTagName("desc")[0]?.textContent || 'No description available';
-                                    localStorage.setItem('descripto', desc);
-                                    document.getElementById('video-description').textContent = desc;
-                                    //document.getElementById('video-description').style.display = 'block';
-                                    break;
-                                }
-                            }
-                        }
-                    })
-                    .catch(error => console.error('Error fetching or parsing XML:', error));
-            } else {
-                console.log("No selected channel found in localStorage.");
-            }
-        });
     </script>
 </body>
 </html>
