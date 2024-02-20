@@ -191,6 +191,41 @@
                 }
             });
         }
+	    document.addEventListener("DOMContentLoaded", function() {
+    // Fetch and store the program description for the selected channel
+    const xmlData = "https://i.mjh.nz/au/Melbourne/epg.xml";
+    const selectedChannelId = localStorage.getItem('selectedChannel');
+
+    if (selectedChannelId) {
+        fetch(xmlData)
+            .then(response => response.text())
+            .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+            .then(data => {
+                const currentTime = new Date();
+                const timezoneOffsetInMinutes = currentTime.getTimezoneOffset();
+                currentTime.setTime(currentTime.getTime() - (timezoneOffsetInMinutes * 60 * 1000)); // Correction: Subtracting the timezone offset
+                const programmes = data.getElementsByTagName("programme");
+
+                for (let program of programmes) {
+                    if (program.getAttribute("channel") === selectedChannelId) {
+                        const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+                        const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+
+                        // Checking if the current time is within the start and end time of the program
+                        if (currentTime >= start && currentTime < end) {
+                            const desc = program.getElementsByTagName("desc")[0]?.textContent || 'No description available';
+                            // Store the description in localStorage
+                            localStorage.setItem('descripto', desc);
+                            break; // Exit the loop once the current program is found and description is stored
+                        }
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching or parsing XML:', error));
+    } else {
+        console.log("No selected channel found in localStorage.");
+    }
+});
     </script>
 </body>
 </html>
