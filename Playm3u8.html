@@ -1,3 +1,29 @@
+Skip to content
+goddardduncan
+/
+epg
+
+Type / to search
+
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+Settings
+Commit
+Update Playm3u8.html
+ main
+@goddardduncan
+goddardduncan committed 3 days ago 
+1 parent 6e1e05d
+commit a5c971a
+Showing 1 changed file with 2 additions and 2 deletions.
+  4 changes: 2 additions & 2 deletions4  
+Playm3u8.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +38,6 @@
             height: 100%;
             overflow: hidden;
         }
-
         #video {
             width: 100%;
             height: 100%;
@@ -26,24 +51,29 @@
     <script src="hls.js"></script>
     <script>
         // Function to get URL parameters
+        function getUrlParameterCheck(name, url) {
+            // Extract everything after 'https://goddardduncan.github.io/epg/'
+            var startIndex = url.indexOf('https://goddardduncan.github.io/epg/') + 'https://goddardduncan.github.io/epg/'.length;
+            return url.slice(startIndex);
+        }
+	// Function to get URL parameters
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
             var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
-
         // Get the 'url' parameter from the URL
         var urlParameter = getUrlParameter('url');
-
+        
+	// Get the 'url' parameter from the URL
+        var url = window.location.href;
+        var urlParameterCheck = getUrlParameterCheck('url', url);
         if (Hls.isSupported() && urlParameter) {
             var video = document.getElementById('video');
             var hls = new Hls();
             hls.loadSource(urlParameter);
             hls.attachMedia(video);
-
-            // Get channel ID from localStorage
-            var storedChannel = localStorage.getItem('selectedChannel');
             // Create array of channel IDs in the order presented in the EPG
             var channelsOrder = [
                 {"id": "mjh-abc-vic", "name": "ABC"},
@@ -67,9 +97,7 @@
                 {"id": "mjh-sbs-nitv", "name": "NITV"},
                 {"id": "mjh-c31", "name": "Channel 31"}
             ];
-            // Get index of storedChannel in channelsOrder
-            var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
-
+            
             // Map of channel IDs to their desired links
             var channelLinkMap = {
                 "mjh-seven-mel": "Playm3u8.html?url=https://i.mjh.nz/seven-mel.m3u8",
@@ -98,18 +126,67 @@
                 "mjh-fox-sports-news": "Playm3u8.html?url=https://i.mjh.nz/fox-sports-news.m3u8",
                 "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8"
             };
-	window.addEventListener('contextmenu', function(event) {
+            // Check if there is a match between the omnibox URL and the stored channel URL
+            var isMatch = false;
+            if (storedChannel && channelLinkMap.hasOwnProperty(storedChannel)) {
+                var desiredChannelUrl = channelLinkMap[storedChannel];
+                if (urlParameterCheck === desiredChannelUrl) {
+                    isMatch = true;
+                }
+            }
+		// If there is no match, find the channel ID that matches the URL parameter
+		if (!isMatch && urlParameterCheck) {
+    		for (var channelId in channelLinkMap) {
+       		 if (channelLinkMap.hasOwnProperty(channelId)) {
+          	  if (channelLinkMap[channelId] === urlParameterCheck) {
+                storedChannel = channelId;
+                localStorage.setItem('selectedChannel', storedChannel);
+                break;
+            	}
+       	}
+    }
+}
+	// Get index of storedChannel in channelsOrder
+            var storedChannel = localStorage.getItem('selectedChannel');
+            var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
+	// Get index of prevChannel in channelsOrder
+            var backChannel = localStorage.getItem('prevChannel');
+            var backChannelIndex = channelsOrder.findIndex(channel => channel.id === backChannel);
+            // Store the match result in localStorage
+            localStorage.setItem('Matchey', isMatch.toString());
+		
+	// Function to toggle subtitles
+        function toggleSubtitles() {
+            var tracks = video.textTracks;
+            for (var i = 0; i < tracks.length; i++) {
+                var track = tracks[i];
+                track.enabled = !track.enabled;
+		    if (track.kind === 'subtitles') {
+                    track.mode = track.mode === 'showing' ? 'disabled' : 'showing';
+                }
+            }
+        }
+        // Add event listener for context menu button press
+        video.addEventListener('contextmenu', function(event) {
             event.preventDefault(); // Prevent default context menu behavior
+            // Toggle subtitles
+            toggleSubtitles();
         });
             // Add event listener for key press to the window object
             window.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
                     video.play();
-                } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey) || (event.key === 'ContextMenu')) {
-                    // Prevent default action associated with Escape key or Meta + Left Arrow or ContextMenu
+                } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey)) {
+                    // Prevent default action associated with Escape key or Meta + Left Arrow
                     event.preventDefault();
-                    // Navigate back to index.html when Escape key or Meta + Left Arrow or ContextMenu is pressed
-                    window.location.href = 'http://goddardduncan.github.io/epg';
+                    // Navigate back to previously EPG selected channel when Escape key or Meta + Left Arrow is pressed
+                    var backIndex = currentIndex;
+                    var backIndex = (backChannelIndex) % channelsOrder.length;
+                    var backbuttonChannel = channelsOrder[backIndex];
+                    var backChannelLink = channelLinkMap[backbuttonChannel.id];
+                    //localStorage.setItem('prevChannel', backbuttonChannel.id); // Update prevChannel in localStorage
+                    localStorage.setItem('prevChannel', backbuttonChannel.id); // Update prevChannel in localStorage
+                    window.location.href = backChannelLink;
                 } else if (event.key === 'ArrowLeft') {
                     // Navigate to previous channel when only Left Arrow is pressed
                     var previousIndex = currentIndex - 1;
@@ -122,10 +199,7 @@
                     window.location.href = previousChannelLink;
                 } else if (event.key === 'ArrowRight') {
                     // Navigate to next channel
-                    var nextIndex = currentIndex + 1;
-                    if (nextIndex >= channelsOrder.length) {
-                        nextIndex = 0;
-                    }
+                    var nextIndex = (currentIndex + 1) % channelsOrder.length;
                     var nextChannel = channelsOrder[nextIndex];
                     var nextChannelLink = channelLinkMap[nextChannel.id];
                     localStorage.setItem('selectedChannel', nextChannel.id); // Update storedChannel in localStorage
@@ -136,3 +210,22 @@
     </script>
 </body>
 </html>
+0 comments on commit a5c971a
+@goddardduncan
+Comment
+ 
+Leave a comment
+ 
+ You’re receiving notifications because you’re watching this repository.
+Footer
+© 2024 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact
+Manage cookies
+Do not share my personal information
+Update Playm3u8.html · goddardduncan/epg@a5c971a
