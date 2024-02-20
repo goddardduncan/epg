@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-@@ -12,7 +38,6 @@
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLS Video Player</title>
+    <style>
+        html, body, #video-container {
+            margin: 0;
+            padding: 0;
+            width: 100%;
             height: 100%;
             overflow: hidden;
         }
-
         #video {
             width: 100%;
             height: 100%;
-@@ -26,24 +51,29 @@
+        }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <video id="video" autoplay controls></video>
+    </div>
     <script src="hls.js"></script>
     <script>
         // Function to get URL parameters
@@ -25,11 +37,9 @@
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
-
         // Get the 'url' parameter from the URL
         var urlParameter = getUrlParameter('url');
-
-
+        
 	// Get the 'url' parameter from the URL
         var url = window.location.href;
         var urlParameterCheck = getUrlParameterCheck('url', url);
@@ -38,28 +48,58 @@
             var hls = new Hls();
             hls.loadSource(urlParameter);
             hls.attachMedia(video);
-
-            // Get channel ID from localStorage
-            var storedChannel = localStorage.getItem('selectedChannel');
             // Create array of channel IDs in the order presented in the EPG
             var channelsOrder = [
                 {"id": "mjh-abc-vic", "name": "ABC"},
-@@ -67,9 +97,7 @@
+                {"id": "mjh-seven-mel", "name": "Seven"},
+                {"id": "mjh-7two-mel", "name": "7two"},
+                {"id": "mjh-7mate-mel", "name": "7mate"},
+                {"id": "mjh-7flix-mel", "name": "7flix"},
+                {"id": "mjh-channel-9-vic", "name": "Channel 9"},
+                {"id": "mjh-gem-vic", "name": "9Gem"},
+                {"id": "mjh-go-vic", "name": "9Go"},
+                {"id": "mjh-life-vic", "name": "9Life"},
+                {"id": "mjh-rush-vic", "name": "9Rush"},
+                {"id": "mjh-10-vic", "name": "Channel 10"},
+                {"id": "mjh-10bold-vic", "name": "10Bold"},
+                {"id": "mjh-10peach-vic", "name": "10Peach"},
+                {"id": "mjh-10shake-vic", "name": "10Shake"},
+                {"id": "mjh-sbs", "name": "SBS"},
+                {"id": "mjh-sbs-viceland", "name": "SBS Viceland"},
+                {"id": "mjh-sbs-food", "name": "SBS Food"},
+                {"id": "mjh-sbs-world-movies", "name": "SBS World Movies"},
                 {"id": "mjh-sbs-nitv", "name": "NITV"},
                 {"id": "mjh-c31", "name": "Channel 31"}
             ];
-            // Get index of storedChannel in channelsOrder
-            var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
-
-
+            
             // Map of channel IDs to their desired links
             var channelLinkMap = {
                 "mjh-seven-mel": "Playm3u8.html?url=https://i.mjh.nz/seven-mel.m3u8",
-@@ -98,18 +126,67 @@
+                "mjh-7two-mel": "Playm3u8.html?url=https://i.mjh.nz/7two-mel.m3u8",
+                "mjh-7mate-mel": "Playm3u8.html?url=https://i.mjh.nz/7mate-mel.m3u8",
+                "mjh-7flix-mel": "Playm3u8.html?url=https://i.mjh.nz/7flix-mel.m3u8",
+                "mjh-channel-9-vic": "Playm3u8.html?url=https://i.mjh.nz/channel-9-vic-alt.m3u8",
+                "mjh-gem-vic": "Playm3u8.html?url=https://i.mjh.nz/gem-vic-alt.m3u8",
+                "mjh-go-vic": "Playm3u8.html?url=https://i.mjh.nz/go-vic.m3u8",
+                "mjh-life-vic": "Playm3u8.html?url=https://i.mjh.nz/life-vic.m3u8",
+                "mjh-rush-vic": "Playm3u8.html?url=https://i.mjh.nz/rush-vic.m3u8",
+                "mjh-abc-vic": "https://c.mjh.nz/abc-vic.m3u8",
+                "mjh-sbs": "Playm3u8.html?url=https://i.mjh.nz/sbs.m3u8",
+                "mjh-sbs-vic-hd": "Playm3u8.html?url=https://i.mjh.nz/sbs-vic-hd.m3u8",
+                "mjh-sbs-viceland": "Playm3u8.html?url=https://i.mjh.nz/sbs-viceland.m3u8",
+                "mjh-sbs-food": "Playm3u8.html?url=https://i.mjh.nz/sbs-food.m3u8",
+                "mjh-sbs-world-movies": "Playm3u8.html?url=https://i.mjh.nz/sbs-world-movies.m3u8",
+                "mjh-sbs-nitv": "Playm3u8.html?url=https://i.mjh.nz/sbs-nitv.m3u8",
+                "mjh-10-vic": "Playm3u8.html?url=https://i.mjh.nz/10-vic.m3u8",
+                "mjh-10peach-vic": "Playm3u8.html?url=https://i.mjh.nz/10peach-vic.m3u8",
+                "mjh-10bold-vic": "Playm3u8.html?url=https://i.mjh.nz/10bold-vic.m3u8",
+                "mjh-10shake-vic": "Playm3u8.html?url=https://i.mjh.nz/10shake-vic.m3u8",
+                "mjh-eleven-vic": "Playm3u8.html?url=https://i.mjh.nz/eleven-vic.m3u8",
+                "mjh-one-vic": "Playm3u8.html?url=https://i.mjh.nz/one-vic.m3u8",
+                "mjh-sky-news-aus": "Playm3u8.html?url=https://i.mjh.nz/sky-news-aus.m3u8",
                 "mjh-fox-sports-news": "Playm3u8.html?url=https://i.mjh.nz/fox-sports-news.m3u8",
                 "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8"
             };
-	window.addEventListener('contextmenu', function(event) {
             // Check if there is a match between the omnibox URL and the stored channel URL
             var isMatch = false;
             if (storedChannel && channelLinkMap.hasOwnProperty(storedChannel)) {
@@ -88,7 +128,7 @@
             var backChannelIndex = channelsOrder.findIndex(channel => channel.id === backChannel);
             // Store the match result in localStorage
             localStorage.setItem('Matchey', isMatch.toString());
-
+		
 	// Function to toggle subtitles
         function toggleSubtitles() {
             var tracks = video.textTracks;
@@ -110,13 +150,9 @@
             window.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
                     video.play();
-                } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey) || (event.key === 'ContextMenu')) {
-                    // Prevent default action associated with Escape key or Meta + Left Arrow or ContextMenu
                 } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey)) {
                     // Prevent default action associated with Escape key or Meta + Left Arrow
                     event.preventDefault();
-                    // Navigate back to index.html when Escape key or Meta + Left Arrow or ContextMenu is pressed
-                    window.location.href = 'http://goddardduncan.github.io/epg';
                     // Navigate back to previously EPG selected channel when Escape key or Meta + Left Arrow is pressed
                     var backIndex = currentIndex;
                     var backIndex = (backChannelIndex) % channelsOrder.length;
@@ -128,19 +164,23 @@
                 } else if (event.key === 'ArrowLeft') {
                     // Navigate to previous channel when only Left Arrow is pressed
                     var previousIndex = currentIndex - 1;
-@@ -122,10 +199,7 @@
+                    if (previousIndex < 0) {
+                        previousIndex = channelsOrder.length - 1;
+                    }
+                    var previousChannel = channelsOrder[previousIndex];
+                    var previousChannelLink = channelLinkMap[previousChannel.id];
+                    localStorage.setItem('selectedChannel', previousChannel.id); // Update storedChannel in localStorage
                     window.location.href = previousChannelLink;
                 } else if (event.key === 'ArrowRight') {
                     // Navigate to next channel
-                    var nextIndex = currentIndex + 1;
-                    if (nextIndex >= channelsOrder.length) {
-                        nextIndex = 0;
-                    }
                     var nextIndex = (currentIndex + 1) % channelsOrder.length;
                     var nextChannel = channelsOrder[nextIndex];
                     var nextChannelLink = channelLinkMap[nextChannel.id];
                     localStorage.setItem('selectedChannel', nextChannel.id); // Update storedChannel in localStorage
-@@ -136,3 +210,22 @@
+                    window.location.href = nextChannelLink;
+                }
+            });
+        }
     </script>
 </body>
 </html>
