@@ -203,7 +203,7 @@
             .then(data => {
                 const currentTime = new Date();
                 const timezoneOffsetInMinutes = currentTime.getTimezoneOffset();
-                currentTime.setTime(currentTime.getTime() - (timezoneOffsetInMinutes * 60 * 1000)); // Correction: Subtracting the timezone offset
+                currentTime.setTime(currentTime.getTime() + (timezoneOffsetInMinutes * 60 * 1000));
                 const programmes = data.getElementsByTagName("programme");
 
                 for (let program of programmes) {
@@ -212,7 +212,7 @@
                         const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
 
                         // Checking if the current time is within the start and end time of the program
-                        if (currentTime >= start && currentTime < end) {
+                        if (currentTime >= start && currentTime <= end) {
                             const desc = program.getElementsByTagName("desc")[0]?.textContent || 'No description available';
                             // Store the description in localStorage
                             localStorage.setItem('descripto', desc);
