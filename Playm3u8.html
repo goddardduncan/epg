@@ -165,6 +165,7 @@
 
             window.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
+		   var video = document.getElementById('video');
                     video.play();
                 } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey)) {
                     event.preventDefault();
@@ -195,7 +196,31 @@
                     } else {
                         videoDescription.style.display = 'none';
                     }
-                }
+                }   else if (event.key === 'ArrowDown') {
+        		  // Toggle mute/unmute on the video player
+        		  var video = document.getElementById('video');
+        		  video.muted = !video.muted;
+		  // Check if the video is now muted
+        			if (video.muted) {
+            		// Attempt to enable subtitles
+           		 var tracks = video.textTracks;
+           		 for (var i = 0; i < tracks.length; i++) {
+            		    if (tracks[i].kind === 'subtitles') {
+                    		tracks[i].mode = 'showing'; // Enable subtitles
+                   		 break; // Assuming we only need to enable the first subtitles track found
+              			  }
+            			}
+       			 } else {
+           			 // Optionally, disable subtitles when unmuting
+           			 var tracks = video.textTracks;
+           			 for (var i = 0; i < tracks.length; i++) {
+              			  if (tracks[i].kind === 'subtitles') {
+                			    tracks[i].mode = 'hidden'; // Disable subtitles
+                  		    break; // Assuming we only want to disable the first subtitles track found
+                			  }
+           			 }
+       			 }
+       		  }
             });
         }
 
@@ -237,3 +262,7 @@
     </script>
 </body>
 </html>
+
+
+
+            
