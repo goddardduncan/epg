@@ -11,49 +11,156 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            position: relative;
         }
-
         #video {
             width: 100%;
             height: 100%;
         }
+        #video-description {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+            display: none;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.25em;
+        }
     </style>
+    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 </head>
 <body>
     <div id="video-container">
         <video id="video" autoplay controls></video>
+        <div id="video-description">Description goes here</div>
+        <google-cast-launcher></google-cast-launcher>
     </div>
-    <script src="player.js"></script>
+    <script src="hls.js"></script>
     <script>
-        // Function to get URL parameters
+        window['__onGCastApiAvailable'] = function(isAvailable) {
+            if (isAvailable) {
+                initializeCastApi();
+            }
+        };
+
+        function initializeCastApi() {
+            cast.framework.CastContext.getInstance().setOptions({
+                receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+            });
+        }
+
+        function getUrlParameterCheck(name, url) {
+            var startIndex = url.indexOf('https://goddardduncan.github.io/epg/') + 'https://goddardduncan.github.io/epg/'.length;
+            return url.slice(startIndex);
+        }
+
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
             var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        };
+        }
 
-        // Get the 'url' parameter from the URL
         var urlParameter = getUrlParameter('url');
+        var url = window.location.href;
+        var urlParameterCheck = getUrlParameterCheck('url', url);
 
         if (Hls.isSupported() && urlParameter) {
             var video = document.getElementById('video');
             var hls = new Hls();
             hls.loadSource(urlParameter);
             hls.attachMedia(video);
-
-            // Add event listener for key press to the window object
-            window.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    video.play();
-                } else if (event.key === 'Escape') {
-                    // Prevent default action associated with Escape key
-                    event.preventDefault();
-                    // Navigate back when Escape key is pressed
-                    window.history.back();
-                }
-            });
         }
+
+        var channelsOrder = [
+            {"id": "mjh-abc-vic", "name": "ABC"},
+            {"id": "mjh-seven-mel", "name": "Seven"},
+            {"id": "mjh-7two-mel", "name": "7two"},
+            {"id": "mjh-7mate-mel", "name": "7mate"},
+            {"id": "mjh-7flix-mel", "name": "7flix"},
+            {"id": "mjh-channel-9-vic", "name": "Channel 9"},
+            {"id": "mjh-gem-vic", "name": "9Gem"},
+            {"id": "mjh-go-vic", "name": "9Go"},
+            {"id": "mjh-life-vic", "name": "9Life"},
+            {"id": "mjh-rush-vic", "name": "9Rush"},
+            {"id": "mjh-10-vic", "name": "Channel 10"},
+            {"id": "mjh-10bold-vic", "name": "10Bold"},
+            {"id": "mjh-10peach-vic", "name": "10Peach"},
+            {"id": "mjh-10shake-vic", "name": "10Shake"},
+            {"id": "mjh-sbs", "name": "SBS"},
+            {"id": "mjh-sbs-viceland", "name": "SBS Viceland"},
+            {"id": "mjh-sbs-food", "name": "SBS Food"},
+            {"id": "mjh-sbs-world-movies", "name": "SBS World Movies"},
+            {"id": "mjh-sbs-nitv", "name": "NITV"},
+            {"id": "mjh-c31", "name": "Channel 31"}
+        ];
+
+        var channelLinkMap = {
+            "mjh-seven-mel": "Playm3u8.html?url=https://i.mjh.nz/seven-mel.m3u8",
+            "mjh-7two-mel": "Playm3u8.html?url=https://i.mjh.nz/7two-mel.m3u8",
+            "mjh-7mate-mel": "Playm3u8.html?url=https://i.mjh.nz/7mate-mel.m3u8",
+            "mjh-7flix-mel": "Playm3u8.html?url=https://i.mjh.nz/7flix-mel.m3u8",
+            "mjh-channel-9-vic": "Playm3u8.html?url=https://i.mjh.nz/channel-9-vic-alt.m3u8",
+            "mjh-gem-vic": "Playm3u8.html?url=https://i.mjh.nz/gem-vic-alt.m3u8",
+            "mjh-go-vic": "Playm3u8.html?url=https://i.mjh.nz/go-vic.m3u8",
+            "mjh-life-vic": "Playm3u8.html?url=https://i.mjh.nz/life-vic.m3u8",
+            "mjh-rush-vic": "Playm3u8.html?url=https://i.mjh.nz/rush-vic.m3u8",
+            "mjh-abc-vic": "https://c.mjh.nz/abc-vic.m3u8",
+            "mjh-sbs": "Playm3u8.html?url=https://i.mjh.nz/sbs.m3u8",
+            "mjh-sbs-vic-hd": "Playm3u8.html?url=https://i.mjh.nz/sbs-vic-hd.m3u8",
+            "mjh-sbs-viceland": "Playm3u8.html?url=https://i.mjh.nz/sbs-viceland.m3u8",
+            "mjh-sbs-food": "Playm3u8.html?url=https://i.mjh.nz/sbs-food.m3u8",
+            "mjh-sbs-world-movies": "Playm3u8.html?url=https://i.mjh.nz/sbs-world-movies.m3u8",
+            "mjh-sbs-nitv": "Playm3u8.html?url=https://i.mjh.nz/sbs-nitv.m3u8",
+            "mjh-10-vic": "Playm3u8.html?url=https://i.mjh.nz/10-vic.m3u8",
+            "mjh-10peach-vic": "Playm3u8.html?url=https://i.mjh.nz/10peach-vic.m3u8",
+            "mjh-10bold-vic": "Playm3u8.html?url=https://i.mjh.nz/10bold-vic.m3u8",
+            "mjh-10shake-vic": "Playm3u8.html?url=https://i.mjh.nz/10shake-vic.m3u8",
+            "mjh-eleven-vic": "Playm3u8.html?url=https://i.mjh.nz/eleven-vic.m3u8",
+            "mjh-one-vic": "Playm3u8.html?url=https://i.mjh.nz/one-vic.m3u8",
+            "mjh-sky-news-aus": "Playm3u8.html?url=https://i.mjh.nz/sky-news-aus.m3u8",
+            "mjh-fox-sports-news": "Playm3u8.html?url=https://i.mjh.nz/fox-sports-news.m3u8",
+            "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8"
+        };
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const xmlData = "https://i.mjh.nz/au/Melbourne/epg.xml";
+            const selectedChannelId = localStorage.getItem('selectedChannel');
+
+            if (selectedChannelId) {
+                fetch(xmlData)
+                    .then(response => response.text())
+                    .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+                    .then(data => {
+                        const currentTime = new Date();
+                        const timezoneOffsetInMinutes = currentTime.getTimezoneOffset();
+                        currentTime.setTime(currentTime.getTime() + (timezoneOffsetInMinutes * 60 * 1000));
+                        const programmes = data.getElementsByTagName("programme");
+
+                        for (let program of programmes) {
+                            if (program.getAttribute("channel") === selectedChannelId) {
+                                const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+                                const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+
+                                if (currentTime >= start && currentTime <= end) {
+                                    const descElements = program.getElementsByTagName("desc");
+                                    const desc = descElements.length > 0 ? descElements[0].textContent : 'No description available';
+                                    document.getElementById('video-description').textContent = desc;
+                                    document.getElementById('video-description').style.display = 'block';
+                                    break;
+                                }
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error fetching or parsing XML:', error));
+            }
+        });
     </script>
 </body>
 </html>
