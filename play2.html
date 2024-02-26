@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple HLS Player with Google Cast</title>
+    <title>HLS Player with Chromecast Support</title>
+    <link href="https://cdn.jsdelivr.net/npm/video.js/dist/video-js.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/video.js/dist/video.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@silvermine/videojs-chromecast/dist/silvermine-videojs-chromecast.min.js"></script>
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
     <style>
-        body, html, #video-container {
+        body, html {
             height: 100%;
             margin: 0;
             padding: 0;
@@ -19,12 +22,23 @@
     </style>
 </head>
 <body>
-    <div id="video-container">
-        <video id="video" controls></video>
-    </div>
-    <google-cast-launcher></google-cast-launcher>
+    <video id="my_video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264">
+        <source src="https://i.mjh.nz/sbs-food.m3u8" type="application/x-mpegURL">
+    </video>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
+        var player = videojs('my_video', {
+            plugins: {
+                chromecast: {
+                    appId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                    metadata: {
+                        title: 'Live Stream',
+                        subtitle: 'SBS Food Channel',
+                    }
+                }
+            }
+        });
+
         window['__onGCastApiAvailable'] = function(isAvailable) {
             if (isAvailable) {
                 initializeCastApi();
@@ -38,19 +52,12 @@
             });
         }
 
-        var video = document.getElementById('video');
-        var videoSrc = 'https://i.mjh.nz/sbs-food.m3u8'; // Replace <YOUR_M3U8_SOURCE_HERE> with your .m3u8 source URL
-
         if (Hls.isSupported()) {
+            var video = document.getElementById('my_video_html5_api');
             var hls = new Hls();
-            hls.loadSource(videoSrc);
+            hls.loadSource('https://i.mjh.nz/sbs-food.m3u8');
             hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED,function() {
-                video.play();
-            });
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = videoSrc;
-            video.addEventListener('loadedmetadata',function() {
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
                 video.play();
             });
         }
