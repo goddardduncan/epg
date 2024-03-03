@@ -66,10 +66,6 @@
             document.addEventListener("keydown", function(event) {
                 event.preventDefault(); // Prevent default scrolling behavior
                 const tableRows = document.querySelectorAll('table tr');
-		// Check if right arrow key is pressed
-                else if (event.key === "ArrowRight") {
-                    window.location.href = "https://goddardduncan.github.io/pluto/";
-                }
                 // Check if up arrow key is pressed
                 if (event.key === "ArrowUp") {
                     if (selectedRowIndex > 0) {
@@ -79,7 +75,10 @@
                         scrollSelectedRowIntoView();
                     }
                 }
-
+		// Check if right arrow key is pressed
+                else if (event.key === "ArrowRight") {
+                    window.location.href = "https://goddardduncan.github.io/pluto/";
+                }
                 // Check if down arrow key is pressed
                 else if (event.key === "ArrowDown") {
                     if (selectedRowIndex < tableRows.length - 1) {
