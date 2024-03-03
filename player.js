@@ -62,7 +62,7 @@ function playM3u8(url) {
     video.play();
   });
   hls.on(Hls.Events.FRAG_PARSING_METADATA, handleTimedMetadata);
-  //document.title = url;
+  document.title = 'ABC';
 }
 
 debug = false;
