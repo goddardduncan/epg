@@ -145,6 +145,8 @@
             var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
             var backChannel = localStorage.getItem('prevChannel');
             var backChannelIndex = channelsOrder.findIndex(channel => channel.id === backChannel);
+	    var currentChannel = channelsOrder.find(channel => channel.id === storedChannel);
+	    document.title = currentChannel.name;
 
             localStorage.setItem('Matchey', isMatch.toString());
 
