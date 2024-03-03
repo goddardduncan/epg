@@ -62,7 +62,7 @@ function playM3u8(url) {
     video.play();
   });
   hls.on(Hls.Events.FRAG_PARSING_METADATA, handleTimedMetadata);
-  document.title = url;
+  //document.title = url;
 }
 
 debug = false;
@@ -71,7 +71,6 @@ var s = document.createElement('script');
 s.src = 'hlsjs/hls.1.1.5.min.js';
 s.onload = function() { playM3u8(window.location.href.split("#")[1]); };
 (document.head || document.documentElement).appendChild(s);
-//(document.documentElement).appendChild(s);
 
 $(window).bind('hashchange', function() {
   playM3u8(window.location.href.split("#")[1]);
