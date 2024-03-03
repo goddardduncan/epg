@@ -51,7 +51,7 @@ function playM3u8(url) {
   hls = new Hls({ debug: debug });
 
   // Use CORS Proxy
-  var corsProxy = 'https://cors-anywhere.herokuapp.com/'; // Specify the CORS proxy URL
+  var corsProxy = 'https://api.allorigins.win/raw?url='; // Specify the CORS proxy URL
   var m3u8Url = decodeURIComponent(url);
   var proxiedUrl = corsProxy + m3u8Url; // Prepend the proxy URL to the actual URL
 
