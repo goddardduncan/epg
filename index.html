@@ -324,10 +324,19 @@
             requestWakeLock();
         </script>
     </table>
-<div style="text-align: center; margin-top: 20px;">
+<!-- Mobile-specific buttons -->
+<div id="mobileButtons" style="text-align: center; margin-top: 20px; display: none;">
     <button onclick="window.location.href = 'https://goddardduncan.github.io/sport/';">Sport</button>
     <button onclick="window.location.href = 'https://goddardduncan.github.io/pluto/';">Pluto</button>
 </div>
+
+<style>
+    @media only screen and (max-width: 768px) {
+        #mobileButtons {
+            display: block;
+        }
+    }
+</style>
 
 </body>
 </html>
