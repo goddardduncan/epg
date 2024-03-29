@@ -324,19 +324,32 @@
             requestWakeLock();
         </script>
     </table>
+<script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+        // Function to show buttons on mobile devices
+        function displayButtonsOnMobile() {
+            var screenWidth = window.innerWidth;
+            var mobileButtonsDiv = document.getElementById("mobileButtons");
+            
+            // Adjust the max-width value as per your requirement
+            if (screenWidth <= 1024) {
+                mobileButtonsDiv.style.display = "block";
+            } else {
+                mobileButtonsDiv.style.display = "none";
+            }
+        }
+
+        // Call the function on initial load
+        displayButtonsOnMobile();
+
+        // Optionally, call this function on window resize if you want to handle dynamic resizing
+        window.onresize = displayButtonsOnMobile;
+    });
+</script>
 <!-- Mobile-specific buttons -->
 <div id="mobileButtons" style="text-align: center; margin-top: 20px; display: none;">
     <button onclick="window.location.href = 'https://goddardduncan.github.io/sport/';">Sport</button>
     <button onclick="window.location.href = 'https://goddardduncan.github.io/pluto/';">Pluto</button>
 </div>
-
-<style>
-    @media only screen and (max-width: 1024px) {
-        #mobileButtons {
-            display: block;
-        }
-    }
-</style>
-
 </body>
 </html>
