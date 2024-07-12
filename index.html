@@ -13,11 +13,11 @@
             margin: 0;
             padding: 0;
         }
-        h1 {
+	h1 {
             text-align: center;
             font-size: 36px;
             margin: 20px 0;
-            color: #00b8d4;
+            color: #4f5e80;
         }
         table {
             border-collapse: collapse;
@@ -32,48 +32,23 @@
             text-align: left;
             border-bottom: 1px solid #33475b;
         }
-        th {
+       th {
             background-color: #33475b;
             color: #ffffff;
             font-size: 18px;
             font-weight: 500;
-        }
-        td {
-            font-size: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
         }
         img {
             width: 100px;
             height: 60px;
             border-radius: 8px;
         }
-        tr:hover {
-            background-color: #3a4b5c;
-        }
-        tr.selected {
+        tr:not(:first-child).selected {
             background-color: #00b8d4;
             color: #000;
-        }
-        button {
-            background-color: #00b8d4;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            margin: 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #00a0c1;
-        }
-        #mobileButtons {
-            text-align: center;
-            margin-top: 20px;
-        }
-        @media (max-width: 1024px) {
-            #mobileButtons {
-                display: block;
-            }
         }
     </style>
 </head>
@@ -90,257 +65,306 @@
             <th>Start Time</th>
             <th>End Time</th>
         </tr>
-    </table>
-    <div id="mobileButtons" style="display: none;">
-        <button onclick="window.location.href = 'https://goddardduncan.github.io/sport/';">Sport</button>
-        <button onclick="window.location.href = 'https://goddardduncan.github.io/pluto/';">Pluto</button>
-        <button onclick="window.location.href = 'https://goddardduncan.github.io/tvcast/';">ChromeCast</button>
-    </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function(event) {
-            function displayButtonsOnMobile() {
-                var screenWidth = window.innerWidth;
-                var mobileButtonsDiv = document.getElementById("mobileButtons");
-                if (screenWidth <= 1024) {
-                    mobileButtonsDiv.style.display = "block";
-                } else {
-                    mobileButtonsDiv.style.display = "none";
-                }
-            }
-            displayButtonsOnMobile();
-            window.onresize = displayButtonsOnMobile;
-        });
 
-        window.addEventListener('pageshow', function(event) {
-            if (event.persisted) { 
-                location.reload();
-            }
-        });
+        <script>
+        // Check if the page is being shown from the bfcache (back-forward cache)
+  	    window.addEventListener('pageshow', function(event) {
+  	        if (event.persisted) { 
+	            location.reload();
+		        }
+	        });
+         // Variable to keep track of the currently selected row
+            let selectedRowIndex = -1;
 
-        let selectedRowIndex = -1;
-        document.addEventListener("keydown", function(event) {
-            event.preventDefault();
-            const tableRows = document.querySelectorAll('table tr');
-            if (event.key === "ArrowUp") {
-                if (selectedRowIndex > 0) {
-                    tableRows[selectedRowIndex].classList.remove("selected");
-                    selectedRowIndex--;
-                    tableRows[selectedRowIndex].classList.add("selected");
-                    scrollSelectedRowIntoView();
-                }
-            } else if (event.key === "ArrowRight") {
-                window.location.href = "https://goddardduncan.github.io/pluto/";
-            } else if (event.key === "ArrowLeft") {
-                window.location.href = "https://goddardduncan.github.io/sport/";
-            } else if (event.key === "ArrowDown") {
-                if (selectedRowIndex < tableRows.length - 1) {
-                    if (selectedRowIndex !== -1) {
+            // Function to handle key presses
+            document.addEventListener("keydown", function(event) {
+                event.preventDefault(); // Prevent default scrolling behavior
+                const tableRows = document.querySelectorAll('table tr');
+                // Check if up arrow key is pressed
+                if (event.key === "ArrowUp") {
+                    if (selectedRowIndex > 0) {
                         tableRows[selectedRowIndex].classList.remove("selected");
+                        selectedRowIndex--;
+                        tableRows[selectedRowIndex].classList.add("selected");
+                        scrollSelectedRowIntoView();
                     }
-                    selectedRowIndex++;
-                    tableRows[selectedRowIndex].classList.add("selected");
-                    scrollSelectedRowIntoView();
                 }
-            } else if (event.key === "Enter") {
-                if (selectedRowIndex !== -1) {
-                    const selectedRow = tableRows[selectedRowIndex];
-                    const image = selectedRow.querySelector('img');
-                    const channelLink = image.dataset.channelLink;
-                    window.location.href = channelLink;
-                    const channelId = image.dataset.channelId;
-                    localStorage.setItem('selectedChannel', channelId);
-                    localStorage.setItem('prevChannel', channelId);
+		// Check if right arrow key is pressed
+                else if (event.key === "ArrowRight") {
+                    window.location.href = "https://goddardduncan.github.io/pluto/";
                 }
-            }
-        });
+		// Check if left arrow key is pressed
+                else if (event.key === "ArrowLeft") {
+                    window.location.href = "https://goddardduncan.github.io/sport/";
+                }
+                // Check if down arrow key is pressed
+                else if (event.key === "ArrowDown") {
+                    if (selectedRowIndex < tableRows.length - 1) {
+                        if (selectedRowIndex !== -1) {
+                            tableRows[selectedRowIndex].classList.remove("selected");
+                        }
+                        selectedRowIndex++;
+                        tableRows[selectedRowIndex].classList.add("selected");
+                        scrollSelectedRowIntoView();
+                    }
+                }
 
-        function scrollSelectedRowIntoView() {
-            const tableRows = document.querySelectorAll('table tr');
-            const selectedRow = tableRows[selectedRowIndex];
-            const stickyRowHeight = document.querySelector('th').offsetHeight;
-            const selectedRowTop = selectedRow.getBoundingClientRect().top;
-            const offset = selectedRowTop - stickyRowHeight;
-            window.scrollBy({
-                top: offset,
-                behavior: 'smooth'
+                // Check if enter key is pressed
+                else if (event.key === "Enter") {
+                    if (selectedRowIndex !== -1) {
+                        const selectedRow = tableRows[selectedRowIndex];
+                        const image = selectedRow.querySelector('img');
+                        const channelLink = image.dataset.channelLink;
+                        window.location.href = channelLink;
+
+                        // Store the selected channel in localStorage
+                        const channelId = image.dataset.channelId;
+                        localStorage.setItem('selectedChannel', channelId);
+                        localStorage.setItem('prevChannel', channelId);
+                    }
+                }
             });
+
+            // Function to scroll the selected row into view
+            function scrollSelectedRowIntoView() {
+                const tableRows = document.querySelectorAll('table tr');
+                const selectedRow = tableRows[selectedRowIndex];
+                const stickyRowHeight = document.querySelector('th').offsetHeight; // Get the height of the sticky row
+                const selectedRowTop = selectedRow.getBoundingClientRect().top; // Get the top position of the selected row relative to the viewport
+                const offset = selectedRowTop - stickyRowHeight; // Calculate the offset to scroll to
+
+                window.scrollBy({
+                    top: offset,
+                    behavior: 'smooth'
+                });
+            }
+
+            const table = document.querySelector('table');
+
+            const xmlData = "https://i.mjh.nz/au/Melbourne/epg.xml";
+            const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
+
+            // Map of channel IDs to their desired names
+            const channelMap = {
+                "mjh-abc-vic": "ABC",
+                "mjh-seven-mel": "Seven",
+                "mjh-7two-mel": "7two",
+                "mjh-7mate-mel": "7mate",
+                "mjh-7flix-mel": "7flix",
+                "mjh-channel-9-vic": "Channel 9",
+                "mjh-gem-vic": "9Gem",
+                "mjh-go-vic": "9Go",
+                "mjh-life-vic": "9Life",
+                "mjh-rush-vic": "9Rush",
+                "mjh-10-vic": "Channel 10",
+                "mjh-10bold-vic": "10Bold",
+                "mjh-10peach-vic": "10Peach",
+                "mjh-10shake-vic": "10Shake",
+                "mjh-sbs": "SBS",
+                "mjh-sbs-viceland": "SBS Viceland",
+                "mjh-sbs-food": "SBS Food",
+                "mjh-sbs-world-movies": "SBS World Movies",
+                "mjh-sbs-nitv": "NITV",
+                "mjh-c31": "Channel 31",
+            };
+
+            // Map of channel IDs to their desired links
+            const channelLinkMap = {
+                "mjh-seven-mel": "Playm3u8.html?url=https://i.mjh.nz/seven-mel.m3u8",
+                "mjh-7two-mel": "Playm3u8.html?url=https://i.mjh.nz/7two-mel.m3u8",
+                "mjh-7mate-mel": "Playm3u8.html?url=https://i.mjh.nz/7mate-mel.m3u8",
+                "mjh-7flix-mel": "Playm3u8.html?url=https://i.mjh.nz/7flix-mel.m3u8",
+                "mjh-channel-9-vic": "Playm3u8.html?url=https://i.mjh.nz/channel-9-vic-alt.m3u8",
+                "mjh-gem-vic": "Playm3u8.html?url=https://i.mjh.nz/gem-vic-alt.m3u8",
+                "mjh-go-vic": "Playm3u8.html?url=https://i.mjh.nz/go-vic.m3u8",
+                "mjh-life-vic": "Playm3u8.html?url=https://i.mjh.nz/life-vic.m3u8",
+                "mjh-rush-vic": "Playm3u8.html?url=https://i.mjh.nz/rush-vic.m3u8",
+                "mjh-abc-vic": "player.html#https://c.mjh.nz/abc-vic.m3u8",
+                "mjh-sbs": "Playm3u8.html?url=https://i.mjh.nz/sbs.m3u8",
+                "mjh-sbs-vic-hd": "Playm3u8.html?url=https://i.mjh.nz/sbs-vic-hd.m3u8",
+                "mjh-sbs-viceland": "Playm3u8.html?url=https://i.mjh.nz/sbs-viceland.m3u8",
+                "mjh-sbs-food": "Playm3u8.html?url=https://i.mjh.nz/sbs-food.m3u8",
+                "mjh-sbs-world-movies": "Playm3u8.html?url=https://i.mjh.nz/sbs-world-movies.m3u8",
+                "mjh-sbs-nitv": "Playm3u8.html?url=https://i.mjh.nz/sbs-nitv.m3u8",
+                "mjh-10-vic": "Playm3u8.html?url=https://i.mjh.nz/10-vic.m3u8",
+                "mjh-10peach-vic": "Playm3u8.html?url=https://i.mjh.nz/10peach-vic.m3u8",
+                "mjh-10bold-vic": "Playm3u8.html?url=https://i.mjh.nz/10bold-vic.m3u8",
+                "mjh-10shake-vic": "Playm3u8.html?url=https://i.mjh.nz/10shake-vic.m3u8",
+                "mjh-eleven-vic": "Playm3u8.html?url=https://i.mjh.nz/eleven-vic.m3u8",
+                "mjh-one-vic": "Playm3u8.html?url=https://i.mjh.nz/one-vic.m3u8",
+                "mjh-sky-news-aus": "Playm3u8.html?url=https://i.mjh.nz/sky-news-aus.m3u8",
+                "mjh-fox-sports-news": "Playm3u8.html?url=https://i.mjh.nz/fox-sports-news.m3u8",
+                "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8",
+            };
+
+            fetch(xmlData)
+                .then(response => response.text())
+                .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+                .then(data => {
+                    const programs = data.getElementsByTagName("programme");
+                    const currentTime = new Date();
+                    currentTime.setTime(currentTime.getTime() + (timezoneOffsetInMinutes * 60 * 1000));
+                    const options = { hour12: true, hour: "numeric", minute: "numeric" };
+
+                    // Sort the channels based on their order in the channelMap
+                    const sortedChannels = Object.keys(channelMap).sort((a, b) => {
+                        return Object.keys(channelMap).indexOf(a) - Object.keys(channelMap).indexOf(b);
+                    });
+
+                    // Loop through the sorted channels and generate table rows accordingly
+                    sortedChannels.forEach(channelID => {
+                        // Find the programs associated with the current channelID
+                        const channelPrograms = Array.from(programs).filter(program => program.getAttribute("channel") === channelID);
+
+                        // Proceed with generating table rows for each program in the channelPrograms
+                        channelPrograms.forEach((program, index) => { // Added 'index' to get the next program
+                            // Fill the table with the channels
+                            const channel = channelID;
+                            const title = program.getElementsByTagName("title")[0].childNodes[0].nodeValue;
+                            const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+                            const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+                            const icon = program.getElementsByTagName("icon")[0].getAttribute("src");
+
+                            // Map the channel ID to its desired name
+                            const mappedChannel = channelMap[channel] || channel;
+                            const mappedChannelLink = channelLinkMap[channel] || channel;
+
+                            // Only show currently playing programs
+                            if (currentTime >= start && currentTime <= end) {
+                                const row = document.createElement("tr");
+
+                                const channelCell = document.createElement("td");
+                                channelCell.appendChild(document.createTextNode(mappedChannel));
+                                row.appendChild(channelCell);
+
+                                const iconCell = document.createElement("td");
+                                const iconImg = document.createElement("img");
+                                iconImg.src = icon;
+                                iconImg.addEventListener("click", function() {
+                                    //window.open(mappedChannelLink);
+                                    window.location.href = mappedChannelLink;
+                                    localStorage.setItem('prevChannel', channelID);
+                                    localStorage.setItem('selectedChannel', channelID);
+                                });
+                                iconImg.dataset.channelLink = mappedChannelLink; // Store channel link in dataset
+                                iconImg.dataset.channelId = channel; // Store channel ID in dataset
+                                iconCell.appendChild(iconImg);
+                                row.appendChild(iconCell);
+
+                                const titleCell = document.createElement("td");
+                                titleCell.appendChild(document.createTextNode(title));
+                                row.appendChild(titleCell);
+
+                                const startCell = document.createElement("td");
+                                const adjustedStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+                                startCell.appendChild(document.createTextNode(adjustedStart.toLocaleTimeString("en-AU", options)));
+                                row.appendChild(startCell);
+
+                                const endCell = document.createElement("td");
+                                const adjustedEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the end time
+                                endCell.appendChild(document.createTextNode(adjustedEnd.toLocaleTimeString("en-AU", options)));
+                                row.appendChild(endCell);
+
+                                // Get details of the next program
+                                const nextProgram = channelPrograms[index + 1]; // Get the next program
+                                if (nextProgram) { // Check if next program exists
+                                    const Ntitle = nextProgram.getElementsByTagName("title")[0].childNodes[0].nodeValue;
+                                    const Nstart = new Date(nextProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+                                    const Nend = new Date(nextProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+
+                                    // Add cells for the next show
+                                    const NtitleCell = document.createElement("td");
+                                    NtitleCell.appendChild(document.createTextNode(Ntitle));
+                                    row.appendChild(NtitleCell);
+
+                                    const nextStartCell = document.createElement("td");
+                                    const adjustedNextStart = new Date(Nstart.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+                                    nextStartCell.appendChild(document.createTextNode(adjustedNextStart.toLocaleTimeString("en-AU", options)));
+                                    row.appendChild(nextStartCell);
+
+                                    const nextEndCell = document.createElement("td");
+                                    const adjustedNextEnd = new Date(Nend.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+                                    nextEndCell.appendChild(document.createTextNode(adjustedNextEnd.toLocaleTimeString("en-AU", options)));
+                                    row.appendChild(nextEndCell);
+                                }
+
+                                table.appendChild(row);
+                            }
+                        });
+                    });
+
+                    // Highlight the first row initially
+                    table.querySelector('tr').classList.add("selected");
+                    selectedRowIndex = 0;
+                    scrollSelectedRowIntoView();
+
+                    // Check if there's a previously selected channel stored in localStorage
+                    const storedChannel = localStorage.getItem('selectedChannel');
+                    if (storedChannel) {
+                        // Find the row corresponding to the stored channel and select it
+                        const storedChannelRow = table.querySelector(`img[data-channel-id="${storedChannel}"]`).parentNode.parentNode;
+                        const rows = table.querySelectorAll('tr');
+                        rows.forEach((row, index) => {
+                            if (row === storedChannelRow) {
+                                row.classList.add("selected");
+                                selectedRowIndex = index;
+                            }
+                        });
+                        scrollSelectedRowIntoView();
+                    }
+                });
+
+            // Wake lock implementation
+            let wakeLock = null;
+
+            const requestWakeLock = async () => {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Screen wake lock is active');
+                } catch (err) {
+                    console.error(`${err.name}, ${err.message}`);
+                }
+            };
+
+            const handleVisibilityChange = () => {
+                if (wakeLock !== null && document.visibilityState === 'visible') {
+                    requestWakeLock();
+                }
+            };
+
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+
+            // Request a wake lock
+            requestWakeLock();
+        </script>
+    </table>
+<script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+        // Function to show buttons on mobile devices
+        function displayButtonsOnMobile() {
+            var screenWidth = window.innerWidth;
+            var mobileButtonsDiv = document.getElementById("mobileButtons");
+            
+            // Adjust the max-width value as per your requirement
+            if (screenWidth <= 1024) {
+                mobileButtonsDiv.style.display = "block";
+            } else {
+                mobileButtonsDiv.style.display = "none";
+            }
         }
 
-        const table = document.querySelector('table');
-        const xmlData = "https://i.mjh.nz/au/Melbourne/epg.xml";
-        const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
-        const channelMap = {
-            "mjh-abc-vic": "ABC",
-            "mjh-seven-mel": "Seven",
-            "mjh-7two-mel": "7two",
-            "mjh-7mate-mel": "7mate",
-            "mjh-7flix-mel": "7flix",
-            "mjh-channel-9-vic": "Channel 9",
-            "mjh-gem-vic": "9Gem",
-            "mjh-go-vic": "9Go",
-            "mjh-life-vic": "9Life",
-            "mjh-rush-vic": "9Rush",
-            "mjh-10-vic": "Channel 10",
-            "mjh-10bold-vic": "10Bold",
-            "mjh-10peach-vic": "10Peach",
-            "mjh-10shake-vic": "10Shake",
-            "mjh-sbs": "SBS",
-            "mjh-sbs-viceland": "SBS Viceland",
-            "mjh-sbs-food": "SBS Food",
-            "mjh-sbs-world-movies": "SBS World Movies",
-            "mjh-sbs-nitv": "NITV",
-            "mjh-c31": "Channel 31",
-        };
+        // Call the function on initial load
+        displayButtonsOnMobile();
 
-        const channelLinkMap = {
-            "mjh-seven-mel": "Playm3u8.html?url=https://i.mjh.nz/seven-mel.m3u8",
-            "mjh-7two-mel": "Playm3u8.html?url=https://i.mjh.nz/7two-mel.m3u8",
-            "mjh-7mate-mel": "Playm3u8.html?url=https://i.mjh.nz/7mate-mel.m3u8",
-            "mjh-7flix-mel": "Playm3u8.html?url=https://i.mjh.nz/7flix-mel.m3u8",
-            "mjh-channel-9-vic": "Playm3u8.html?url=https://i.mjh.nz/channel-9-vic-alt.m3u8",
-            "mjh-gem-vic": "Playm3u8.html?url=https://i.mjh.nz/gem-vic-alt.m3u8",
-            "mjh-go-vic": "Playm3u8.html?url=https://i.mjh.nz/go-vic.m3u8",
-            "mjh-life-vic": "Playm3u8.html?url=https://i.mjh.nz/life-vic.m3u8",
-            "mjh-rush-vic": "Playm3u8.html?url=https://i.mjh.nz/rush-vic.m3u8",
-            "mjh-abc-vic": "player.html#https://c.mjh.nz/abc-vic.m3u8",
-            "mjh-sbs": "Playm3u8.html?url=https://i.mjh.nz/sbs.m3u8",
-            "mjh-sbs-vic-hd": "Playm3u8.html?url=https://i.mjh.nz/sbs-vic-hd.m3u8",
-            "mjh-sbs-viceland": "Playm3u8.html?url=https://i.mjh.nz/sbs-viceland.m3u8",
-            "mjh-sbs-food": "Playm3u8.html?url=https://i.mjh.nz/sbs-food.m3u8",
-            "mjh-sbs-world-movies": "Playm3u8.html?url=https://i.mjh.nz/sbs-world-movies.m3u8",
-            "mjh-sbs-nitv": "Playm3u8.html?url=https://i.mjh.nz/sbs-nitv.m3u8",
-            "mjh-10-vic": "Playm3u8.html?url=https://i.mjh.nz/10-vic.m3u8",
-            "mjh-10peach-vic": "Playm3u8.html?url=https://i.mjh.nz/10peach-vic.m3u8",
-            "mjh-10bold-vic": "Playm3u8.html?url=https://i.mjh.nz/10bold-vic.m3u8",
-            "mjh-10shake-vic": "Playm3u8.html?url=https://i.mjh.nz/10shake-vic.m3u8",
-            "mjh-eleven-vic": "Playm3u8.html?url=https://i.mjh.nz/eleven-vic.m3u8",
-            "mjh-one-vic": "Playm3u8.html?url=https://i.mjh.nz/one-vic.m3u8",
-            "mjh-sky-news-aus": "Playm3u8.html?url=https://i.mjh.nz/sky-news-aus.m3u8",
-            "mjh-fox-sports-news": "Playm3u8.html?url=https://i.mjh.nz/fox-sports-news.m3u8",
-            "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8",
-        };
-
-        fetch(xmlData)
-            .then(response => response.text())
-            .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
-            .then(data => {
-                const programs = data.getElementsByTagName("programme");
-                const currentTime = new Date();
-                currentTime.setTime(currentTime.getTime() + (timezoneOffsetInMinutes * 60 * 1000));
-                const options = { hour12: true, hour: "numeric", minute: "numeric" };
-
-                const sortedChannels = Object.keys(channelMap).sort((a, b) => {
-                    return Object.keys(channelMap).indexOf(a) - Object.keys(channelMap).indexOf(b);
-                });
-
-                sortedChannels.forEach(channelID => {
-                    const channelPrograms = Array.from(programs).filter(program => program.getAttribute("channel") === channelID);
-                    channelPrograms.forEach((program, index) => {
-                        const channel = channelID;
-                        const title = program.getElementsByTagName("title")[0].childNodes[0].nodeValue;
-                        const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-                        const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-                        const icon = program.getElementsByTagName("icon")[0].getAttribute("src");
-
-                        const mappedChannel = channelMap[channel] || channel;
-                        const mappedChannelLink = channelLinkMap[channel] || channel;
-
-                        if (currentTime >= start && currentTime <= end) {
-                            const row = document.createElement("tr");
-
-                            const channelCell = document.createElement("td");
-                            channelCell.appendChild(document.createTextNode(mappedChannel));
-                            row.appendChild(channelCell);
-
-                            const iconCell = document.createElement("td");
-                            const iconImg = document.createElement("img");
-                            iconImg.src = icon;
-                            iconImg.addEventListener("click", function() {
-                                window.location.href = mappedChannelLink;
-                                localStorage.setItem('prevChannel', channelID);
-                                localStorage.setItem('selectedChannel', channelID);
-                            });
-                            iconImg.dataset.channelLink = mappedChannelLink;
-                            iconImg.dataset.channelId = channel;
-                            iconCell.appendChild(iconImg);
-                            row.appendChild(iconCell);
-
-                            const titleCell = document.createElement("td");
-                            titleCell.appendChild(document.createTextNode(title));
-                            row.appendChild(titleCell);
-
-                            const startCell = document.createElement("td");
-                            const adjustedStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60 * 1000);
-                            startCell.appendChild(document.createTextNode(adjustedStart.toLocaleTimeString("en-AU", options)));
-                            row.appendChild(startCell);
-
-                            const endCell = document.createElement("td");
-                            const adjustedEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60 * 1000);
-                            endCell.appendChild(document.createTextNode(adjustedEnd.toLocaleTimeString("en-AU", options)));
-                            row.appendChild(endCell);
-
-                            const nextProgram = channelPrograms[index + 1];
-                            if (nextProgram) {
-                                const Ntitle = nextProgram.getElementsByTagName("title")[0].childNodes[0].nodeValue;
-                                const Nstart = new Date(nextProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-                                const Nend = new Date(nextProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-
-                                const NtitleCell = document.createElement("td");
-                                NtitleCell.appendChild(document.createTextNode(Ntitle));
-                                row.appendChild(NtitleCell);
-
-                                const nextStartCell = document.createElement("td");
-                                const adjustedNextStart = new Date(Nstart.getTime() - timezoneOffsetInMinutes * 60 * 1000);
-                                nextStartCell.appendChild(document.createTextNode(adjustedNextStart.toLocaleTimeString("en-AU", options)));
-                                row.appendChild(nextStartCell);
-
-                                const nextEndCell = document.createElement("td");
-                                const adjustedNextEnd = new Date(Nend.getTime() - timezoneOffsetInMinutes * 60 * 1000);
-                                nextEndCell.appendChild(document.createTextNode(adjustedNextEnd.toLocaleTimeString("en-AU", options)));
-                                row.appendChild(nextEndCell);
-                            }
-
-                            table.appendChild(row);
-                        }
-                    });
-                });
-
-                table.querySelector('tr').classList.add("selected");
-                selectedRowIndex = 0;
-                scrollSelectedRowIntoView();
-
-                const storedChannel = localStorage.getItem('selectedChannel');
-                if (storedChannel) {
-                    const storedChannelRow = table.querySelector(`img[data-channel-id="${storedChannel}"]`).parentNode.parentNode;
-                    const rows = table.querySelectorAll('tr');
-                    rows.forEach((row, index) => {
-                        if (row === storedChannelRow) {
-                            row.classList.add("selected");
-                            selectedRowIndex = index;
-                        }
-                    });
-                    scrollSelectedRowIntoView();
-                }
-            });
-
-        let wakeLock = null;
-        const requestWakeLock = async () => {
-            try {
-                wakeLock = await navigator.wakeLock.request('screen');
-                console.log('Screen wake lock is active');
-            } catch (err) {
-                console.error(`${err.name}, ${err.message}`);
-            }
-        };
-
-        const handleVisibilityChange = () => {
-            if (wakeLock !== null && document.visibilityState === 'visible') {
-                requestWakeLock();
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        requestWakeLock();
-    </script>
+        // Optionally, call this function on window resize if you want to handle dynamic resizing
+        window.onresize = displayButtonsOnMobile;
+    });
+</script>
+<!-- Mobile-specific buttons -->
+<div id="mobileButtons" style="text-align: center; margin-top: 20px; display: none;">
+    <button onclick="window.location.href = 'https://goddardduncan.github.io/sport/';">Sport</button>
+    <button onclick="window.location.href = 'https://goddardduncan.github.io/pluto/';">Pluto</button>
+    <button onclick="window.location.href = 'https://goddardduncan.github.io/tvcast/';">ChromeCast</button>
+</div>
 </body>
 </html>
