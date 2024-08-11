@@ -79,24 +79,24 @@
 
         // Load and evaluate the content of 9now.txt
         function loadChannelLinkMap() {
-            return fetch(channelLinkMapFile)
-                .then(response => response.text())
-                .then(text => {
-                    // Expect the text to contain a valid JavaScript object
-                    try {
-                        const channelLinkMap = new Function('return ' + text)();
-                        console.log('Loaded channelLinkMap:', channelLinkMap);
-                        return channelLinkMap;
-                    } catch (error) {
-                        console.error('Failed to evaluate channelLinkMap:', error);
-                        return {}; // Return an empty map on error
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading channelLinkMap:', error);
-                    return {}; // Return an empty map on error
-                });
-        }
+    return fetch(channelLinkMapFile)
+        .then(response => response.text())
+        .then(text => {
+            try {
+                const channelLinkMap = JSON.parse(text);
+                console.log('Loaded channelLinkMap:', channelLinkMap);
+                return channelLinkMap;
+            } catch (error) {
+                console.error('Failed to parse channelLinkMap:', error);
+                return {}; // Return an empty map on error
+            }
+        })
+        .catch(error => {
+            console.error('Error loading channelLinkMap:', error);
+            return {}; // Return an empty map on error
+        });
+}
+
 
         // Function to set up the TV guide table
         function setupTVGuide(channelLinkMap) {
