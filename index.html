@@ -70,7 +70,7 @@
             // Function to load channel link map from 9now.txt
             async function loadChannelLinkMap() {
                 try {
-                    const response = await fetch('9now.txt');
+                    const response = await fetch('file.txt');
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
@@ -149,7 +149,7 @@
 
             // Function to initialize the TV guide
             async function initTVGuide() {
-                const channelLinkMap = await loadChannelLinkMap(); // Load channel link map from 9now.txt
+                const channelLinkMap = await loadChannelLinkMap(); // Load channel link map from file.txt
 
                 // Start saving m3u8 files to localStorage
                 startSavingToLocalStorage();
