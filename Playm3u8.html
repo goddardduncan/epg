@@ -58,18 +58,16 @@
             }
         }
 
-        function getUrlParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name) ? decodeURIComponent(urlParams.get(name)) : '';
+        function getUrlParameterCheck(name, url) {
+            var startIndex = url.indexOf('https://goddardduncan.github.io/epg/') + 'https://goddardduncan.github.io/epg/'.length;
+            return url.slice(startIndex);
         }
 
-        function decodeBase64Url(encodedUrl) {
-            try {
-                return atob(encodedUrl);
-            } catch (e) {
-                console.error('Invalid Base64 string:', encodedUrl);
-                return '';
-            }
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
 
         async function loadAndPlayStream(url) {
@@ -90,21 +88,16 @@
         }
 
         document.addEventListener("DOMContentLoaded", async function() {
-            var encodedUrl = getUrlParameter('url');
+            var urlParameter = getUrlParameter('url');
             var streamKey = getUrlParameter('stream');
             var url = window.location.href;
             var urlParameterCheck = getUrlParameterCheck('url', url);
 
             const channelLinkMap = await loadChannelLinkMap(); // Load the channel link map dynamically
 
-            if (encodedUrl) {
-                // Decode the Base64 encoded URL
-                var decodedUrl = decodeBase64Url(encodedUrl);
-                if (decodedUrl) {
-                    loadAndPlayStream(decodedUrl);
-                } else {
-                    alert('Failed to decode the provided URL.');
-                }
+            if (urlParameter) {
+                // If a direct URL is provided, use it
+                loadAndPlayStream(urlParameter);
             } else if (streamKey) {
                 // If no URL is provided, check for the stream key in localStorage
                 const m3u8Files = JSON.parse(localStorage.getItem('m3u8Files'));
