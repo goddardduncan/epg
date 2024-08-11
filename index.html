@@ -146,7 +146,19 @@
                     console.error('Error during saving to local storage:', error);
                 }
             }
-
+            async function loadChannelLinkMap() {
+                try {
+                    const response = await fetch('file.txt');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const channelLinkMap = await response.json();
+                    return channelLinkMap;
+                } catch (error) {
+                    console.error('Failed to load channel links:', error);
+                    return {}; // Return an empty map in case of an error
+                }
+            }
             // Function to initialize the TV guide
             async function initTVGuide() {
                 const channelLinkMap = await loadChannelLinkMap(); // Load channel link map from file.txt
