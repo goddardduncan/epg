@@ -1,1 +1,27 @@
-This is the content of the file
+{
+    "mjh-channel-9-vic": "Playm3u8.html?stream=mjh-channel-9-vic",
+    "mjh-gem-vic": "Playm3u8.html?stream=mjh-gem-vic",
+    "mjh-go-vic": "Playm3u8.html?stream=mjh-go-vic",
+    "mjh-life-vic": "Playm3u8.html?stream=mjh-life-vic",
+    "mjh-rush-vic": "Playm3u8.html?stream=mjh-rush-vic",
+    "mjh-seven-mel": "Playm3u8.html?url=https://i.mjh.nz/seven-mel.m3u8",
+    "mjh-7two-mel": "Playm3u8.html?url=https://i.mjh.nz/7two-mel.m3u8",
+    "mjh-7mate-mel": "Playm3u8.html?url=https://i.mjh.nz/7mate-mel.m3u8",
+    "mjh-7flix-mel": "Playm3u8.html?url=https://i.mjh.nz/7flix-mel.m3u8",
+    "mjh-abc-vic": "player.html#https://c.mjh.nz/abc-vic.m3u8",
+    "mjh-sbs": "Playm3u8.html?url=https://i.mjh.nz/sbs.m3u8",
+    "mjh-sbs-vic-hd": "Playm3u8.html?url=https://i.mjh.nz/sbs-vic-hd.m3u8",
+    "mjh-sbs-viceland": "Playm3u8.html?url=https://i.mjh.nz/sbs-viceland.m3u8",
+    "mjh-sbs-food": "Playm3u8.html?url=https://i.mjh.nz/sbs-food.m3u8",
+    "mjh-sbs-world-movies": "Playm3u8.html?url=https://i.mjh.nz/sbs-world-movies.m3u8",
+    "mjh-sbs-nitv": "Playm3u8.html?url=https://i.mjh.nz/sbs-nitv.m3u8",
+    "mjh-10-vic": "Playm3u8.html?url=https://i.mjh.nz/10-vic.m3u8",
+    "mjh-10peach-vic": "Playm3u8.html?url=https://i.mjh.nz/10peach-vic.m3u8",
+    "mjh-10bold-vic": "Playm3u8.html?url=https://i.mjh.nz/10bold-vic.m3u8",
+    "mjh-10shake-vic": "Playm3u8.html?url=https://i.mjh.nz/10shake-vic.m3u8",
+    "mjh-eleven-vic": "Playm3u8.html?url=https://i.mjh.nz/eleven-vic.m3u8",
+    "mjh-one-vic": "Playm3u8.html?url=https://i.mjh.nz/one-vic.m3u8",
+    "mjh-sky-news-aus": "Playm3u8.html?url=https://i.mjh.nz/sky-news-aus.m3u8",
+    "mjh-fox-sports-news": "Playm3u8.html?url=https://i.mjh.nz/fox-sports-news.m3u8",
+    "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8"
+}
