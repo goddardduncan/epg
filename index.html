@@ -70,7 +70,7 @@
             // Function to load channel link map from 9now.txt
             async function loadChannelLinkMap() {
                 try {
-                    const response = await fetch('9now.txt');
+                    const response = await fetch('file.txt');
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
