@@ -39,19 +39,33 @@
         <button onclick="changeChannel('mjh-rush-vic')">RUSH</button>
     </div>
 
+    <!-- Include HLS.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
-        // Function to change the channel
+        const videoPlayer = document.getElementById('videoPlayer');
+
         function changeChannel(channelKey) {
             // Retrieve the stored m3u8 files from localStorage
             const m3u8Files = JSON.parse(localStorage.getItem('m3u8Files'));
 
             if (m3u8Files && m3u8Files[channelKey]) {
-                const videoPlayer = document.getElementById('videoPlayer');
                 const blob = new Blob([m3u8Files[channelKey]], { type: 'application/vnd.apple.mpegurl' });
                 const url = URL.createObjectURL(blob);
 
-                videoPlayer.src = url;
-                videoPlayer.play();
+                if (Hls.isSupported()) {
+                    const hls = new Hls();
+                    hls.loadSource(url);
+                    hls.attachMedia(videoPlayer);
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        videoPlayer.play();
+                    });
+                } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+                    // For Safari, which natively supports HLS
+                    videoPlayer.src = url;
+                    videoPlayer.play();
+                } else {
+                    alert('Your browser does not support HLS.js or native HLS playback.');
+                }
             } else {
                 alert('Channel not available or m3u8 data is missing.');
             }
