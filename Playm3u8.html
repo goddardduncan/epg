@@ -43,7 +43,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
-        // Function to load channel link map from 9now.txt
+        // Your existing JavaScript code
         async function loadChannelLinkMap() {
             try {
                 const response = await fetch('file.txt');
@@ -272,6 +272,96 @@
                 console.log("No selected channel found in localStorage.");
             }
         });
+
+        // Your new script code
+        (function() {
+            'use strict';
+
+            const streamFilenames = {
+                "mjh-channel-9-vic": "m3u8/9.m3u8",
+                "mjh-gem-vic": "m3u8/9gem.m3u8",
+                "mjh-go-vic": "m3u8/9go.m3u8",
+                "mjh-life-vic": "m3u8/9life.m3u8",
+                "mjh-rush-vic": "m3u8/9rush.m3u8"
+            };
+
+            const fetchStreams = () => {
+                return new Promise((resolve, reject) => {
+                    GM_xmlhttpRequest({
+                        method: "GET",
+                        url: "https://goddardduncan.github.io/epg/9now.txt",
+                        onload: function(response) {
+                            if (response.status === 200) {
+                                try {
+                                    const allStreams = JSON.parse(response.responseText);
+                                    // Filter to only include the desired streams
+                                    const selectedStreams = {
+                                        "mjh-channel-9-vic": allStreams["mjh-channel-9-vic"],
+                                        "mjh-gem-vic": allStreams["mjh-gem-vic"],
+                                        "mjh-go-vic": allStreams["mjh-go-vic"],
+                                        "mjh-life-vic": allStreams["mjh-life-vic"],
+                                        "mjh-rush-vic": allStreams["mjh-rush-vic"]
+                                    };
+                                    resolve(selectedStreams);
+                                } catch (error) {
+                                    reject(`Failed to parse stream data: ${error}`);
+                                }
+                            } else {
+                                reject(`Failed to fetch stream URLs: ${response.responseText}`);
+                            }
+                        }
+                    });
+                });
+            };
+
+            function fetchAndStoreFile(url, streamKey) {
+                GM_xmlhttpRequest({
+                    method: "GET",
+                    url: url,
+                    onload: function(response) {
+                        if (response.status === 200) {
+                            const m3u8Content = response.responseText;
+
+                            // Retrieve current storage or initialize as empty object
+                            let storedContent = JSON.parse(localStorage.getItem('m3u8Files')) || {};
+
+                            // Update stored content
+                            storedContent[streamKey] = m3u8Content;
+
+                            // Save back to localStorage
+                            localStorage.setItem('m3u8Files', JSON.stringify(storedContent));
+
+                            console.log('Saved m3u8 file for ' + streamKey);
+                        } else {
+                            console.error('Failed to fetch m3u8 file from ' + url, response.responseText);
+                        }
+                    }
+                });
+            }
+
+            async function startSavingToLocalStorage() {
+                try {
+                    const streams = await fetchStreams();
+                    let delay = 0;
+                    for (let streamKey in streams) {
+                        let streamUrl = streams[streamKey];
+                        setTimeout(() => {
+                            fetchAndStoreFile(streamUrl, streamKey);
+                        }, delay);
+                        delay += 10000; // Increase the delay by 10 seconds (10000 milliseconds) for each iteration
+                    }
+                } catch (error) {
+                    console.error('Error during saving to local storage:', error);
+                }
+            }
+
+            // Run the script every 5 minutes (300000 milliseconds)
+            setInterval(startSavingToLocalStorage, 100000);
+
+            // Start the first run immediately
+            startSavingToLocalStorage();
+
+        })();
     </script>
 </body>
 </html>
