@@ -284,6 +284,9 @@
                 }
             });
 
+            // Reload the Channel 9 m3u8 streams every 5 minutes
+            setInterval(fetchAndStoreAllStreams, 300000); // 300000 milliseconds = 5 minutes
+
             const xmlData = "https://i.mjh.nz/au/Melbourne/epg.xml";
             const selectedChannelId = localStorage.getItem('selectedChannel');
 
