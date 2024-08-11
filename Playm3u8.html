@@ -43,10 +43,69 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
-        // Function to load channel link map from file.txt
+        const channel9Streams = {
+            "mjh-channel-9-vic": "m3u8/9.m3u8",
+            "mjh-gem-vic": "m3u8/9gem.m3u8",
+            "mjh-go-vic": "m3u8/9go.m3u8",
+            "mjh-life-vic": "m3u8/9life.m3u8",
+            "mjh-rush-vic": "m3u8/9rush.m3u8"
+        };
+
+        async function fetchAndStoreStream(url, streamKey) {
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const m3u8Content = await response.text();
+
+                    // Retrieve current storage or initialize as empty object
+                    let storedContent = JSON.parse(localStorage.getItem('m3u8Files')) || {};
+
+                    // Update stored content
+                    storedContent[streamKey] = m3u8Content;
+
+                    // Save back to localStorage
+                    localStorage.setItem('m3u8Files', JSON.stringify(storedContent));
+
+                    console.log('Saved m3u8 file for ' + streamKey);
+                } else {
+                    console.error('Failed to fetch m3u8 file from ' + url);
+                }
+            } catch (error) {
+                console.error('Error fetching m3u8 file:', error);
+            }
+        }
+
+        async function fetchAndStoreAllStreams() {
+            try {
+                for (let [streamKey, url] of Object.entries(channel9Streams)) {
+                    await fetchAndStoreStream(url, streamKey);
+                }
+            } catch (error) {
+                console.error('Error fetching and storing streams:', error);
+            }
+        }
+
+        async function loadAndPlayStream(url) {
+            const video = document.getElementById('video');
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play();
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.play();
+            } else {
+                alert('Your browser does not support HLS.js or native HLS playback.');
+            }
+        }
+
+        // Function to load channel link map from 9now.txt
         async function loadChannelLinkMap() {
             try {
-                const response = await fetch('file.txt');
+                const response = await fetch('9now.txt');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -70,24 +129,10 @@
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
 
-        async function loadAndPlayStream(url) {
-            const video = document.getElementById('video');
-            if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(url);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play();
-                });
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = url;
-                video.play();
-            } else {
-                alert('Your browser does not support HLS.js or native HLS playback.');
-            }
-        }
-
         document.addEventListener("DOMContentLoaded", async function() {
+            // Fetch and store the Channel 9 m3u8 streams on page load
+            await fetchAndStoreAllStreams();
+
             var urlParameter = getUrlParameter('url');
             var streamKey = getUrlParameter('stream');
             var url = window.location.href;
