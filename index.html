@@ -78,24 +78,22 @@
         const channelLinkMapFile = '9now.txt';
 
         // Load and evaluate the content of 9now.txt
-        fetch(channelLinkMapFile)
-            .then(response => response.text())
-            .then(text => {
-                // Evaluate the JavaScript content from 9now.txt
-                eval(text);
-
-                // Now you can use the updated channelLinkMap in the rest of your code
-                console.log(channelLinkMap); // Debugging: check if the map is loaded correctly
-
-                // The rest of your script can now use channelLinkMap as needed
-                setupTVGuide(); // Call the function to set up the TV guide table
-            })
-            .catch(error => {
-                console.error('Error loading channelLinkMap:', error);
-            });
+        function loadChannelLinkMap() {
+            return fetch(channelLinkMapFile)
+                .then(response => response.text())
+                .then(text => {
+                    // Wrap the content in a function to safely execute it
+                    const channelLinkMapFunction = new Function('return ' + text);
+                    return channelLinkMapFunction(); // This should return the channelLinkMap
+                })
+                .catch(error => {
+                    console.error('Error loading channelLinkMap:', error);
+                    return {}; // Return an empty map on error
+                });
+        }
 
         // Function to set up the TV guide table
-        function setupTVGuide() {
+        function setupTVGuide(channelLinkMap) {
             // Variable to keep track of the currently selected row
             let selectedRowIndex = -1;
 
@@ -235,7 +233,6 @@
                                 const iconImg = document.createElement("img");
                                 iconImg.src = icon;
                                 iconImg.addEventListener("click", function() {
-                                    //window.open(mappedChannelLink);
                                     window.location.href = mappedChannelLink;
                                     localStorage.setItem('prevChannel', channelID);
                                     localStorage.setItem('selectedChannel', channelID);
@@ -331,6 +328,11 @@
             // Request a wake lock
             requestWakeLock();
         }
+
+        // Initialize the guide after loading the channel link map
+        loadChannelLinkMap().then(channelLinkMap => {
+            setupTVGuide(channelLinkMap);
+        });
         </script>
     </table>
     <script>
