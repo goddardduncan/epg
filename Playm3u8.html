@@ -43,7 +43,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
-        // Function to load channel link map from 9now.txt
+        // Function to load channel link map from file.txt
         async function loadChannelLinkMap() {
             try {
                 const response = await fetch('file.txt');
@@ -159,21 +159,9 @@
             var url = window.location.href;
             var urlParameterCheck = getUrlParameterCheck('url', url);
 
-            // Function to load channel link map from 9now.txt
-        async function loadChannelLinkMap() {
-            try {
-                const response = await fetch('file.txt');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const channelLinkMap = await response.json();
-                return channelLinkMap;
-            } catch (error) {
-                console.error('Failed to load channel links:', error);
-                return {}; // Return an empty map in case of an error
-            }
-        }
-            
+            // Load the channel link map
+            const channelLinkMap = await loadChannelLinkMap();
+
             if (urlParameter) {
                 // If a direct URL is provided, use it
                 loadAndPlayStream(urlParameter);
