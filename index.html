@@ -75,16 +75,22 @@
         });
 
         // Path to your 9now.txt file
-        const channelLinkMapFile = 'https://goddardduncan.github.io/epg/9now.txt';
+        const channelLinkMapFile = '9now.txt';
 
         // Load and evaluate the content of 9now.txt
         function loadChannelLinkMap() {
             return fetch(channelLinkMapFile)
                 .then(response => response.text())
                 .then(text => {
-                    // Wrap the content in a function to safely execute it
-                    const channelLinkMapFunction = new Function('return ' + text);
-                    return channelLinkMapFunction(); // This should return the channelLinkMap
+                    // Expect the text to contain a valid JavaScript object
+                    try {
+                        const channelLinkMap = new Function('return ' + text)();
+                        console.log('Loaded channelLinkMap:', channelLinkMap);
+                        return channelLinkMap;
+                    } catch (error) {
+                        console.error('Failed to evaluate channelLinkMap:', error);
+                        return {}; // Return an empty map on error
+                    }
                 })
                 .catch(error => {
                     console.error('Error loading channelLinkMap:', error);
@@ -94,6 +100,11 @@
 
         // Function to set up the TV guide table
         function setupTVGuide(channelLinkMap) {
+            if (Object.keys(channelLinkMap).length === 0) {
+                console.error('channelLinkMap is empty. Cannot proceed with guide setup.');
+                return;
+            }
+
             // Variable to keep track of the currently selected row
             let selectedRowIndex = -1;
 
