@@ -24,6 +24,6 @@
                 "mjh-one-vic": "Playm3u8.html?url=https://i.mjh.nz/one-vic.m3u8",
                 "mjh-sky-news-aus": "Playm3u8.html?url=https://i.mjh.nz/sky-news-aus.m3u8",
                 "mjh-fox-sports-news": "Playm3u8.html?url=https://i.mjh.nz/fox-sports-news.m3u8",
-                "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8",
+                "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/c31.m3u8"
             };
         
