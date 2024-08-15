@@ -72,7 +72,6 @@
 
         document.addEventListener("DOMContentLoaded", async function() {
             if (isIPad()) {
-                var video = document.getElementById('video');
                 var videoContainer = document.getElementById('video-container');
 
                 // Create the back button
@@ -87,32 +86,20 @@
                 // Show the back button
                 backButton.style.display = 'block';
 
-                // Handle fullscreen changes specifically for iPads and Safari
-                video.addEventListener('webkitbeginfullscreen', function() {
-                    backButton.style.position = 'fixed';
-                    backButton.style.display = 'block';
-                });
-
-                video.addEventListener('webkitendfullscreen', function() {
-                    backButton.style.display = 'block';
-                });
-
-                // Standard fullscreen change events for other browsers
+                // Handle fullscreen changes
                 document.addEventListener('fullscreenchange', function() {
                     if (document.fullscreenElement) {
-                        backButton.style.position = 'fixed';
-                        backButton.style.display = 'block';
+                        backButton.style.position = 'fixed'; // Ensure it's still fixed
                     } else {
-                        backButton.style.display = 'block';
+                        backButton.style.position = 'fixed';
                     }
                 });
 
                 document.addEventListener('webkitfullscreenchange', function() { // For Safari support
                     if (document.webkitFullscreenElement) {
                         backButton.style.position = 'fixed';
-                        backButton.style.display = 'block';
                     } else {
-                        backButton.style.display = 'block';
+                        backButton.style.position = 'fixed';
                     }
                 });
             }
@@ -388,7 +375,7 @@
                                     const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
                                     const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
 
-                                    if (currentTime >= start and currentTime <= end) {
+                                    if (currentTime >= start && currentTime <= end) {
                                         const descElements = program.getElementsByTagName("desc");
                                         const desc = descElements.length > 0 ? descElements[0].textContent : 'No description available';
                                         localStorage.setItem('descripto', desc);
