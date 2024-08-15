@@ -35,10 +35,10 @@
             font-size: 1.5em;
         }
 
-        /* iPad-specific back button */
+        /* iPad-specific back button in bottom left corner */
         #back-button {
-            position: absolute;
-            top: 20px;
+            position: fixed; /* Fixed position to stay on screen even in fullscreen */
+            bottom: 20px;
             left: 20px;
             background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
             color: #fff; /* White text color */
@@ -80,8 +80,8 @@
                 backButton.href = 'https://goddardduncan.github.io/epg/';
                 backButton.textContent = 'Back';
 
-                // Append the back button to the video container
-                videoContainer.appendChild(backButton);
+                // Append the back button to the body instead of the video container
+                document.body.appendChild(backButton);
 
                 // Show the back button
                 backButton.style.display = 'block';
