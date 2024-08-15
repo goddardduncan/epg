@@ -85,6 +85,23 @@
 
                 // Show the back button
                 backButton.style.display = 'block';
+
+                // Handle fullscreen changes
+                document.addEventListener('fullscreenchange', function() {
+                    if (document.fullscreenElement) {
+                        backButton.style.position = 'fixed'; // Ensure it's still fixed
+                    } else {
+                        backButton.style.position = 'fixed';
+                    }
+                });
+
+                document.addEventListener('webkitfullscreenchange', function() { // For Safari support
+                    if (document.webkitFullscreenElement) {
+                        backButton.style.position = 'fixed';
+                    } else {
+                        backButton.style.position = 'fixed';
+                    }
+                });
             }
 
             async function loadChannelLinkMap() {
