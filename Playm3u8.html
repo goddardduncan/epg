@@ -43,10 +43,10 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
-        // Function to load channel link map from file.txt
+        // Function to load channel link map from channels.json
         async function loadChannelLinkMap() {
             try {
-                const response = await fetch('file.txt');
+                const response = await fetch('channels.json');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

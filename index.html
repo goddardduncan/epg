@@ -67,10 +67,10 @@
         </tr>
 
         <script>
-            // Function to load channel link map from 9now.txt
+            // Function to load channel link map from channels.json
             async function loadChannelLinkMap() {
                 try {
-                    const response = await fetch('file.txt');
+                    const response = await fetch('channels.json');
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
@@ -148,7 +148,7 @@
             }
             async function loadChannelLinkMap() {
                 try {
-                    const response = await fetch('file.txt');
+                    const response = await fetch('channels.json');
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
@@ -161,7 +161,7 @@
             }
             // Function to initialize the TV guide
             async function initTVGuide() {
-                const channelLinkMap = await loadChannelLinkMap(); // Load channel link map from file.txt
+                const channelLinkMap = await loadChannelLinkMap(); // Load channel link map from channels.json
 
                 // Start saving m3u8 files to localStorage
                 startSavingToLocalStorage();
