@@ -8,4 +8,4 @@ This EPG is designed for a wireless remote so the buttons are fit for purpose.<b
 
 While watching: **Up** shows program info.  **Down** mutes. **Left** moves a channel up in the guide.  **Right** moves a channel down in the guide.  **Escape** returns to the last channel you selected FROM the EPG.  **Home** returns you to the EPG.<br><br>
 
-If you want to use the Pluto sport and movie channels, install the **DeeGee HLS playback** extension to chrome extensions in developer mode.  Then you can press **left** or **right** from the guide to move to these new channels.
+You might notice that if you use left or right keypresses from the guide, it takes you to new channel lists.  If you want to use the Pluto sport and movie channels, install the **DeeGee HLS playback** extension to chrome extensions in developer mode.  Then you can press **left** or **right** from the guide to watch these new channels.  Without the extension, selecting one of these channels downloads an m3u8 file.
