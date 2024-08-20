@@ -67,6 +67,28 @@
         </tr>
 
         <script>
+            // Function to load and transform channel order into channelMap
+            async function loadChannelMap() {
+                try {
+                    const response = await fetch('channelorder.json');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const channelOrder = await response.json();
+
+                    // Transform channel order into the required channelMap format
+                    const channelMap = channelOrder.reduce((map, channel) => {
+                        map[channel.id] = channel.name;
+                        return map;
+                    }, {});
+
+                    return channelMap;
+                } catch (error) {
+                    console.error('Failed to load channel order:', error);
+                    return {}; // Return an empty map in case of an error
+                }
+            }
+
             // Function to load channel link map from channels.json
             async function loadChannelLinkMap() {
                 try {
@@ -146,27 +168,15 @@
                     console.error('Error during saving to local storage:', error);
                 }
             }
-            async function loadChannelLinkMap() {
-                try {
-                    const response = await fetch('channels.json');
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const channelLinkMap = await response.json();
-                    return channelLinkMap;
-                } catch (error) {
-                    console.error('Failed to load channel links:', error);
-                    return {}; // Return an empty map in case of an error
-                }
-            }
+
             // Function to initialize the TV guide
             async function initTVGuide() {
+                const channelMap = await loadChannelMap(); // Load and transform channel order to channelMap
                 const channelLinkMap = await loadChannelLinkMap(); // Load channel link map from channels.json
 
                 // Start saving m3u8 files to localStorage
                 startSavingToLocalStorage();
 
-                // Rest of your existing code that uses channelLinkMap...
                 let selectedRowIndex = -1;
 
                 // Function to handle key presses
@@ -236,30 +246,6 @@
 
                 const xmlData = "https://i.mjh.nz/au/Melbourne/epg.xml";
                 const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
-
-                // Map of channel IDs to their desired names
-                const channelMap = {
-                    "mjh-abc-vic": "ABC",
-                    "mjh-seven-mel": "Seven",
-                    "mjh-7two-mel": "7two",
-                    "mjh-7mate-mel": "7mate",
-                    "mjh-7flix-mel": "7flix",
-                    "mjh-channel-9-vic": "Channel 9",
-                    "mjh-gem-vic": "9Gem",
-                    "mjh-go-vic": "9Go",
-                    "mjh-life-vic": "9Life",
-                    "mjh-rush-vic": "9Rush",
-                    "mjh-10-vic": "Channel 10",
-                    "mjh-10bold-vic": "10Bold",
-                    "mjh-10peach-vic": "10Peach",
-                    "mjh-10shake-vic": "10Shake",
-                    "mjh-sbs": "SBS",
-                    "mjh-sbs-viceland": "SBS Viceland",
-                    "mjh-sbs-food": "SBS Food",
-                    "mjh-sbs-world-movies": "SBS World Movies",
-                    "mjh-sbs-nitv": "NITV",
-                    "mjh-c31": "Channel 31",
-                };
 
                 fetch(xmlData)
                     .then(response => response.text())
