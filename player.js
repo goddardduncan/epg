@@ -69,7 +69,7 @@ function playM3u8(url) {
 debug = false;
 var native = false;
 var s = document.createElement('script');
-s.src = 'hlsjs/hls.1.1.5.min.js';
+s.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
 s.onload = function() { playM3u8(window.location.href.split("#")[1]); };
 (document.head || document.documentElement).appendChild(s);
 
