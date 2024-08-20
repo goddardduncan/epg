@@ -1,3 +1,4 @@
+[
     {"id": "mjh-abc-vic", "name": "ABC"},
     {"id": "mjh-seven-mel", "name": "Seven"},
     {"id": "mjh-7two-mel", "name": "7two"},
@@ -18,3 +19,4 @@
     {"id": "mjh-sbs-world-movies", "name": "SBS World Movies"},
     {"id": "mjh-sbs-nitv", "name": "NITV"},
     {"id": "mjh-c31", "name": "Channel 31"}
+]
