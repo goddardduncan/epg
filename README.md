@@ -2,3 +2,6 @@
 Wrecked our TV receppo with cheap lights from Bunnings.  Decided to cut the cable and go IPTV.  This is a wrapper on [Matt](https://www.matthuisman.nz/)'s work.<br><br>
 https://goddardduncan.github.io/epg/
 <img width="1231" alt="image" src="https://github.com/user-attachments/assets/d158440e-2af8-4960-bb35-bfcc0c4f1981">
+
+
+If you want to use the Pluto sport and movie channels, install the **DeeGee HLS playback** extension to chrome extensions in developer mode.
