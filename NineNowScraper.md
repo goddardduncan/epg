@@ -7,4 +7,4 @@ then you can install the scraper extension.  Fill in those details in the option
 m3u8 links w/ tokens every 20 hours.<br><br>  
 
 You probably won't even notice it when (every 20 hours) it opens the windows systematically to each of the channel 9 channels, waits for your tokenised m3u8 links to appear in your browser, saves 
-them and then uploads them to your github. **It's what I use here for 9now.json**
+them and then uploads them to your github. <br><br>**It's what I use here for 9now.json**
