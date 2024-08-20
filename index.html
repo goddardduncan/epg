@@ -67,10 +67,10 @@
         </tr>
 
         <script>
-            // Function to load channel link map from channels.json
+            // Function to load channel link map from 9now.txt
             async function loadChannelLinkMap() {
                 try {
-                    const response = await fetch('channels.json');
+                    const response = await fetch('file.txt');
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
@@ -84,7 +84,7 @@
 
             async function fetchStreams() {
                 try {
-                    const response = await fetch('https://goddardduncan.github.io/epg/9now.json');
+                    const response = await fetch('https://goddardduncan.github.io/epg/9now.txt');
                     if (!response.ok) {
                         throw new Error(`Failed to fetch stream URLs: ${response.statusText}`);
                     }
@@ -148,7 +148,7 @@
             }
             async function loadChannelLinkMap() {
                 try {
-                    const response = await fetch('channels.json');
+                    const response = await fetch('file.txt');
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
@@ -161,7 +161,7 @@
             }
             // Function to initialize the TV guide
             async function initTVGuide() {
-                const channelLinkMap = await loadChannelLinkMap(); // Load channel link map from channels.json
+                const channelLinkMap = await loadChannelLinkMap(); // Load channel link map from file.txt
 
                 // Start saving m3u8 files to localStorage
                 startSavingToLocalStorage();
