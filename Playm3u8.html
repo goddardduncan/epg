@@ -43,6 +43,20 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
+        async function loadChannelOrder() {
+            try {
+                const response = await fetch('channelorder.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const channelOrder = await response.json();
+                return channelOrder;
+            } catch (error) {
+                console.error('Failed to load channel order:', error);
+                return []; // Return an empty array in case of an error
+            }
+        }
+
         // Function to load channel link map from channels.json
         async function loadChannelLinkMap() {
             try {
@@ -143,24 +157,24 @@
                     setTimeout(() => {
                         fetchAndStoreFile(streamUrl, streamKey);
                     }, delay);
-                    delay += 1000; // Increase the delay by 1 seconds (2000 milliseconds) for each iteration
+                    delay += 1000; // Increase the delay by 1 second (1000 milliseconds) for each iteration
                 }
 
                 // Pause for 5 minutes (300000 milliseconds) after processing all streams
-                setTimeout(startSavingToLocalStorage, 100000);
+                setTimeout(startSavingToLocalStorage, 300000);
             } catch (error) {
                 console.error('Error during saving to local storage:', error);
             }
         }
 
         document.addEventListener("DOMContentLoaded", async function() {
+            const channelsOrder = await loadChannelOrder();
+            const channelLinkMap = await loadChannelLinkMap();
+
             var urlParameter = getUrlParameter('url');
             var streamKey = getUrlParameter('stream');
             var url = window.location.href;
             var urlParameterCheck = getUrlParameterCheck('url', url);
-
-            // Load the channel link map
-            const channelLinkMap = await loadChannelLinkMap();
 
             if (urlParameter) {
                 // If a direct URL is provided, use it
@@ -180,29 +194,6 @@
 
             // Start saving m3u8 files to localStorage every 5 minutes
             startSavingToLocalStorage();
-
-            var channelsOrder = [
-                {"id": "mjh-abc-vic", "name": "ABC"},
-                {"id": "mjh-seven-mel", "name": "Seven"},
-                {"id": "mjh-7two-mel", "name": "7two"},
-                {"id": "mjh-7mate-mel", "name": "7mate"},
-                {"id": "mjh-7flix-mel", "name": "7flix"},
-                {"id": "mjh-channel-9-vic", "name": "Channel 9"},
-                {"id": "mjh-gem-vic", "name": "9Gem"},
-                {"id": "mjh-go-vic", "name": "9Go"},
-                {"id": "mjh-life-vic", "name": "9Life"},
-                {"id": "mjh-rush-vic", "name": "9Rush"},
-                {"id": "mjh-10-vic", "name": "Channel 10"},
-                {"id": "mjh-10bold-vic", "name": "10Bold"},
-                {"id": "mjh-10peach-vic", "name": "10Peach"},
-                {"id": "mjh-10shake-vic", "name": "10Shake"},
-                {"id": "mjh-sbs", "name": "SBS"},
-                {"id": "mjh-sbs-viceland", "name": "SBS Viceland"},
-                {"id": "mjh-sbs-food", "name": "SBS Food"},
-                {"id": "mjh-sbs-world-movies", "name": "SBS World Movies"},
-                {"id": "mjh-sbs-nitv", "name": "NITV"},
-                {"id": "mjh-c31", "name": "Channel 31"}
-            ];
 
             var isMatch = false;
             var storedChannel = localStorage.getItem('selectedChannel');
@@ -229,7 +220,7 @@
             var backChannel = localStorage.getItem('prevChannel');
             var backChannelIndex = channelsOrder.findIndex(channel => channel.id === backChannel);
             var currentChannel = channelsOrder.find(channel => channel.id === storedChannel);
-            document.title = currentChannel.name;
+            document.title = currentChannel ? currentChannel.name : "Live TV";
 
             localStorage.setItem('Matchey', isMatch.toString());
 
