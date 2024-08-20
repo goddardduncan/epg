@@ -1,4 +1,4 @@
-**NineNow Sniffer**
+**NineNow Scraper**
 
 Want to get your own personal 9now links sniffed daily?<br><br>
 
