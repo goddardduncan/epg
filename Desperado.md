@@ -10,4 +10,4 @@ While watching: **Enter** plays. **Up** shows program info.  **Down** mutes. **L
 
 You might notice that if you use left or right keypresses from the guide, it takes you to new channel lists.  If you want to use the Pluto sport and movie channels, install the **DeeGee HLS playback** extension to chrome extensions in developer mode.  Then you can press **left** or **right** from the guide to watch these new channels.  Without the extension, selecting one of these channels downloads an m3u8 file.<br><br>
 
-The extension is a modified version of **Native HLS playback** but has modifications to keypress behaviour while watching these channels.
+The extension is a modified version of **Native HLS playback** but has modifications to keypress behaviour while watching these channels to maintain consistency in guide/mute/subtitle behaviours within the EPG.
