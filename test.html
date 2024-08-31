@@ -54,7 +54,7 @@
             position: absolute;
             width: 2px;
             height: 100%;
-            background-color: rgba(255, 165, 0, 0.7); /* Orange and slightly transparent */
+            background-color: #FFFFFF; /* Opaque white */
             top: 0;
             left: 0;
         }
@@ -179,17 +179,25 @@
 
             // Function to create and position the progress bar
             function createProgressBar(startTime, endTime, cell) {
-                const currentTime = new Date();
-                if (currentTime >= startTime && currentTime <= endTime) {
-                    const duration = endTime - startTime;
-                    const elapsed = currentTime - startTime;
-                    const progressPercentage = (elapsed / duration) * 100;
+                try {
+                    const currentTime = new Date();
+                    if (currentTime >= startTime && currentTime <= endTime) {
+                        const duration = endTime - startTime;
+                        const elapsed = currentTime - startTime;
+                        const progressPercentage = (elapsed / duration) * 100;
 
-                    const progressBar = document.createElement('div');
-                    progressBar.className = 'progress-bar';
-                    progressBar.style.left = progressPercentage + '%';
-                    cell.style.position = 'relative';
-                    cell.appendChild(progressBar);
+                        console.log(`Creating progress bar: ${progressPercentage}% through program`);
+
+                        const progressBar = document.createElement('div');
+                        progressBar.className = 'progress-bar';
+                        progressBar.style.left = progressPercentage + '%';
+                        cell.style.position = 'relative';
+                        cell.appendChild(progressBar);
+                    } else {
+                        console.log('Current time is outside the program time range');
+                    }
+                } catch (error) {
+                    console.error('Error creating progress bar:', error);
                 }
             }
 
@@ -320,8 +328,10 @@
                                     const titleCell = document.createElement("td");
                                     titleCell.appendChild(document.createTextNode(title));
 
-                                    // Create the progress bar for the current program
-                                    createProgressBar(start, end, titleCell);
+                                    // Create the progress bar for the current program after the title cell is fully rendered
+                                    setTimeout(() => {
+                                        createProgressBar(start, end, titleCell);
+                                    }, 0);
 
                                     row.appendChild(titleCell);
 
