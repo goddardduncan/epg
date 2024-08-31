@@ -179,27 +179,30 @@
 
             // Function to create and position the progress bar
             function createProgressBar(startTime, endTime, cell) {
-                try {
-                    const currentTime = new Date();
-                    if (currentTime >= startTime && currentTime <= endTime) {
-                        const duration = endTime - startTime;
-                        const elapsed = currentTime - startTime;
-                        const progressPercentage = (elapsed / duration) * 100;
+    try {
+        const currentTime = new Date();
+        console.log(`Start Time: ${startTime}, End Time: ${endTime}, Current Time: ${currentTime}`);
 
-                        console.log(`Creating progress bar: ${progressPercentage}% through program`);
+        if (currentTime >= startTime && currentTime <= endTime) {
+            const duration = endTime - startTime;
+            const elapsed = currentTime - startTime;
+            const progressPercentage = (elapsed / duration) * 100;
 
-                        const progressBar = document.createElement('div');
-                        progressBar.className = 'progress-bar';
-                        progressBar.style.left = progressPercentage + '%';
-                        cell.style.position = 'relative';
-                        cell.appendChild(progressBar);
-                    } else {
-                        console.log('Current time is outside the program time range');
-                    }
-                } catch (error) {
-                    console.error('Error creating progress bar:', error);
-                }
-            }
+            console.log(`Creating progress bar: ${progressPercentage}% through program`);
+
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress-bar';
+            progressBar.style.left = progressPercentage + '%';
+            cell.style.position = 'relative';
+            cell.appendChild(progressBar);
+        } else {
+            console.log('Current time is outside the program time range');
+        }
+    } catch (error) {
+        console.error('Error creating progress bar:', error);
+    }
+}
+
 
             // Function to initialize the TV guide
             async function initTVGuide() {
