@@ -253,7 +253,14 @@
 
                             // Check if this is the Block row
                             if (selectedRow.innerText.includes("The Block")) {
-                                // Navigate to the Block link
+                                try {
+                                    const response = await fetch('block.json');
+                                    if (!response.ok) {
+                                    throw new Error(`Failed to load block episode: ${response.statusText}`);
+                                    }
+                                const blockData = await response.json();
+                                const blockUrl = blockData.block;
+                                const playUrl = `Playm3u8.html?url=${encodeURIComponent(blockUrl)}`;
                                 window.location.href = playUrl;
                             } else {
                                 const image = selectedRow.querySelector('img');
