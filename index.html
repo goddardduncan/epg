@@ -250,12 +250,20 @@
                     } else if (event.key === "Enter") {
                         if (selectedRowIndex !== -1) {
                             const selectedRow = tableRows[selectedRowIndex];
-                            const image = selectedRow.querySelector('img');
-                            const channelLink = image.dataset.channelLink;
-                            window.location.href = channelLink;
-                            const channelId = image.dataset.channelId;
-                            localStorage.setItem('selectedChannel', channelId);
-                            localStorage.setItem('prevChannel', channelId);
+
+                            // Check if this is the Block row
+                            if (selectedRow.innerText.includes("The Block")) {
+                                // Navigate to the Block link
+                                const blockUrl = 'Playm3u8.html?url=' + encodeURIComponent(selectedRow.querySelector('img').src);
+                                window.location.href = blockUrl;
+                            } else {
+                                const image = selectedRow.querySelector('img');
+                                const channelLink = image.dataset.channelLink;
+                                window.location.href = channelLink;
+                                const channelId = image.dataset.channelId;
+                                localStorage.setItem('selectedChannel', channelId);
+                                localStorage.setItem('prevChannel', channelId);
+                            }
                         }
                     }
                 });
