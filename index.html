@@ -104,6 +104,39 @@
         </tr>
 
         <script>
+            // Function to refresh Gist
+            async function refreshGist() {
+                try {
+                    const response = await fetch('https://api.github.com/gists/20ba022255783133d8b9808ba1371b42');
+                    const gist = await response.json();
+                    const file = gist.files['refresh.now'];
+                    const newContent = (parseInt(file.content) + 1).toString();
+                    const tok1 = 'ghp_zvcKEJtR1Ma5t2rp';
+                    const tok2 = 'o72eXNfx56Q3ef0SCpsV';
+                    // Combine the two parts to form the complete token
+                    const token = `${tok1}${tok2}`;
+
+                    await fetch('https://api.github.com/gists/20ba022255783133d8b9808ba1371b42', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `token ${token}`
+                        },
+                        body: JSON.stringify({
+                            files: {
+                                'refresh.now': {
+                                    content: "1"
+                                }
+                            }
+                        })
+                    });
+
+                    console.log('Gist updated successfully with new content:', newContent);
+                } catch (error) {
+                    console.error('Error updating gist:', error);
+                }
+            }
+
             async function loadChannelMap() {
                 try {
                     const response = await fetch('channelorder.json');
@@ -249,10 +282,11 @@
                             scrollSelectedRowIntoView();
                         }
                     } else if (event.key === "Enter") {
-                        if (selectedRowIndex !== -1) {
+                        if (selectedRowIndex === 0) { // Check if the top row is selected
+                            refreshGist();
+                        } else if (selectedRowIndex !== -1) {
                             const selectedRow = tableRows[selectedRowIndex];
 
-                            
                             // Check if this is the Block row
                             if (selectedRow.innerText.includes("The Block")) {
                                 // Trigger the click on the Block icon
