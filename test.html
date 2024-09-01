@@ -55,10 +55,10 @@
             position: absolute;
             width: 23px;
             height: 10%;
-            background-color: rgba(255, 255, 255, 0.5); /* Transparent white */
-            top: 1px; /* Move the progress bar down by 1px */
+            background-color: rgba(255, 255, 255, 0.5); 
+            bottom: 1px; 
             left: 0;
-            border-radius: 5px; /* Add rounded edges */
+            border-radius: 5px; 
         }
 
         
@@ -187,15 +187,10 @@
                 const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
                 const currentTimeUTC = new Date(new Date().getTime() + timezoneOffsetInMinutes * 60 * 1000);
 
-                console.log(`Adjusted Start Time: ${adjustedStart}, Adjusted End Time: ${adjustedEnd}, Current Time UTC: ${currentTimeUTC}`);
-
                 if (currentTimeUTC >= adjustedStart && currentTimeUTC <= adjustedEnd) {
                 const duration = adjustedEnd - adjustedStart;
                 const elapsed = currentTimeUTC - adjustedStart;
                 const progressPercentage = (elapsed / duration) * 100;
-
-                console.log(`Creating progress bar: ${progressPercentage}% through program`);
-
                 const progressBar = document.createElement('div');
                 progressBar.className = 'progress-bar';
                 progressBar.style.left = progressPercentage + '%';
