@@ -59,9 +59,33 @@
             bottom: 1px; 
             left: 0;
             border-radius: 5px; 
+            transition: background-color 0.3s ease;
         }
 
-        
+        .progress-bar:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .knob {
+            position: absolute;
+            bottom: 12px; /* 1px above the progress bar */
+            left: 0;
+            padding: 5px 10px;
+            background-color: #4f5e80;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(-50%);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none; /* Ensure the knob itself does not interfere with hover */
+        }
+
+        .progress-bar:hover .knob {
+            opacity: 1;
+            transform: translateX(-50%) scale(1.1); /* Slightly enlarge the knob */
+        }
     </style>
 </head>
 <body>
@@ -69,7 +93,7 @@
     <table>
         <tr>
             <th>Channel</th> 
-            <th> </th>
+            <th></th>
             <th>What's Playing</th>
             <th>Start Time</th>
             <th>End Time</th>
@@ -79,7 +103,6 @@
         </tr>
 
         <script>
-            // Function to load and transform channel order into channelMap
             async function loadChannelMap() {
                 try {
                     const response = await fetch('channelorder.json');
@@ -87,21 +110,17 @@
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const channelOrder = await response.json();
-
-                    // Transform channel order into the required channelMap format
                     const channelMap = channelOrder.reduce((map, channel) => {
                         map[channel.id] = channel.name;
                         return map;
                     }, {});
-
                     return channelMap;
                 } catch (error) {
                     console.error('Failed to load channel order:', error);
-                    return {}; // Return an empty map in case of an error
+                    return {};
                 }
             }
 
-            // Function to load channel link map from channels.json
             async function loadChannelLinkMap() {
                 try {
                     const response = await fetch('channels.json');
@@ -112,7 +131,7 @@
                     return channelLinkMap;
                 } catch (error) {
                     console.error('Failed to load channel links:', error);
-                    return {}; // Return an empty map in case of an error
+                    return {};
                 }
             }
 
@@ -123,7 +142,6 @@
                         throw new Error(`Failed to fetch stream URLs: ${response.statusText}`);
                     }
                     const allStreams = await response.json();
-                    // Filter to only include the desired streams
                     return {
                         "mjh-channel-9-vic": allStreams["mjh-channel-9-vic"],
                         "mjh-gem-vic": allStreams["mjh-gem-vic"],
@@ -146,15 +164,9 @@
                         return response.text();
                     })
                     .then(m3u8Content => {
-                        // Retrieve current storage or initialize as empty object
                         let storedContent = JSON.parse(localStorage.getItem('m3u8Files')) || {};
-
-                        // Update stored content
                         storedContent[streamKey] = m3u8Content;
-
-                        // Save back to localStorage
                         localStorage.setItem('m3u8Files', JSON.stringify(storedContent));
-
                         console.log('Saved m3u8 file for ' + streamKey);
                     })
                     .catch(error => {
@@ -171,57 +183,52 @@
                         setTimeout(() => {
                             fetchAndStoreFile(streamUrl, streamKey);
                         }, delay);
-                        delay += 1000; // Increase the delay by 1 second (1000 milliseconds) for each iteration
+                        delay += 1000;
                     }
-
-                    // Pause for 5 minutes (100000 milliseconds) after processing all streams
                     setTimeout(startSavingToLocalStorage, 100000);
                 } catch (error) {
                     console.error('Error during saving to local storage:', error);
                 }
             }
 
-                function createProgressBar(adjustedStart, adjustedEnd, cell) {
+            function createProgressBar(adjustedStart, adjustedEnd, cell) {
                 try {
-                // Adjust current time to UTC by subtracting the timezone offset
-                const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
-                const currentTimeUTC = new Date(new Date().getTime() + timezoneOffsetInMinutes * 60 * 1000);
+                    const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
+                    const currentTimeUTC = new Date(new Date().getTime() + timezoneOffsetInMinutes * 60 * 1000);
 
-                if (currentTimeUTC >= adjustedStart && currentTimeUTC <= adjustedEnd) {
-                const duration = adjustedEnd - adjustedStart;
-                const elapsed = currentTimeUTC - adjustedStart;
-                const progressPercentage = (elapsed / duration) * 100;
-                const progressBar = document.createElement('div');
-                progressBar.className = 'progress-bar';
-                progressBar.style.left = progressPercentage + '%';
-                cell.style.position = 'relative';
-                cell.appendChild(progressBar);
-                } else {
-            console.log('Current time is outside the program time range');
+                    if (currentTimeUTC >= adjustedStart && currentTimeUTC <= adjustedEnd) {
+                        const duration = adjustedEnd - adjustedStart;
+                        const elapsed = currentTimeUTC - adjustedStart;
+                        const progressPercentage = (elapsed / duration) * 100;
+                        const progressBar = document.createElement('div');
+                        progressBar.className = 'progress-bar';
+                        progressBar.style.left = progressPercentage + '%';
+                        cell.style.position = 'relative';
+
+                        // Create the knob
+                        const knob = document.createElement('div');
+                        knob.className = 'knob';
+                        knob.innerText = `${Math.floor(progressPercentage)}%`; // Display the percentage
+                        progressBar.appendChild(knob); // Attach the knob to the progress bar
+
+                        cell.appendChild(progressBar);
+                    } else {
+                        console.log('Current time is outside the program time range');
+                    }
+                } catch (error) {
+                    console.error('Error creating progress bar:', error);
+                }
             }
-        } catch (error) {
-        console.error('Error creating progress bar:', error);
-            }
-        }
 
-
-
-
-            // Function to initialize the TV guide
             async function initTVGuide() {
-                const channelMap = await loadChannelMap(); // Load and transform channel order to channelMap
-                const channelLinkMap = await loadChannelLinkMap(); // Load channel link map from channels.json
-
-                // Start saving m3u8 files to localStorage
+                const channelMap = await loadChannelMap();
+                const channelLinkMap = await loadChannelLinkMap();
                 startSavingToLocalStorage();
-
                 let selectedRowIndex = -1;
 
-                // Function to handle key presses
                 document.addEventListener("keydown", function(event) {
-                    event.preventDefault(); // Prevent default scrolling behavior
+                    event.preventDefault();
                     const tableRows = document.querySelectorAll('table tr');
-                    // Check if up arrow key is pressed
                     if (event.key === "ArrowUp") {
                         if (selectedRowIndex > 0) {
                             tableRows[selectedRowIndex].classList.remove("selected");
@@ -229,10 +236,7 @@
                             tableRows[selectedRowIndex].classList.add("selected");
                             scrollSelectedRowIntoView();
                         }
-                    }
-                    
-                    // Check if down arrow key is pressed
-                    else if (event.key === "ArrowDown") {
+                    } else if (event.key === "ArrowDown") {
                         if (selectedRowIndex < tableRows.length - 1) {
                             if (selectedRowIndex !== -1) {
                                 tableRows[selectedRowIndex].classList.remove("selected");
@@ -241,17 +245,12 @@
                             tableRows[selectedRowIndex].classList.add("selected");
                             scrollSelectedRowIntoView();
                         }
-                    }
-
-                    // Check if enter key is pressed
-                    else if (event.key === "Enter") {
+                    } else if (event.key === "Enter") {
                         if (selectedRowIndex !== -1) {
                             const selectedRow = tableRows[selectedRowIndex];
                             const image = selectedRow.querySelector('img');
                             const channelLink = image.dataset.channelLink;
                             window.location.href = channelLink;
-
-                            // Store the selected channel in localStorage
                             const channelId = image.dataset.channelId;
                             localStorage.setItem('selectedChannel', channelId);
                             localStorage.setItem('prevChannel', channelId);
@@ -259,13 +258,12 @@
                     }
                 });
 
-                // Function to scroll the selected row into view
                 function scrollSelectedRowIntoView() {
                     const tableRows = document.querySelectorAll('table tr');
                     const selectedRow = tableRows[selectedRowIndex];
-                    const stickyRowHeight = document.querySelector('th').offsetHeight; // Get the height of the sticky row
-                    const selectedRowTop = selectedRow.getBoundingClientRect().top; // Get the top position of the selected row relative to the viewport
-                    const offset = selectedRowTop - stickyRowHeight; // Calculate the offset to scroll to
+                    const stickyRowHeight = document.querySelector('th').offsetHeight;
+                    const selectedRowTop = selectedRow.getBoundingClientRect().top;
+                    const offset = selectedRowTop - stickyRowHeight;
 
                     window.scrollBy({
                         top: offset,
@@ -274,7 +272,6 @@
                 }
 
                 const table = document.querySelector('table');
-
                 const xmlData = "https://i.mjh.nz/au/Melbourne/epg.xml";
                 const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
 
@@ -287,30 +284,23 @@
                         currentTime.setTime(currentTime.getTime() + (timezoneOffsetInMinutes * 60 * 1000));
                         const options = { hour12: true, hour: "numeric", minute: "numeric" };
 
-                        // Sort the channels based on their order in the channelMap
                         const sortedChannels = Object.keys(channelMap).sort((a, b) => {
                             return Object.keys(channelMap).indexOf(a) - Object.keys(channelMap).indexOf(b);
                         });
 
-                        // Loop through the sorted channels and generate table rows accordingly
                         sortedChannels.forEach(channelID => {
-                            // Find the programs associated with the current channelID
                             const channelPrograms = Array.from(programs).filter(program => program.getAttribute("channel") === channelID);
 
-                            // Proceed with generating table rows for each program in the channelPrograms
-                            channelPrograms.forEach((program, index) => { // Added 'index' to get the next program
-                                // Fill the table with the channels
+                            channelPrograms.forEach((program, index) => {
                                 const channel = channelID;
                                 const title = program.getElementsByTagName("title")[0].childNodes[0].nodeValue;
                                 const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
                                 const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
                                 const icon = program.getElementsByTagName("icon")[0].getAttribute("src");
 
-                                // Map the channel ID to its desired name
                                 const mappedChannel = channelMap[channel] || channel;
                                 const mappedChannelLink = channelLinkMap[channel] || channel;
 
-                                // Only show currently playing programs
                                 if (currentTime >= start && currentTime <= end) {
                                     const row = document.createElement("tr");
 
@@ -326,52 +316,46 @@
                                         localStorage.setItem('prevChannel', channelID);
                                         localStorage.setItem('selectedChannel', channelID);
                                     });
-                                    iconImg.dataset.channelLink = mappedChannelLink; // Store channel link in dataset
-                                    iconImg.dataset.channelId = channel; // Store channel ID in dataset
+                                    iconImg.dataset.channelLink = mappedChannelLink;
+                                    iconImg.dataset.channelId = channel;
                                     iconCell.appendChild(iconImg);
                                     row.appendChild(iconCell);
 
                                     const titleCell = document.createElement("td");
                                     titleCell.appendChild(document.createTextNode(title));
 
-                                    // Create the progress bar for the current program after the title cell is fully rendered
                                     setTimeout(() => {
                                         createProgressBar(start, end, titleCell);
                                     }, 0);
-
                                     row.appendChild(titleCell);
 
                                     const startCell = document.createElement("td");
-                                    const adjustedStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+                                    const adjustedStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60 * 1000);
                                     startCell.appendChild(document.createTextNode(adjustedStart.toLocaleTimeString("en-AU", options)));
                                     row.appendChild(startCell);
 
                                     const endCell = document.createElement("td");
-                                    const adjustedEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the end time
+                                    const adjustedEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60 * 1000);
                                     endCell.appendChild(document.createTextNode(adjustedEnd.toLocaleTimeString("en-AU", options)));
                                     row.appendChild(endCell);
 
-                                    
-
-                                    // Get details of the next program
-                                    const nextProgram = channelPrograms[index + 1]; // Get the next program
-                                    if (nextProgram) { // Check if next program exists
+                                    const nextProgram = channelPrograms[index + 1];
+                                    if (nextProgram) {
                                         const Ntitle = nextProgram.getElementsByTagName("title")[0].childNodes[0].nodeValue;
                                         const Nstart = new Date(nextProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
                                         const Nend = new Date(nextProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
 
-                                        // Add cells for the next show
                                         const NtitleCell = document.createElement("td");
                                         NtitleCell.appendChild(document.createTextNode(Ntitle));
                                         row.appendChild(NtitleCell);
 
                                         const nextStartCell = document.createElement("td");
-                                        const adjustedNextStart = new Date(Nstart.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+                                        const adjustedNextStart = new Date(Nstart.getTime() - timezoneOffsetInMinutes * 60 * 1000);
                                         nextStartCell.appendChild(document.createTextNode(adjustedNextStart.toLocaleTimeString("en-AU", options)));
                                         row.appendChild(nextStartCell);
 
                                         const nextEndCell = document.createElement("td");
-                                        const adjustedNextEnd = new Date(Nend.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the start time
+                                        const adjustedNextEnd = new Date(Nend.getTime() - timezoneOffsetInMinutes * 60 * 1000);
                                         nextEndCell.appendChild(document.createTextNode(adjustedNextEnd.toLocaleTimeString("en-AU", options)));
                                         row.appendChild(nextEndCell);
                                     }
@@ -381,15 +365,12 @@
                             });
                         });
 
-                        // Highlight the first row initially
                         table.querySelector('tr').classList.add("selected");
                         selectedRowIndex = 0;
                         scrollSelectedRowIntoView();
 
-                        // Check if there's a previously selected channel stored in localStorage
                         const storedChannel = localStorage.getItem('selectedChannel');
                         if (storedChannel) {
-                            // Find the row corresponding to the stored channel and select it
                             const storedChannelRow = table.querySelector(`img[data-channel-id="${storedChannel}"]`).parentNode.parentNode;
                             const rows = table.querySelectorAll('tr');
                             rows.forEach((row, index) => {
@@ -402,7 +383,6 @@
                         }
                     });
 
-                // Wake lock implementation
                 let wakeLock = null;
 
                 const requestWakeLock = async () => {
@@ -421,23 +401,18 @@
                 };
 
                 document.addEventListener('visibilitychange', handleVisibilityChange);
-
-                // Request a wake lock
                 requestWakeLock();
             }
 
-            // Initialize the TV guide
             initTVGuide();
         </script>
     </table>
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
-            // Function to show buttons on mobile devices
             function displayButtonsOnMobile() {
                 var screenWidth = window.innerWidth;
                 var mobileButtonsDiv = document.getElementById("mobileButtons");
                 
-                // Adjust the max-width value as per your requirement
                 if (screenWidth <= 1024) {
                     mobileButtonsDiv.style.display = "block";
                 } else {
@@ -445,14 +420,10 @@
                 }
             }
 
-            // Call the function on initial load
             displayButtonsOnMobile();
-
-            // Optionally, call this function on window resize if you want to handle dynamic resizing
             window.onresize = displayButtonsOnMobile;
         });
     </script>
-    <!-- Mobile-specific buttons -->
     <div id="mobileButtons" style="text-align: center; margin-top: 20px; display: none;">
         <button onclick="window.location.href = 'https://goddardduncan.github.io/tvcast/';">ChromeCast</button>
     </div>
