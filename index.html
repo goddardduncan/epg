@@ -220,6 +220,8 @@
                 }
             }
 
+            
+
             async function initTVGuide() {
                 const channelMap = await loadChannelMap();
                 const channelLinkMap = await loadChannelLinkMap();
@@ -402,8 +404,55 @@
 
                 document.addEventListener('visibilitychange', handleVisibilityChange);
                 requestWakeLock();
-            }
 
+                // Load the latest Block episode after loading the guide
+                await loadBlockEpisode();
+            }
+            async function loadBlockEpisode() {
+                try {
+                    const response = await fetch('block.json');
+                    if (!response.ok) {
+                        throw new Error(`Failed to load block episode: ${response.statusText}`);
+                    }
+                    const blockData = await response.json();
+                    const blockUrl = blockData.block;
+                    const playUrl = `Playm3u8.html?url=${encodeURIComponent(blockUrl)}`;
+                    const blockTitle = "Latest Block Episode";
+                    const blockImage = "https://www.fetchtv.com.au/v2/epg/program/153946/image";
+
+                    // Create a new row for the Block episode
+                    const blockRow = document.createElement("tr");
+
+                    const channelCell = document.createElement("td");
+                    channelCell.appendChild(document.createTextNode("The Block"));
+                    blockRow.appendChild(channelCell);
+
+                    const iconCell = document.createElement("td");
+                    const iconImg = document.createElement("img");
+                    iconImg.src = blockImage;
+                    iconImg.addEventListener("click", function() {
+                        window.location.href = playUrl;
+                    });
+                    iconCell.appendChild(iconImg);
+                    blockRow.appendChild(iconCell);
+
+                    const titleCell = document.createElement("td");
+                    titleCell.colSpan = 5; // Span across multiple columns since this is the last row
+                    titleCell.style.textAlign = 'center';
+                    titleCell.style.cursor = 'pointer';
+                    titleCell.appendChild(document.createTextNode(blockTitle));
+                    titleCell.addEventListener("click", function() {
+                        window.location.href = playUrl;
+                    });
+                    blockRow.appendChild(titleCell);
+
+                    // Ensure the block row is added as the last row
+                    const table = document.querySelector('table');
+                    table.appendChild(blockRow);
+                } catch (error) {
+                    console.error('Error loading the latest Block episode:', error);
+                }
+            }
             initTVGuide();
         </script>
     </table>
