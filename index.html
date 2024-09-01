@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,14 +7,93 @@
     <meta http-equiv="refresh" content="300">
     <title>Melbourne Live TV Guide</title>
     <style>
-        /* Your existing styles */
+        body {
+            background-color: #1e2d3b;
+            color: #d4d4d4;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            margin: 20px 0;
+            color: #4f5e80;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 20px auto;
+            width: 95%;
+            max-width: 1200px;
+            background-color: #263544;
+            border-radius: 8px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #33475b;
+            position: relative;
+        }
+        th {
+            background-color: #33475b;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        img {
+            width: 100px;
+            height: 60px;
+            border-radius: 8px;
+        }
+        tr:not(:first-child).selected {
+            background-color: #13508a;
+            color: #FFFFFF;
+        }
+        .progress-bar {
+            position: absolute;
+            width: 23px;
+            height: 10%;
+            background-color: rgba(255, 255, 255, 0.5); 
+            bottom: 3px; 
+            left: 0;
+            border-radius: 5px; 
+            transition: background-color 0.3s ease;
+        }
+
+        .progress-bar:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .knob {
+            position: absolute;
+            bottom: 14px;
+            left: 0;
+            padding: 5px 10px;
+            background-color: #4f5e80;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(-50%);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none; /* Ensure the knob itself does not interfere with hover */
+        }
+
+        .progress-bar:hover .knob {
+            opacity: 1;
+            transform: translateX(-50%) scale(1.1); /* Slightly enlarge the knob */
+        }
     </style>
 </head>
 <body>
     <h1>Melbourne Live TV Guide</h1>
     <table>
         <tr>
-            <th>Channel</th>
+            <th>Channel</th> 
             <th></th>
             <th>What's Playing</th>
             <th>Start Time</th>
@@ -22,13 +102,8 @@
             <th>Start Time</th>
             <th>End Time</th>
         </tr>
-    </table>
-    <div id="mobileButtons" style="text-align: center; margin-top: 20px; display: none;">
-        <button onclick="window.location.href = 'https://goddardduncan.github.io/tvcast/';">ChromeCast</button>
-    </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", async function () {
+        <script>
             async function loadChannelMap() {
                 try {
                     const response = await fetch('channelorder.json');
@@ -146,13 +221,16 @@
                 }
             }
 
+            
+
             async function initTVGuide() {
                 const channelMap = await loadChannelMap();
                 const channelLinkMap = await loadChannelLinkMap();
                 startSavingToLocalStorage();
                 let selectedRowIndex = -1;
 
-                document.addEventListener("keydown", function (event) {
+                document.addEventListener("keydown", function(event) {
+                    event.preventDefault();
                     const tableRows = document.querySelectorAll('table tr');
                     if (event.key === "ArrowUp") {
                         if (selectedRowIndex > 0) {
@@ -176,18 +254,9 @@
 
                             // Check if this is the Block row
                             if (selectedRow.innerText.includes("The Block")) {
-                                try {
-                                    const response = await fetch('block.json');
-                                    if (!response.ok) {
-                                        throw new Error(`Failed to load block episode: ${response.statusText}`);
-                                    }
-                                    const blockData = await response.json();
-                                    const blockUrl = blockData.block;
-                                    const playUrl = `Playm3u8.html?url=${encodeURIComponent(blockUrl)}`;
-                                    window.location.href = playUrl;
-                                } catch (error) {
-                                    console.error('Error loading Block episode:', error);
-                                }
+                                // Navigate to the Block link
+                                // const blockUrl = 'Playm3u8.html?url=' + encodeURIComponent(selectedRow.querySelector('img').src);
+                                window.location.href = playUrl;
                             } else {
                                 const image = selectedRow.querySelector('img');
                                 const channelLink = image.dataset.channelLink;
@@ -253,7 +322,7 @@
                                     const iconCell = document.createElement("td");
                                     const iconImg = document.createElement("img");
                                     iconImg.src = icon;
-                                    iconImg.addEventListener("click", function () {
+                                    iconImg.addEventListener("click", function() {
                                         window.location.href = mappedChannelLink;
                                         localStorage.setItem('prevChannel', channelID);
                                         localStorage.setItem('selectedChannel', channelID);
@@ -323,8 +392,7 @@
                             });
                             scrollSelectedRowIntoView();
                         }
-                    })
-                    .catch(error => console.error('Error loading EPG data:', error));
+                    });
 
                 let wakeLock = null;
 
@@ -349,7 +417,6 @@
                 // Load the latest Block episode after loading the guide
                 await loadBlockEpisode();
             }
-
             async function loadBlockEpisode() {
                 try {
                     const response = await fetch('block.json');
@@ -372,7 +439,7 @@
                     const iconCell = document.createElement("td");
                     const iconImg = document.createElement("img");
                     iconImg.src = blockImage;
-                    iconImg.addEventListener("click", function () {
+                    iconImg.addEventListener("click", function() {
                         window.location.href = playUrl;
                     });
                     iconCell.appendChild(iconImg);
@@ -383,7 +450,7 @@
                     titleCell.style.textAlign = 'center';
                     titleCell.style.cursor = 'pointer';
                     titleCell.appendChild(document.createTextNode(blockTitle));
-                    titleCell.addEventListener("click", function () {
+                    titleCell.addEventListener("click", function() {
                         window.location.href = playUrl;
                     });
                     blockRow.appendChild(titleCell);
@@ -395,15 +462,15 @@
                     console.error('Error loading the latest Block episode:', error);
                 }
             }
-
-            // Initialize the TV guide
             initTVGuide();
-
-            // Display mobile buttons based on screen size
+        </script>
+    </table>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
             function displayButtonsOnMobile() {
                 var screenWidth = window.innerWidth;
                 var mobileButtonsDiv = document.getElementById("mobileButtons");
-
+                
                 if (screenWidth <= 1024) {
                     mobileButtonsDiv.style.display = "block";
                 } else {
@@ -415,5 +482,8 @@
             window.onresize = displayButtonsOnMobile;
         });
     </script>
+    <div id="mobileButtons" style="text-align: center; margin-top: 20px; display: none;">
+        <button onclick="window.location.href = 'https://goddardduncan.github.io/tvcast/';">ChromeCast</button>
+    </div>
 </body>
 </html>
