@@ -177,10 +177,9 @@
                 }
             }
 
-            // Function to create and position the progress bar
             function createProgressBar(startTime, endTime, cell) {
     try {
-        const currentTime = new Date();
+        const currentTime = new Date();  // Keep the current time in local timezone
         console.log(`Start Time: ${startTime}, End Time: ${endTime}, Current Time: ${currentTime}`);
 
         if (currentTime >= startTime && currentTime <= endTime) {
@@ -202,6 +201,7 @@
         console.error('Error creating progress bar:', error);
     }
 }
+
 
 
             // Function to initialize the TV guide
