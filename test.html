@@ -198,8 +198,8 @@
 
                     if (currentTimeUTC >= adjustedStart && currentTimeUTC <= adjustedEnd) {
                         const duration = adjustedEnd - adjustedStart;
-                        const elapsed = currentTimeUTC - adjustedStart;
-                        const progressPercentage = (elapsed / duration) * 100;
+                        const remainingTime = Math.floor((adjustedEnd - currentTimeUTC) / (1000 * 60)); // Remaining time in minutes
+                        const progressPercentage = ((currentTimeUTC - adjustedStart) / duration) * 100;
                         const progressBar = document.createElement('div');
                         progressBar.className = 'progress-bar';
                         progressBar.style.left = progressPercentage + '%';
@@ -208,7 +208,7 @@
                         // Create the knob
                         const knob = document.createElement('div');
                         knob.className = 'knob';
-                        knob.innerText = `${Math.floor(progressPercentage)}%`; // Display the percentage
+                        knob.innerText = `${remainingTime} minutes remain`; // Display remaining time
                         progressBar.appendChild(knob); // Attach the knob to the progress bar
 
                         cell.appendChild(progressBar);
