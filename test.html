@@ -228,6 +228,7 @@
                     }
                     const blockData = await response.json();
                     const blockUrl = blockData.block;
+                    const playUrl = `Playm3u8.html?url=${encodeURIComponent(blockUrl)}`;
                     const blockTitle = "Latest Block Episode";
                     const blockImage = "https://www.fetchtv.com.au/v2/epg/program/153946/image";
 
@@ -242,7 +243,7 @@
                     const iconImg = document.createElement("img");
                     iconImg.src = blockImage;
                     iconImg.addEventListener("click", function() {
-                        window.location.href = blockUrl;
+                        window.location.href = playUrl;
                     });
                     iconCell.appendChild(iconImg);
                     blockRow.appendChild(iconCell);
@@ -253,7 +254,7 @@
                     titleCell.style.cursor = 'pointer';
                     titleCell.appendChild(document.createTextNode(blockTitle));
                     titleCell.addEventListener("click", function() {
-                        window.location.href = blockUrl;
+                        window.location.href = playUrl;
                     });
                     blockRow.appendChild(titleCell);
 
