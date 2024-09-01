@@ -31,6 +31,7 @@
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid #33475b;
+            position: relative;
         }
         th {
             background-color: #33475b;
@@ -54,9 +55,17 @@
             position: absolute;
             width: 2px;
             height: 100%;
-            background-color: #FFFFFF; /* Opaque white */
+            background-color: rgba(255, 165, 0, 0.5); /* Transparent orange */
             top: 0;
             left: 0;
+        }
+        .timeline {
+            position: absolute;
+            height: 2px;
+            background-color: rgba(211, 211, 211, 0.5); /* Transparent grey */
+            bottom: 5px; /* Position 5px from the bottom */
+            left: 0;
+            width: 100%;
         }
     </style>
 </head>
@@ -351,6 +360,11 @@
                                     const adjustedEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60 * 1000); // add time zone offset to the end time
                                     endCell.appendChild(document.createTextNode(adjustedEnd.toLocaleTimeString("en-AU", options)));
                                     row.appendChild(endCell);
+
+                                    // Add the timeline (horizontal line)
+                                    const timeline = document.createElement('div');
+                                    timeline.className = 'timeline';
+                                    row.appendChild(timeline);
 
                                     // Get details of the next program
                                     const nextProgram = channelPrograms[index + 1]; // Get the next program
