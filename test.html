@@ -181,7 +181,7 @@
                 try {
                 // Adjust current time to UTC by subtracting the timezone offset
                 const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
-                const currentTimeUTC = new Date(new Date().getTime() - timezoneOffsetInMinutes * 60 * 1000);
+                const currentTimeUTC = new Date(new Date().getTime() + timezoneOffsetInMinutes * 60 * 1000);
 
                 console.log(`Adjusted Start Time: ${adjustedStart}, Adjusted End Time: ${adjustedEnd}, Current Time UTC: ${currentTimeUTC}`);
 
