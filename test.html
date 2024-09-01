@@ -107,21 +107,21 @@
             // Function to refresh Gist
         async function refreshGist() {
             try {
-                const response = await fetch('https://api.github.com/gists/0b5b84b7dbad52d89f803fe6e5b606dd');
+                const response = await fetch('https://api.github.com/gists/20ba022255783133d8b9808ba1371b42');
                 const gist = await response.json();
                 const file = gist.files['refresh.now'];
                 const newContent = (parseInt(file.content) + 1).toString();
 
-                await fetch('https://api.github.com/gists/0b5b84b7dbad52d89f803fe6e5b606dd', {
+                await fetch('https://api.github.com/gists/20ba022255783133d8b9808ba1371b42', {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `token YOUR_GITHUB_TOKEN` // Replace with your GitHub token
+                        'Authorization': `token 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` // Replace with your GitHub token
                     },
                     body: JSON.stringify({
                         files: {
                             'refresh.now': {
-                                content: newContent
+                                content: "1"
                             }
                         }
                     })
