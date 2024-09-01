@@ -177,30 +177,34 @@
                 }
             }
 
-            function createProgressBar(startTime, endTime, cell) {
-    try {
-        const currentTime = new Date();  // Keep the current time in local timezone
-        console.log(`Start Time: ${startTime}, End Time: ${endTime}, Current Time: ${currentTime}`);
+                function createProgressBar(adjustedStart, adjustedEnd, cell) {
+                try {
+                // Adjust current time to UTC by subtracting the timezone offset
+                const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
+                const currentTimeUTC = new Date(new Date().getTime() - timezoneOffsetInMinutes * 60 * 1000);
 
-        if (currentTime >= startTime && currentTime <= endTime) {
-            const duration = endTime - startTime;
-            const elapsed = currentTime - startTime;
-            const progressPercentage = (elapsed / duration) * 100;
+                console.log(`Adjusted Start Time: ${adjustedStart}, Adjusted End Time: ${adjustedEnd}, Current Time UTC: ${currentTimeUTC}`);
 
-            console.log(`Creating progress bar: ${progressPercentage}% through program`);
+                if (currentTimeUTC >= adjustedStart && currentTimeUTC <= adjustedEnd) {
+                const duration = adjustedEnd - adjustedStart;
+                const elapsed = currentTimeUTC - adjustedStart;
+                const progressPercentage = (elapsed / duration) * 100;
 
-            const progressBar = document.createElement('div');
-            progressBar.className = 'progress-bar';
-            progressBar.style.left = progressPercentage + '%';
-            cell.style.position = 'relative';
-            cell.appendChild(progressBar);
-        } else {
+                console.log(`Creating progress bar: ${progressPercentage}% through program`);
+
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressBar.style.left = progressPercentage + '%';
+                cell.style.position = 'relative';
+                cell.appendChild(progressBar);
+                } else {
             console.log('Current time is outside the program time range');
-        }
-    } catch (error) {
+            }
+        } catch (error) {
         console.error('Error creating progress bar:', error);
-    }
-}
+            }
+        }
+
 
 
 
