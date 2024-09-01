@@ -59,14 +59,7 @@
             top: 0;
             left: 0;
         }
-        .timeline {
-            position: absolute;
-            height: 2px;
-            background-color: rgba(211, 211, 211, 0.5); /* Transparent grey */
-            bottom: 5px; /* Position 5px from the bottom */
-            left: 0;
-            width: 100%;
-        }
+        
     </style>
 </head>
 <body>
@@ -361,10 +354,7 @@
                                     endCell.appendChild(document.createTextNode(adjustedEnd.toLocaleTimeString("en-AU", options)));
                                     row.appendChild(endCell);
 
-                                    // Add the timeline (horizontal line)
-                                    const timeline = document.createElement('div');
-                                    timeline.className = 'timeline';
-                                    row.appendChild(timeline);
+                                    
 
                                     // Get details of the next program
                                     const nextProgram = channelPrograms[index + 1]; // Get the next program
