@@ -56,7 +56,7 @@
             width: 23px;
             height: 10%;
             background-color: rgba(255, 255, 255, 0.5); 
-            bottom: 1px; 
+            bottom: 3px; 
             left: 0;
             border-radius: 5px; 
             transition: background-color 0.3s ease;
@@ -68,7 +68,7 @@
 
         .knob {
             position: absolute;
-            bottom: 12px; /* 1px above the progress bar */
+            bottom: 14px;
             left: 0;
             padding: 5px 10px;
             background-color: #4f5e80;
@@ -217,6 +217,51 @@
                     }
                 } catch (error) {
                     console.error('Error creating progress bar:', error);
+                }
+            }
+
+            async function loadBlockEpisode() {
+                try {
+                    const response = await fetch('block.json');
+                    if (!response.ok) {
+                        throw new Error(`Failed to load block episode: ${response.statusText}`);
+                    }
+                    const blockData = await response.json();
+                    const blockUrl = blockData.block;
+                    const blockTitle = "Latest Block Episode";
+                    const blockImage = "https://www.fetchtv.com.au/v2/epg/program/153946/image";
+
+                    // Create a new row for the Block episode
+                    const blockRow = document.createElement("tr");
+
+                    const channelCell = document.createElement("td");
+                    channelCell.appendChild(document.createTextNode("The Block"));
+                    blockRow.appendChild(channelCell);
+
+                    const iconCell = document.createElement("td");
+                    const iconImg = document.createElement("img");
+                    iconImg.src = blockImage;
+                    iconImg.addEventListener("click", function() {
+                        window.location.href = blockUrl;
+                    });
+                    iconCell.appendChild(iconImg);
+                    blockRow.appendChild(iconCell);
+
+                    const titleCell = document.createElement("td");
+                    titleCell.colSpan = 5; // Span across multiple columns since this is the last row
+                    titleCell.style.textAlign = 'center';
+                    titleCell.style.cursor = 'pointer';
+                    titleCell.appendChild(document.createTextNode(blockTitle));
+                    titleCell.addEventListener("click", function() {
+                        window.location.href = blockUrl;
+                    });
+                    blockRow.appendChild(titleCell);
+
+                    // Append the block row to the table
+                    const table = document.querySelector('table');
+                    table.appendChild(blockRow);
+                } catch (error) {
+                    console.error('Error loading the latest Block episode:', error);
                 }
             }
 
@@ -402,6 +447,9 @@
 
                 document.addEventListener('visibilitychange', handleVisibilityChange);
                 requestWakeLock();
+
+                // Load the latest Block episode after loading the guide
+                await loadBlockEpisode();
             }
 
             initTVGuide();
