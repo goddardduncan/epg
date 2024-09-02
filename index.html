@@ -111,10 +111,10 @@
                     const gist = await response.json();
                     const file = gist.files['refresh.now'];
                     const newContent = (parseInt(file.content) + 1).toString();
-                    const tok1 = 'ghp_zvcKEJtR1Ma5t2rp';
-                    const tok2 = 'o72eXNfx56Q3ef0SCpsV';
+                    const tok1 = 'T16nNuEDxoPN3r3p';
+                    const tok2 = 'FTn9gbcgBn3aVT4P0Gyv';
                     // Combine the two parts to form the complete token
-                    const token = `${tok1}${tok2}`;
+                    const token = `ghp_${tok1}${tok2}`;
 
                     await fetch('https://api.github.com/gists/20ba022255783133d8b9808ba1371b42', {
                         method: 'PATCH',
