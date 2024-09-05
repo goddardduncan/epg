@@ -87,6 +87,9 @@
             opacity: 1;
             transform: translateX(-50%) scale(1.1); /* Slightly enlarge the knob */
         }
+        .icon {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -356,6 +359,7 @@
 
                                     const iconCell = document.createElement("td");
                                     const iconImg = document.createElement("img");
+                                    iconImg.setAttribute('class', 'icon');
                                     iconImg.src = icon;
                                     iconImg.addEventListener("click", function() {
                                         window.location.href = mappedChannelLink;
@@ -473,6 +477,7 @@
 
                     const iconCell = document.createElement("td");
                     const iconImg = document.createElement("img");
+                    iconImg.setAttribute('class', 'icon');
                     iconImg.src = blockImage;
                     iconImg.addEventListener("click", function() {
                         window.location.href = playUrl;
