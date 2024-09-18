@@ -458,6 +458,7 @@
             }
             async function loadBlockEpisode() {
                 try {
+                    const timestamp = new Date().getTime();
                     const response = await fetch(`block.json?t=${timestamp}`);
                     if (!response.ok) {
                         throw new Error(`Failed to load block episode: ${response.statusText}`);
