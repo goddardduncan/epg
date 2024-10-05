@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,18 +80,17 @@
             opacity: 0;
             transform: translateX(-50%);
             transition: opacity 0.3s ease, transform 0.3s ease;
-            pointer-events: none;
+            pointer-events: none; /* Ensure the knob itself does not interfere with hover */
         }
 
         .progress-bar:hover .knob {
             opacity: 1;
-            transform: translateX(-50%) scale(1.1);
+            transform: translateX(-50%) scale(1.1); /* Slightly enlarge the knob */
         }
         .icon {
             cursor: pointer;
         }
-
-        /* Styles for the video preview overlay */
+	/* Styles for the video preview overlay */
         #video-overlay {
             position: fixed;
             top: 20px;
@@ -135,6 +135,7 @@
                     const newContent = (parseInt(file.content) + 1).toString();
                     const tok1 = 'T16nNuEDxoPN3r3p';
                     const tok2 = 'FTn9gbcgBn3aVT4P0Gyv';
+                    // Combine the two parts to form the complete token
                     const token = `ghp_${tok1}${tok2}`;
 
                     await fetch('https://api.github.com/gists/20ba022255783133d8b9808ba1371b42', {
@@ -275,14 +276,16 @@
                 }
             }
 
+            
+
             async function initTVGuide() {
                 const channelMap = await loadChannelMap();
                 const channelLinkMap = await loadChannelLinkMap();
                 startSavingToLocalStorage();
                 let selectedRowIndex = -1;
-                let videoOverlayVisible = false;
 
                 document.addEventListener("keydown", function(event) {
+                    event.preventDefault();
                     const tableRows = document.querySelectorAll('table tr');
                     if (event.key === "ArrowUp") {
                         if (selectedRowIndex > 0) {
@@ -300,7 +303,27 @@
                             tableRows[selectedRowIndex].classList.add("selected");
                             scrollSelectedRowIntoView();
                         }
-                    } else if (event.key === "ArrowRight") {
+                    } else if (event.key === "Enter") {
+                        if (selectedRowIndex === 0) { // Check if the top row is selected
+                            refreshGist();
+                        } else if (selectedRowIndex !== -1) {
+                            const selectedRow = tableRows[selectedRowIndex];
+
+                            // Check if this is the Block row
+                            if (selectedRow.innerText.includes("The Block")) {
+                                // Trigger the click on the Block icon
+                                const iconImg = selectedRow.querySelector('img');
+                                iconImg.click();
+                            } else {
+                                const image = selectedRow.querySelector('img');
+                                const channelLink = image.dataset.channelLink;
+                                window.location.href = channelLink;
+                                const channelId = image.dataset.channelId;
+                                localStorage.setItem('selectedChannel', channelId);
+                                localStorage.setItem('prevChannel', channelId);
+                            }
+                        }
+		    } else if (event.key === "ArrowRight") {
                         const selectedRow = tableRows[selectedRowIndex];
                         const image = selectedRow.querySelector('img');
                         const channelLink = image.dataset.channelLink;
@@ -327,7 +350,7 @@
                     });
                 }
 
-                function showVideoOverlay(channelLink, imgElement) {
+	        function showVideoOverlay(channelLink, imgElement) {
                     const videoOverlay = document.getElementById('video-overlay');
                     const videoPreview = document.getElementById('video-preview');
 
@@ -531,12 +554,6 @@
             initTVGuide();
         </script>
     </table>
-
-    <div id="video-overlay">
-        <iframe id="video-preview" allow="autoplay; fullscreen"></iframe>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
             function displayButtonsOnMobile() {
