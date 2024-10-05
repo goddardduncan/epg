@@ -79,25 +79,35 @@
             opacity: 0;
             transform: translateX(-50%);
             transition: opacity 0.3s ease, transform 0.3s ease;
-            pointer-events: none; /* Ensure the knob itself does not interfere with hover */
+            pointer-events: none;
         }
 
         .progress-bar:hover .knob {
             opacity: 1;
-            transform: translateX(-50%) scale(1.1); /* Slightly enlarge the knob */
+            transform: translateX(-50%) scale(1.1);
         }
         .icon {
             cursor: pointer;
         }
-        /* Styles for the video overlay */
+
+        /* Styles for the video preview overlay */
         #video-overlay {
-            position: absolute;
+            position: fixed;
+            top: 20px;
+            right: 20px;
             width: 240px;
             height: 200px;
             border-radius: 10px;
             border: 2px solid grey;
             display: none;
             z-index: 9999;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            border: none;
         }
     </style>
 </head>
@@ -125,7 +135,6 @@
                     const newContent = (parseInt(file.content) + 1).toString();
                     const tok1 = 'T16nNuEDxoPN3r3p';
                     const tok2 = 'FTn9gbcgBn3aVT4P0Gyv';
-                    // Combine the two parts to form the complete token
                     const token = `ghp_${tok1}${tok2}`;
 
                     await fetch('https://api.github.com/gists/20ba022255783133d8b9808ba1371b42', {
@@ -318,28 +327,21 @@
                     });
                 }
 
-                function showVideoOverlay(m3u8Url, imgElement) {
+                function showVideoOverlay(channelLink, imgElement) {
                     const videoOverlay = document.getElementById('video-overlay');
-                    videoOverlay.style.left = (imgElement.getBoundingClientRect().right + 10) + 'px';
-                    videoOverlay.style.top = imgElement.getBoundingClientRect().top + 'px';
+                    const videoPreview = document.getElementById('video-preview');
+
                     videoOverlay.style.display = 'block';
-
-                    // Use HLS.js to play the m3u8 stream
-                    if (Hls.isSupported()) {
-                        const video = document.getElementById('video');
-                        const hls = new Hls();
-                        hls.loadSource("https://i.mjh.nz/7flix-mel.m3u8");
-                        hls.attachMedia(video);
-                    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                        video.src = "https://i.mjh.nz/7flix-mel.m3u8";
-                    }
-
+                    videoPreview.src = channelLink; // Set the URL of the iframe to the channel link
                     videoOverlayVisible = true;
                 }
 
                 function hideVideoOverlay() {
                     const videoOverlay = document.getElementById('video-overlay');
+                    const videoPreview = document.getElementById('video-preview');
+
                     videoOverlay.style.display = 'none';
+                    videoPreview.src = ''; // Stop the video by clearing the src
                     videoOverlayVisible = false;
                 }
 
@@ -529,10 +531,12 @@
             initTVGuide();
         </script>
     </table>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
     <div id="video-overlay">
-        <video id="video" width="240" height="200" autoplay muted playsinline></video>
+        <iframe id="video-preview" allow="autoplay; fullscreen"></iframe>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
             function displayButtonsOnMobile() {
