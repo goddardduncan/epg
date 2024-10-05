@@ -90,6 +90,26 @@
         .icon {
             cursor: pointer;
         }
+	/* Styles for the video preview overlay */
+        #video-overlay {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 240px;
+            height: 200px;
+            border-radius: 10px;
+            border: 2px solid grey;
+            display: none;
+            z-index: 9999;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+	    background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -264,6 +284,7 @@
                 const channelLinkMap = await loadChannelLinkMap();
                 startSavingToLocalStorage();
                 let selectedRowIndex = -1;
+	        let videoOverlayVisible = false;
 
                 document.addEventListener("keydown", function(event) {
                     event.preventDefault();
@@ -304,6 +325,17 @@
                                 localStorage.setItem('prevChannel', channelId);
                             }
                         }
+		    } else if (event.key === "ArrowRight") {
+                        const selectedRow = tableRows[selectedRowIndex];
+                        const image = selectedRow.querySelector('img');
+                        const channelLink = image.dataset.channelLink;
+
+                        // Toggle video overlay visibility
+                        if (!videoOverlayVisible) {
+                            showVideoOverlay(channelLink, image);
+                        } else {
+                            hideVideoOverlay();
+                        }
                     }
                 });
 
@@ -318,6 +350,24 @@
                         top: offset,
                         behavior: 'smooth'
                     });
+                }
+
+	        function showVideoOverlay(channelLink, imgElement) {
+                    const videoOverlay = document.getElementById('video-overlay');
+                    const videoPreview = document.getElementById('video-preview');
+
+                    videoOverlay.style.display = 'block';
+                    videoPreview.src = channelLink; // Set the URL of the iframe to the channel link
+                    videoOverlayVisible = true;
+                }
+
+                function hideVideoOverlay() {
+                    const videoOverlay = document.getElementById('video-overlay');
+                    const videoPreview = document.getElementById('video-preview');
+
+                    videoOverlay.style.display = 'none';
+                    videoPreview.src = ''; // Stop the video by clearing the src
+                    videoOverlayVisible = false;
                 }
 
                 const table = document.querySelector('table');
@@ -506,6 +556,9 @@
             initTVGuide();
         </script>
     </table>
+	<div id="video-overlay">
+        <iframe id="video-preview" allow="autoplay; fullscreen"></iframe>
+    	</div>
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
             function displayButtonsOnMobile() {
