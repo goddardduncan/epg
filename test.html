@@ -328,10 +328,10 @@
                     if (Hls.isSupported()) {
                         const video = document.getElementById('video');
                         const hls = new Hls();
-                        hls.loadSource(m3u8Url);
+                        hls.loadSource("https://i.mjh.nz/7flix-mel.m3u8");
                         hls.attachMedia(video);
                     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                        video.src = m3u8Url;
+                        video.src = "https://i.mjh.nz/7flix-mel.m3u8";
                     }
 
                     videoOverlayVisible = true;
