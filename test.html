@@ -203,6 +203,7 @@
                     };
                 } catch (error) {
                     console.error('Error fetching streams:', error);
+                    // Return a default or empty object to keep the script running
                     return {};
                 }
             }
