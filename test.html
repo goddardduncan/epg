@@ -336,6 +336,15 @@
             
             // Show the video overlay with playUrl instead of channelLink
             if (!videoOverlayVisible) {
+		try {
+                    const timestamp = new Date().getTime();
+                    const response = await fetch(`block.json?t=${timestamp}`);
+                    if (!response.ok) {
+                        throw new Error(`Failed to load block episode: ${response.statusText}`);
+                    }
+                    const blockData = await response.json();
+                    const blockUrl = blockData.block;
+                    const playUrl = `Playm3u8.html?url=${encodeURIComponent(blockUrl)}`;
                 showVideoOverlay(playUrl, image);
             } else {
                 hideVideoOverlay();
