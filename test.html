@@ -283,6 +283,7 @@
                 const channelLinkMap = await loadChannelLinkMap();
                 startSavingToLocalStorage();
                 let selectedRowIndex = -1;
+	        let videoOverlayVisible = false;
 
                 document.addEventListener("keydown", function(event) {
                     event.preventDefault();
@@ -554,6 +555,9 @@
             initTVGuide();
         </script>
     </table>
+	<div id="video-overlay">
+        <iframe id="video-preview" allow="autoplay; fullscreen"></iframe>
+    	</div>
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
             function displayButtonsOnMobile() {
