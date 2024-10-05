@@ -548,7 +548,9 @@
                 requestWakeLock();
 
                 // Load the latest Block episode after loading the guide
+                setTimeout(async () => {
                 await loadBlockEpisode();
+                }, 5000); // Adding a 5-second delay
             }
             initTVGuide();
         </script>
