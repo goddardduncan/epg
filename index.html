@@ -273,7 +273,7 @@
             async function loadBlockEpisode() {
                 try {
                     const timestamp = new Date().getTime();
-                    const response = await fetch(`https://gist.githubusercontent.com/goddardduncan/ef1603dc35dcd55840a58ecf8b94bf8b/raw/8d43425aeef2f3fbc4a7b7f8672372ba2f615544/block.json?t=${timestamp}`);
+                    const response = await fetch(`https://gist.githubusercontent.com/goddardduncan/ef1603dc35dcd55840a58ecf8b94bf8b/raw/block.json?t=${timestamp}`);
                     if (!response.ok) {
                         throw new Error(`Failed to load block episode: ${response.statusText}`);
                     }
