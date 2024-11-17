@@ -18,9 +18,9 @@
     "mjh-sbs-food": "Playm3u8.html?url=https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(food)/hdntl=exp=1731915996~acl=%2f*~id=5c49a5fd-5d85-42d0-b2b3-ae313bf49170~data=hdntl~hmac=7c71b52adb0c7813b9d9c1594d7662d55fa14d3a82eaa5376a123668f15dea8e/master-07.m3u8",
     "mjh-sbs-world-movies": "Playm3u8.html?url=https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(worldmovies)/hdntl=exp=1731916048~acl=%2f*~id=682fef01-3393-4aaa-b611-604eeb66c900~data=hdntl~hmac=6f5381bc74a0ab6df9096110aa9ac46fed1bd378c1787bffed3e3e7ef1457865/master-07.m3u8",
     "mjh-sbs-nitv": "Playm3u8.html?url=https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(nitv)/hdntl=exp=1731916091~acl=%2f*~id=e64ff558-9cdc-45bf-be40-b8d2817360fe~data=hdntl~hmac=3e36363f591233f4853ff56a647acab9be90dc842d5a70076bd5a7fb1ec9b549/master-07.m3u8",
-    "mjh-10-vic": "Playm3u8.html?url=https://i.mjh.nz/.r/10-vic.m3u8",
-    "mjh-10peach-vic": "Playm3u8.html?url=https://i.mjh.nz/.r/10peach-vic.m3u8",
-    "mjh-10bold-vic": "Playm3u8.html?url=https://i.mjh.nz/.r/10bold-vic.m3u8",
-    "mjh-10shake-vic": "Playm3u8.html?url=https://i.mjh.nz/.r/10shake-vic.m3u8",
+    "mjh-10-vic": "Playm3u8.html?url=https://corsproxy.io/?https://i.mjh.nz/.r/10-vic.m3u8",
+    "mjh-10peach-vic": "Playm3u8.html?url=https://corsproxy.io/?https://i.mjh.nz/.r/10peach-vic.m3u8",
+    "mjh-10bold-vic": "Playm3u8.html?url=https://corsproxy.io/?https://i.mjh.nz/.r/10bold-vic.m3u8",
+    "mjh-10shake-vic": "Playm3u8.html?url=https://corsproxy.io/?https://i.mjh.nz/.r/10shake-vic.m3u8",
     "mjh-c31": "Playm3u8.html?url=https://i.mjh.nz/.r/c31.m3u8"
 }
