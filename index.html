@@ -285,6 +285,8 @@
         const iconImg = document.createElement("img");
         iconImg.setAttribute('class', 'icon');
         iconImg.src = TfImage;
+        iconImg.dataset.channelLink = playUrl;
+        iconImg.dataset.channelId = "treenflix";
         iconImg.addEventListener("click", function() {
             window.location.href = playUrl;
         });
