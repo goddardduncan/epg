@@ -269,7 +269,7 @@
                     console.error('Error creating progress bar:', error);
                 }
             }
-            async function loadTreenFlix() {
+async function loadTreenFlix() {
     try {
         const playUrl = `http://192.168.68.71:8090/`;
         const TfTitle = "TreenFlix";
@@ -287,7 +287,7 @@
         iconImg.src = TfImage;
         iconImg.dataset.channelLink = playUrl;
         iconImg.dataset.channelId = "treenflix";
-        iconImg.addEventListener("click", function() {
+        iconImg.addEventListener("click", function () {
             window.location.href = playUrl;
         });
         iconCell.appendChild(iconImg);
@@ -298,35 +298,33 @@
         titleCell.style.textAlign = 'center';
         titleCell.style.cursor = 'pointer';
         titleCell.appendChild(document.createTextNode(TfTitle));
-        titleCell.addEventListener("click", function() {
+        titleCell.addEventListener("click", function () {
             window.location.href = playUrl;
         });
         TfRow.appendChild(titleCell);
 
         const table = document.querySelector('table');
         table.appendChild(TfRow);
-    } catch (error) {
-        console.error('Error loading TreenFlix:', error);
-    }
-}
-        // ADD Reset TreenFlix row just below
+
+        // ✅ Add Reset TreenFlix row immediately after
         const resetRow = document.createElement("tr");
         resetRow.setAttribute("tabindex", "0");
         resetRow.style.cursor = "pointer";
 
         const resetCell = document.createElement("td");
-        resetCell.colSpan = 100;
+        resetCell.colSpan = 8;
         resetCell.style.textAlign = "center";
         resetCell.style.fontWeight = "bold";
         resetCell.style.backgroundColor = "#2a3c4d";
+        resetCell.style.color = "#ffffff";
         resetCell.textContent = "Reset TreenFlix";
 
         resetRow.appendChild(resetCell);
 
-        resetRow.addEventListener("click", function() {
+        resetRow.addEventListener("click", function () {
             window.location.href = "http://192.168.68.71:5050/";
         });
-        resetRow.addEventListener("keydown", function(event) {
+        resetRow.addEventListener("keydown", function (event) {
             if (event.key === "Enter") {
                 window.location.href = "http://192.168.68.71:5050/";
             }
@@ -337,6 +335,7 @@
         console.error('Error loading TreenFlix:', error);
     }
 }
+
             async function loadBlockEpisode() {
                 try {
                     const timestamp = new Date().getTime();
