@@ -269,7 +269,7 @@
                     console.error('Error creating progress bar:', error);
                 }
             }
-async function loadTreenFlix() {
+            async function loadTreenFlix() {
     try {
         const playUrl = `http://192.168.68.71:8090/`;
         const TfTitle = "TreenFlix";
@@ -287,7 +287,7 @@ async function loadTreenFlix() {
         iconImg.src = TfImage;
         iconImg.dataset.channelLink = playUrl;
         iconImg.dataset.channelId = "treenflix";
-        iconImg.addEventListener("click", function () {
+        iconImg.addEventListener("click", function() {
             window.location.href = playUrl;
         });
         iconCell.appendChild(iconImg);
@@ -298,42 +298,13 @@ async function loadTreenFlix() {
         titleCell.style.textAlign = 'center';
         titleCell.style.cursor = 'pointer';
         titleCell.appendChild(document.createTextNode(TfTitle));
-        titleCell.addEventListener("click", function () {
+        titleCell.addEventListener("click", function() {
             window.location.href = playUrl;
         });
         TfRow.appendChild(titleCell);
 
         const table = document.querySelector('table');
         table.appendChild(TfRow);
-
-// ✅ Add Reset TreenFlix row immediately after
-const resetRow = document.createElement("tr");
-resetRow.setAttribute("tabindex", "0");
-resetRow.style.cursor = "pointer";
-resetRow.dataset.reset = "true"; // helps us detect it later
-
-const resetCell = document.createElement("td");
-resetCell.colSpan = 8;
-resetCell.style.textAlign = "center";
-resetCell.style.fontWeight = "bold";
-resetCell.style.backgroundColor = "#2a3c4d";
-resetCell.style.color = "#ffffff";
-resetCell.textContent = "Reset TreenFlix";
-
-resetRow.appendChild(resetCell);
-
-resetRow.addEventListener("click", function () {
-    window.location.href = "http://192.168.68.71:5050/";
-});
-
-resetRow.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        window.location.href = "http://192.168.68.71:5050/";
-    }
-});
-
-table.appendChild(resetRow);
-
     } catch (error) {
         console.error('Error loading TreenFlix:', error);
     }
@@ -413,26 +384,22 @@ table.appendChild(resetRow);
                                 scrollSelectedRowIntoView();
                             }
                         } else if (event.key === "Enter") {
-    const selectedRow = tableRows[selectedRowIndex];
-    if (!selectedRow) return;
-
-    if (selectedRow.innerText.includes("The Block")) {
-        const iconImg = selectedRow.querySelector('img');
-        iconImg?.click();
-    } else if (selectedRow.dataset.reset === "true") {
-        // Special Reset row
-        window.location.href = "http://192.168.68.71:5050/";
-    } else {
-        const image = selectedRow.querySelector('img');
-        if (!image) return;
-        const channelLink = image.dataset.channelLink;
-        window.location.href = channelLink;
-        const channelId = image.dataset.channelId;
-        localStorage.setItem('selectedChannel', channelId);
-        localStorage.setItem('prevChannel', channelId);
-    }
-}
-
+                            if (selectedRowIndex === 0) {
+                                refreshGist();
+                            } else if (selectedRowIndex !== -1) {
+                                const selectedRow = tableRows[selectedRowIndex];
+                                if (selectedRow.innerText.includes("The Block")) {
+                                    const iconImg = selectedRow.querySelector('img');
+                                    iconImg.click();
+                                } else {
+                                    const image = selectedRow.querySelector('img');
+                                    const channelLink = image.dataset.channelLink;
+                                    window.location.href = channelLink;
+                                    const channelId = image.dataset.channelId;
+                                    localStorage.setItem('selectedChannel', channelId);
+                                    localStorage.setItem('prevChannel', channelId);
+                                }
+                            }
                         } else if (event.key === "ArrowRight") {
                             const selectedRow = tableRows[selectedRowIndex];
                             const image = selectedRow.querySelector('img');
