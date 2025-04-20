@@ -309,7 +309,34 @@
         console.error('Error loading TreenFlix:', error);
     }
 }
+        // ADD Reset TreenFlix row just below
+        const resetRow = document.createElement("tr");
+        resetRow.setAttribute("tabindex", "0");
+        resetRow.style.cursor = "pointer";
 
+        const resetCell = document.createElement("td");
+        resetCell.colSpan = 100;
+        resetCell.style.textAlign = "center";
+        resetCell.style.fontWeight = "bold";
+        resetCell.style.backgroundColor = "#2a3c4d";
+        resetCell.textContent = "Reset TreenFlix";
+
+        resetRow.appendChild(resetCell);
+
+        resetRow.addEventListener("click", function() {
+            window.location.href = "http://192.168.68.71:5050/";
+        });
+        resetRow.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                window.location.href = "http://192.168.68.71:5050/";
+            }
+        });
+
+        table.appendChild(resetRow);
+    } catch (error) {
+        console.error('Error loading TreenFlix:', error);
+    }
+}
             async function loadBlockEpisode() {
                 try {
                     const timestamp = new Date().getTime();
