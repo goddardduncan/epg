@@ -309,7 +309,46 @@
         console.error('Error loading TreenFlix:', error);
     }
 }
+            async function loadTreenFlixReset() {
+    try {
+        const playUrl = `http://192.168.68.71:5050/`;
+        const TfTitle = "Reset TreenFlix";
+        const TfImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsufhswc5ch8SCEP0gtGVPG1Z_K-4qF7semg&s";
 
+        const TfRow = document.createElement("tr");
+
+        const channelCell = document.createElement("td");
+        channelCell.appendChild(document.createTextNode("Reset TreenFlix"));
+        TfRow.appendChild(channelCell);
+
+        const iconCell = document.createElement("td");
+        const iconImg = document.createElement("img");
+        iconImg.setAttribute('class', 'icon');
+        iconImg.src = TfImage;
+        iconImg.dataset.channelLink = playUrl;
+        iconImg.dataset.channelId = "treenflixreset";
+        iconImg.addEventListener("click", function() {
+            window.location.href = playUrl;
+        });
+        iconCell.appendChild(iconImg);
+        TfRow.appendChild(iconCell);
+
+        const titleCell = document.createElement("td");
+        titleCell.colSpan = 5;
+        titleCell.style.textAlign = 'center';
+        titleCell.style.cursor = 'pointer';
+        titleCell.appendChild(document.createTextNode(TfTitle));
+        titleCell.addEventListener("click", function() {
+            window.location.href = playUrl;
+        });
+        TfRow.appendChild(titleCell);
+
+        const table = document.querySelector('table');
+        table.appendChild(TfRow);
+    } catch (error) {
+        console.error('Error loading TreenFlixReset:', error);
+    }
+}
             async function loadBlockEpisode() {
                 try {
                     const timestamp = new Date().getTime();
@@ -591,6 +630,7 @@
                 setTimeout(async () => {
                 await loadBlockEpisode();
                 await loadTreenFlix();
+                await loadTreenFlixReset();
                 }, 50); // Adding a delay
             }
             initTVGuide();
