@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VPN Setup Instructions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2em;
+      line-height: 1.8;
+      background: #f9f9f9;
+      color: #333;
+      font-size: 1.25em; /* Larger base font size */
+    }
+    h1 {
+      color: #4B0082;
+      font-size: 2em;
+    }
+    code, pre {
+      background: #eee;
+      padding: 1em;
+      display: block;
+      overflow-x: auto;
+      border-radius: 6px;
+      position: relative;
+      margin-bottom: 1.5em;
+      font-size: 1.1em;
+    }
+    button.copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #4B0082;
+      color: white;
+      border: none;
+      padding: 0.5em 0.75em;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    kbd {
+      background: #ccc;
+      border-radius: 3px;
+      padding: 2px 6px;
+      font-size: 0.9em;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+
+<h1>VPN Setup Instructions</h1>
+
+<p>Download the four config files and VPN script from your email to the Downloads folder. These include:</p>
+<ul>
+  <li>vpn.conf (AUS)</li>
+  <li>vpunk.conf (UK)</li>
+  <li>vpus.conf (USA)</li>
+  <li>vpnz.conf (NZ)</li>
+  <li>vpn.sh (script for SwiftBar)</li>
+</ul>
+
+<p>Open <strong>Terminal</strong> using Spotlight or your launcher.</p>
+
+<p>You will need to install a special application installer to install two programs called Homebrew - you have probably encountered it before with your DRM hacking.  Install Homebrew by running:</p>
+<pre><code id="code1">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code><button class="copy-btn" onclick="copyToClipboard('code1')">Copy</button></pre>
+
+<p>Then this copy-paste command lets you run "brew" from command line - Add Homebrew to your PATH:</p>
+<pre><code id="code2">echo 'eval "$(/usr/local/bin/brew shellenv)"' &gt;&gt; ~/.zprofile
+eval "$(/usr/local/bin/brew shellenv)"</code><button class="copy-btn" onclick="copyToClipboard('code2')">Copy</button></pre>
+
+<p>Check Homebrew installed correctly.  Check it worked with...</p>
+<pre><code id="code3">brew -v</code><button class="copy-btn" onclick="copyToClipboard('code3')">Copy</button></pre>
+<p>.. it should report Homebrew 4.5.2</p>
+  
+<p>Install SwiftBar and place the VPN script plugin:</p>
+<pre><code id="code4">brew install --cask swiftbar
+mkdir -p ~/swiftplugins
+sudo cp ~/Downloads/vpn.sh ~/swiftplugins/vpn.sh</code><button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button></pre>
+
+<p>Before you run that app, you will need to install wireguard - the tool which NordVPN is based on. Install WireGuard and copy config files:</p>
+<pre><code id="code5">brew install wireguard-tools
+sudo mkdir -p /usr/local/etc/wireguard
+sudo cp ~/Downloads/*.conf /usr/local/etc/wireguard/</code><button class="copy-btn" onclick="copyToClipboard('code5')">Copy</button></pre>
+
+<p>
+Then you need to add this command to the bottom of your Visudo - to allow this command to run without asking for your super-user password - it is wg-quick, and connects/disconnectes you to/from the NordVPN servers.  Allow <code>wg-quick</code> to run without a password. Replace <strong>andrewgoddard</strong> with your Mac username. First run:</p>
+<pre><code id="code6">sudo EDITOR=nano visudo</code><button class="copy-btn" onclick="copyToClipboard('code6')">Copy</button></pre>
+
+<p>I have the username here as andrewgoddard, but you probably have a different one.  It is the same as the name of your home folder.  Then scroll to the bottom and paste:</p>
+<pre><code id="code7">andrewgoddard ALL=(ALL) NOPASSWD: /usr/local/bin/wg-quick up *, /usr/local/bin/wg-quick down *</code><button class="copy-btn" onclick="copyToClipboard('code7')">Copy</button></pre>
+
+<p>Then press <kbd>Ctrl</kbd> + <kbd>X</kbd>, then <kbd>Y</kbd>, then <kbd>Enter</kbd> to save.  If it asks you "What now?"  Type Q and press enter.</p>
+
+<p>When you run swift for the first time, it will ask you where your plugins are - they are where we moved your downloaded script to earlier.  Run SwiftBar and point it to:</p>
+<pre><code id="code8">~/swiftplugins</code><button class="copy-btn" onclick="copyToClipboard('code8')">Copy</button></pre>
+  
+  <p>Your app should now appear and is almost ready to allow you to connect to your VPN.</p>
+  
+ <p>The first time it runs you need to give it some permissions. Click run in terminal. And click allow etc.</p>
+  
+<img src="https://cdn.glitch.global/08b3c188-ddb3-4445-a924-d54df6ec85e3/3cec11e0-f05e-4825-8f40-3baa14059afc.image.png?v=1747524867760" 
+     alt="VPN Setup Screenshot 2" 
+     style="max-width:100%; height:auto; margin-bottom: 2em;" />
+  
+<p>Give it permission again.  Unlock, enable swiftbar, lock, close.</p>  
+
+<img src="https://cdn.glitch.global/08b3c188-ddb3-4445-a924-d54df6ec85e3/adb56531-55e7-402a-82b6-f1b329fae1b6.image.png?v=1747524830195" alt="VPN Setup Screenshot" style="max-width:100%; height:auto; margin-bottom: 2em;" />
+ 
+<p>Your app should now appear and allow you to connect to your VPN.</p>
+
+<script>
+  function copyToClipboard(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Copied to clipboard!");
+    }).catch(err => {
+      alert("Failed to copy: " + err);
+    });
+  }
+</script>
+
+</body>
+</html>
