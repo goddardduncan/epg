@@ -13,10 +13,10 @@
     {"id": "mjh-10bold-vic", "name": "10Bold"},
     {"id": "mjh-10peach-vic", "name": "10Peach"},
     {"id": "mjh-10shake-vic", "name": "10Shake"},
-    {"id": "mjh-sbs", "name": "SBS"},
-    {"id": "mjh-sbs-viceland", "name": "SBS Viceland"},
-    {"id": "mjh-sbs-food", "name": "SBS Food"},
-    {"id": "mjh-sbs-world-movies", "name": "SBS World Movies"},
-    {"id": "mjh-sbs-nitv", "name": "NITV"},
+    {"id": "mjh-sbs-sbst", "name": "SBS"},
+    {"id": "mjh-sbs-2syd", "name": "SBS Viceland"},
+    {"id": "mjh-sbs-3syd", "name": "SBS Food"},
+    {"id": "mjh-sbs-4syd", "name": "SBS World Movies"},
+    {"id": "mjh-sbs-5nsw", "name": "NITV"},
     {"id": "mjh-c31", "name": "Channel 31"}
 ]
