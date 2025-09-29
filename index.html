@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" href="https://goddardduncan.github.io/epg/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="https://epg.dunc.app/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <meta http-equiv="refresh" content="300">
     <title>Melbourne Live TV Guide</title>
@@ -189,7 +189,7 @@
 
             async function fetchStreams() {
                 try {
-                    const response = await fetch('https://goddardduncan.github.io/epg/9now.json');
+                    const response = await fetch('https://epg.dunc.app/9now.json');
                     if (!response.ok) {
                         throw new Error(`Failed to fetch stream URLs: ${response.statusText}`);
                     }
