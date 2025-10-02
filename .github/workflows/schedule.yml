@@ -1,0 +1,34 @@
+name: Token Update Scheduler
+
+on:
+  schedule:
+    # Runs at 00:00 and 12:00 UTC every day
+    - cron: '0 0,12 * * *'
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  update_tokens:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run token update script
+        env:
+          # Use the GITHUB_TOKEN as an environment variable in the script
+          # You must ensure the token in the script is configured to read from the env var,
+          # or simply pass the secret to the script as an argument if you want to keep the current structure.
+          # For this example, let's pass it as a variable directly to the script, replacing the hardcoded one.
+          GH_TOKEN: ${{ secrets.GH_PAT }} # Your GitHub Personal Access Token saved as a repository secret named 'GH_PAT'
+        run: |
+          # Simple way to replace the hardcoded token with the secret token for the run
+          sed -i "s|MY_TOKEN|${GH_TOKEN}|g" 9now.py
+          python 9now.py
