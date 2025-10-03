@@ -26,3 +26,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run:
           python 9now.py
+          python sbs.py
