@@ -21,9 +21,16 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run token update script
+      - name: Run 9Now updater
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
-        run:
+          # Use the built-in token unless you specifically need a PAT
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
           python 9now.py
+
+      - name: Run SBS updater
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python sbs.py
           python sbs.py
