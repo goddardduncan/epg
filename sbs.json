@@ -1,8 +1,8 @@
 {
     "timestamp": "2025-10-03T09:53:51.980804Z",
     "sbs": "https://pubads.g.doubleclick.net/ssai/event/57xy4s1FS1-sXx624PRryg/master.m3u8",
-    "sbs-viceland": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(viceland)/master.m3u8?hdnea=st=1759485235~exp=1759485535~acl=*~id=60793971-0a0e-4e57-bbca-431b11a76d12~hmac=d40630b101eac69df7b73bf44d590d58ea1966d5b01da764f0bdeff0cc7c8725&originpath=/linear/hls/pb/event/-55BKEWMTourUcUrCJnKqg/stream/b7e415c9-242c-4732-8ddb-b80cb94b277d:TPE/master.m3u8",
-    "sbs-food": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(food)/master.m3u8?hdnea=st=1759485236~exp=1759485536~acl=*~id=53493c61-98b9-498c-bbc2-c3ae092b91b8~hmac=917ee0f25adffa328b512ef628f423a527a84e3ac3fe6763435d2622ec021e8d&originpath=/linear/hls/pb/event/jebMy0KUTe-xe7RbPTaBDA/stream/a25a6f9e-500b-488e-a455-fd7740f46659:SIN/master.m3u8",
-    "sbs-world-movies": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(worldmovies)/master.m3u8?hdnea=st=1759485237~exp=1759485537~acl=*~id=ab20723c-83dc-46e1-ac1a-dd36ac4bee9c~hmac=8cb5fb89d4902dff059c0a4415f8f37be7bf59699881ce30780a9bc810f6b64b&originpath=/linear/hls/pb/event/hk8zv5vkQsS6OO0FkiiHrA/stream/63262638-ee74-4178-9195-0061729e233f:TPE2/master.m3u8",
-    "nitv": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(nitv)/master.m3u8?hdnea=st=1759485238~exp=1759485538~acl=*~id=b08298f5-8143-4f2d-8569-f572aba74cc6~hmac=32fa0e1ed0f99fd1e0a7a9fe0527b55acdc0f1300519e51e7ccf8cd8ac6d2d21&originpath=/linear/hls/pb/event/nUp81RPuRVSmDcOjT9yOKw/stream/a93a9d22-e582-4d07-887b-f763c1420bfe:SIN2/master.m3u8"
+    "sbs-viceland": "https://pubads.g.doubleclick.net/ssai/event/-55BKEWMTourUcUrCJnKqg/master.m3u8",
+    "sbs-food": "https://pubads.g.doubleclick.net/ssai/event/jebMy0KUTe-xe7RbPTaBDA/master.m3u8",    
+    "sbs-world-movies": "https://pubads.g.doubleclick.net/ssai/event/hk8zv5vkQsS6OO0FkiiHrA/master.m3u8",
+    "nitv": "https://pubads.g.doubleclick.net/ssai/event/nUp81RPuRVSmDcOjT9yOKw/master.m3u8"
 }
