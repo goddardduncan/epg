@@ -2,11 +2,11 @@ import requests
 import json
 import base64
 import time
+import os
 from datetime import datetime, timezone # Added for timestamp generation
 
 #Config
 
-GITHUB_TOKEN = 'MY_TOKEN'
 GITHUB_OWNER = 'goddardduncan'
 GITHUB_REPO = 'epg'
 GITHUB_PATH = '9now.json'
@@ -20,7 +20,13 @@ CHANNEL_SLUGS = {
     "mjh-life-vic": "life",
     "mjh-rush-vic": "rush"
 }
+GITHUB_TOKEN = os.environ.get('GH_TOKEN')
 
+if not GITHUB_TOKEN:
+    # Handle the error, as the script can't run without the token
+    print("Error: The GH_TOKEN environment variable is missing.")
+    exit(1)
+    
 # --- Core Functions ---
 
 def fetch_channel_url(slug):
