@@ -1,1 +1,8 @@
-
+{
+    "timestamp": "2025-10-03T09:20:09.995575Z",
+    "sbs": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/Live/geo/channel(sbs)/master.m3u8?hdnea=st=1759483210~exp=1759483510~acl=*~id=28f1aa54-0c34-49a8-8b8b-e1a30b27b644~hmac=37931cb8f8949625839220a5ddd0961d067b13bc7bf7d30795e119d5fc87ce09&originpath=/linear/hls/pb/event/57xy4s1FS1-sXx624PRryg/stream/28e2ed8a-8d00-437b-a230-6053e9795227:SIN/master.m3u8",
+    "sbs-viceland": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(viceland)/master.m3u8?hdnea=st=1759483212~exp=1759483512~acl=*~id=7f09aac9-ae57-43be-9665-e28d410bcb64~hmac=272ac08c1e4b7f5d94c3876027504c59098eb8dc28e60bb4df25fe54c467658c&originpath=/linear/hls/pb/event/-55BKEWMTourUcUrCJnKqg/stream/8c432e52-57fa-4b07-a9cb-da4011036654:TPE2/master.m3u8",
+    "sbs-food": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(food)/master.m3u8?hdnea=st=1759483213~exp=1759483513~acl=*~id=b58ab922-b76f-461c-8d30-2e6892268b8c~hmac=26087d0ed9dbd07c8a64534c125008c59e66a104268de39d72a1db7e95a15935&originpath=/linear/hls/pb/event/jebMy0KUTe-xe7RbPTaBDA/stream/5ddd0a3b-ab49-4faf-9193-6a30a24fb1f5:TPE2/master.m3u8",
+    "sbs-world-movies": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(worldmovies)/master.m3u8?hdnea=st=1759483214~exp=1759483514~acl=*~id=dc012e01-ca71-4f1b-87f6-2a60baf9559e~hmac=b43819e98be5ed380fb1cfbdddfc45b2144cde92c560b46af928fcabe1fd9d1c&originpath=/linear/hls/pb/event/hk8zv5vkQsS6OO0FkiiHrA/stream/eaea8dac-eed7-422f-b95c-e5858f8da825:TPE/master.m3u8",
+    "nitv": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(nitv)/master.m3u8?hdnea=st=1759483216~exp=1759483516~acl=*~id=77c05f9e-991d-4ce1-83c2-f4a76ee67e02~hmac=fb585a49348a34d15388f28796a0ea1e0fd9bf761d950fd9058eae9d81a1d39d&originpath=/linear/hls/pb/event/nUp81RPuRVSmDcOjT9yOKw/stream/5440cb3f-ea39-45a6-82ff-18300b3b9540:TPE/master.m3u8"
+}
