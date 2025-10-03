@@ -1,6 +1,6 @@
 {
-    "mjh-channel-9-vic": "Playm3u8.html?url=https://s.goddardduncan.workers.dev/channel9.m3u8",
-    "mjh-gem-vic": "Playm3u8.html?url=https://s.goddardduncan.workers.dev/gem.m3u8",
+    "mjh-channel-9-vic": "Playm3u8.html?url=https://d.goddardduncan.workers.dev/channel9.m3u8",
+    "mjh-gem-vic": "Playm3u8.html?url=https://d.goddardduncan.workers.dev/gem.m3u8",
     "mjh-go-vic": "Playm3u8.html?stream=mjh-go-vic",
     "mjh-life-vic": "Playm3u8.html?stream=mjh-life-vic",
     "mjh-rush-vic": "Playm3u8.html?stream=mjh-rush-vic",
@@ -22,5 +22,5 @@
     "mjh-10peach-vic": "Playm3u8.html?url=https://d.goddardduncan.workers.dev/peach.m3u8",
     "mjh-10bold-vic": "Playm3u8.html?url=https://i.mjh.nz/.r/10bold-vic.m3u8",
     "mjh-10shake-vic": "Playm3u8.html?url=https://i.mjh.nz/.r/10shake-vic.m3u8",
-    "mjh-c31": "Playm3u8.html?url=https://d1k6kax80wecy5.cloudfront.net/RLnAKY/index.m3u8"
+    "mjh-c31": "Playm3u8.html?url=https://d.goddardduncan.workers.dev/ch31.m3u8"
 }
