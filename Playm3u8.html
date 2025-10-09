@@ -139,7 +139,7 @@
                     storedContent[streamKey] = m3u8Content;
 
                     // Save back to localStorage
-                    localStorage.setItem('m3u8Files', JSON.stringify(storedContent));
+             //       localStorage.setItem('m3u8Files', JSON.stringify(storedContent));
 
                     console.log('Saved m3u8 file for ' + streamKey);
                 })
@@ -161,7 +161,7 @@
                 }
 
                 // Pause for 5 minutes (300000 milliseconds) after processing all streams
-                setTimeout(startSavingToLocalStorage, 300000);
+      //          setTimeout(startSavingToLocalStorage, 300000);
             } catch (error) {
                console.error('Error during saving to local storage:', error);
             }
