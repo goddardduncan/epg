@@ -1,0 +1,38 @@
+name: Daily XMLTV Channel ID Synchronization
+
+on:
+
+Allows you to run this workflow manually from the Actions tab in GitHub
+workflow_dispatch:
+
+Schedule to run once daily. This is set to 00:00 UTC,
+which corresponds to 10:00 AM AEST / 11:00 AM AEDT.
+schedule:
+- cron: '0 0 * * *'
+
+jobs:
+update-epg:
+runs-on: ubuntu-latest
+
+steps:
+  - name: Checkout Repository Code
+    uses: actions/checkout@v4
+
+  - name: Set up Python Environment
+    uses: actions/setup-python@v5
+    with:
+      # Use a stable version of Python
+      python-version: '3.10'
+
+  - name: Install required Python packages (requests)
+    run: pip install requests
+
+  - name: Execute XMLTV Sync and Upload Script
+    # This step runs your Python script
+    run: xml.py
+    env:
+      # The GH_TOKEN environment variable is required by your Python script 
+      # for authentication when uploading to the GitHub API.
+      # NOTE: You MUST configure a secret named GH_TOKEN in your repository 
+      # settings containing a Personal Access Token with 'repo' scope access.
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
