@@ -34,4 +34,4 @@ jobs:
           # for authentication when uploading to the GitHub API.
           # NOTE: You MUST configure a secret named GH_TOKEN in your repository 
           # settings containing a Personal Access Token with 'repo' scope access.
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
