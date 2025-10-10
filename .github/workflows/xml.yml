@@ -2,11 +2,11 @@ name: Daily XMLTV Channel ID Synchronization
 
 on:
 
-Allows you to run this workflow manually from the Actions tab in GitHub
+#Allows you to run this workflow manually from the Actions tab in GitHub
 workflow_dispatch:
 
-Schedule to run once daily. This is set to 00:00 UTC,
-which corresponds to 10:00 AM AEST / 11:00 AM AEDT.
+#Schedule to run once daily. This is set to 00:00 UTC,
+#which corresponds to 10:00 AM AEST / 11:00 AM AEDT.
 schedule:
 - cron: '0 0 * * *'
 
