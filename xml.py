@@ -24,7 +24,7 @@ EXTERNAL_XML_URL = 'https://xmltv.net/xml_files/Melbourne.xml'
 REPLACEMENT_RULES = [
   # SBS - Original request
   {'from': '273191auepg.com.au', 'to': 'dmg-sbs-sbst'},
-  
+
   # Network 10 channels
   {'from': '250185auepg.com.au', 'to': 'dmg-10-vic'},
   {'from': '403767auepg.com.au', 'to': 'dmg-10peach-vic'},
@@ -36,22 +36,22 @@ REPLACEMENT_RULES = [
   {'from': '92843auepg.com.au', 'to': 'dmg-abc-vic'},
   {'from': '284792auepg.com.au', 'to': 'dmg-abc-kids'},
   {'from': '391136auepg.com.au', 'to': 'dmg-abc-news'},
-  
+
   # More SBS channels
   {'from': '431777auepg.com.au', 'to': 'dmg-sbs-2syd'},
   {'from': '432038auepg.com.au', 'to': 'dmg-sbs-4syd'},
   {'from': '431492auepg.com.au', 'to': 'dmg-sbs-3syd'},
   {'from': '430925auepg.com.au', 'to': 'dmg-sbs-5nsw'},
-  
+
   # Community TV
   {'from': '251882auepg.com.au', 'to': 'dmg-c31'},
-  
+
   # Channel 7 channels
   {'from': '96100auepg.com.au', 'to': 'dmg-seven-mel'},
   {'from': '410799auepg.com.au', 'to': 'dmg-7two-mel'},
   {'from': '388547auepg.com.au', 'to': 'dmg-7mate-mel'},
   {'from': '431544auepg.com.au', 'to': 'dmg-7flix-mel'},
-  
+
   # Channel 9 channels
   {'from': '252342auepg.com.au', 'to': 'dmg-channel-9-vic'},
   {'from': '391132auepg.com.au', 'to': 'dmg-gem-vic'},
@@ -88,10 +88,16 @@ def generate_xml_content():
     """
     print(f"Fetching XML from: {EXTERNAL_XML_URL}...")
 
+    # Define headers to mimic a web browser and avoid the 403 Forbidden error
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'application/xml, text/xml, */*; q=0.01'
+    }
+
     # 1. Fetch the external XML data
     try:
-        # Use a reasonable timeout
-        xml_response = requests.get(EXTERNAL_XML_URL, timeout=20)
+        # Pass the defined headers to the requests.get call
+        xml_response = requests.get(EXTERNAL_XML_URL, headers=headers, timeout=20)
         # Raise an exception for HTTP error codes (4xx or 5xx)
         xml_response.raise_for_status() 
     except requests.exceptions.RequestException as e:
@@ -104,20 +110,20 @@ def generate_xml_content():
 
     # 2. Pre-process: remove non-breaking spaces (\u00A0)
     modified_xml_text = modified_xml_text.replace('\u00A0', ' ')
-    
+
     replacements_made = 0
     # 3. Modify the content using all replacement rules
     for rule in REPLACEMENT_RULES:
         # Escape the original string to ensure dots are treated as literal characters.
         escaped_from = escape_regex(rule['from'])
-        
+
         # Target the ID string globally.
         # re.DOTALL ensures '.' matches newlines if needed, though usually not for XML IDs
         regex = re.compile(escaped_from, re.IGNORECASE) 
-        
+
         # Use re.sub to perform the replacement and count occurrences
         new_xml_text, count = re.subn(regex, rule['to'], modified_xml_text)
-        
+
         if count > 0:
             print(f"  -> Replaced '{rule['from']}' {count} time(s) with '{rule['to']}'.")
             modified_xml_text = new_xml_text
@@ -167,7 +173,7 @@ def upload_file(content, sha, max_retries=3):
         "Content-Type": "application/json",
         "Accept": "application/vnd.github.v3+json"
     }
-    
+
     # Encode the XML content string
     encoded_content = base64.b64encode(content.encode('utf-8')).decode('utf-8')
 
@@ -210,7 +216,7 @@ def main():
 
     # 1. Generate the modified XML content
     xml_content = generate_xml_content()
-    
+
     if not xml_content:
         print("\nERROR: Could not generate XML content. Aborting upload.")
         return
@@ -223,7 +229,7 @@ def main():
 
     # 2. Get current SHA of the file to be updated
     sha = get_file_sha()
-    
+
     # 3. Upload the new XML content
     upload_file(xml_content, sha)
 
