@@ -96,6 +96,14 @@
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
                 video.play();
+                    const tracks = video.textTracks;
+                    for (let i = 0; i < tracks.length; i++) {
+                        const track = tracks[i];
+                            if (track.kind === 'subtitles' || track.kind === 'captions') {
+                            track.mode = 'hidden'; // 'hidden' is generally preferred over 'disabled'
+                            console.log(`Subtitle track ${i} set to hidden.`);
+                        }
+                    }
             } else {
                 alert('Your browser does not support HLS.js or native HLS playback.');
             }
