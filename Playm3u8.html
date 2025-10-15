@@ -86,32 +86,43 @@
 
         async function loadAndPlayStream(url) {
             const video = document.getElementById('video');
+
+            // Consolidated function to disable subtitles
+            function disableSubtitles() {
+                const tracks = video.textTracks;
+                for (let i = 0; i < tracks.length; i++) {
+                    const track = tracks[i];
+                    // Target 'subtitles' and 'captions' tracks
+                    if (track.kind === 'subtitles' || track.kind === 'captions') {
+                        // 'hidden' is the reliable way to keep the track loaded but not showing
+                        track.mode = 'hidden'; 
+                        console.log(`Subtitle track ${i} set to hidden.`);
+                    }
+                }
+            }
+            
             if (Hls.isSupported()) {
                 const hls = new Hls();
                 hls.loadSource(url);
                 hls.attachMedia(video);
+                
+                // For Hls.js, tracks are available after the manifest is parsed
                 hls.on(Hls.Events.MANIFEST_PARSED, function() {
                     video.play();
-                    const tracks = video.textTracks;
-                    for (let i = 0; i < tracks.length; i++) {
-                        const track = tracks[i];
-                            if (track.kind === 'subtitles' || track.kind === 'captions') {
-                            track.mode = 'hidden'; // 'hidden' is generally preferred over 'disabled'
-                            console.log(`Subtitle track ${i} set to hidden.`);
-                        }
-                    }
+                    disableSubtitles(); // <--- CALLING FUNCTION HERE
                 });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                // For Native HLS playback (Safari/iOS)
                 video.src = url;
+                
+                // Tracks are available after loadedmetadata or canplaythrough
+                video.addEventListener('loadedmetadata', function disableNativeSubs() {
+                    disableSubtitles(); // <--- CALLING FUNCTION HERE
+                    // Remove listener to prevent multiple executions
+                    video.removeEventListener('loadedmetadata', disableNativeSubs); 
+                });
+                
                 video.play();
-                    const tracks = video.textTracks;
-                    for (let i = 0; i < tracks.length; i++) {
-                        const track = tracks[i];
-                            if (track.kind === 'subtitles' || track.kind === 'captions') {
-                            track.mode = 'hidden'; // 'hidden' is generally preferred over 'disabled'
-                            console.log(`Subtitle track ${i} set to hidden.`);
-                        }
-                    }
             } else {
                 alert('Your browser does not support HLS.js or native HLS playback.');
             }
@@ -192,6 +203,9 @@
             var streamKey = getUrlParameter('stream');
             var url = window.location.href;
             var urlParameterCheck = getUrlParameterCheck('url', url);
+            
+            // Get the video element reference for use in event listeners and DOMContentLoaded
+            const video = document.getElementById('video');
 
             if (urlParameter) {
                 // If a direct URL is provided, use it
@@ -245,9 +259,9 @@
                 var tracks = video.textTracks;
                 for (var i = 0; i < tracks.length; i++) {
                     var track = tracks[i];
-                    track.enabled = !track.enabled;
-                    if (track.kind === 'subtitles') {
-                        track.mode = track.mode === 'showing' ? 'disabled' : 'showing';
+                    // Toggle the mode between 'showing' and 'hidden' for captions/subtitles.
+                    if (track.kind === 'subtitles' || track.kind === 'captions') {
+                        track.mode = track.mode === 'showing' ? 'hidden' : 'showing';
                     }
                 }
             }
@@ -259,7 +273,6 @@
 
             window.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
-                    var video = document.getElementById('video');
                     video.play();
                 } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey)) {
                     event.preventDefault();
@@ -292,26 +305,14 @@
                     }
                 } else if (event.key === 'ArrowDown') {
                     // Toggle mute/unmute on the video player
-                    var video = document.getElementById('video');
                     video.muted = !video.muted;
-                    // Check if the video is now muted
-                    if (video.muted) {
-                        // Attempt to enable subtitles
-                        var tracks = video.textTracks;
-                        for (var i = 0; i < tracks.length; i++) {
-                            if (tracks[i].kind === 'subtitles') {
-                                tracks[i].mode = 'showing'; // Enable subtitles
-                                break; // Assuming we only need to enable the first subtitles track found
-                            }
-                        }
-                    } else {
-                        // Optionally, disable subtitles when unmuting
-                        var tracks = video.textTracks;
-                        for (var i = 0; i < tracks.length; i++) {
-                            if (tracks[i].kind === 'subtitles') {
-                                tracks[i].mode = 'hidden'; // Disable subtitles
-                                break; // Assuming we only want to disable the first subtitles track found
-                            }
+                    
+                    // Enable/disable subtitles based on mute state
+                    var tracks = video.textTracks;
+                    for (var i = 0; i < tracks.length; i++) {
+                         // Only affect subtitle/caption tracks
+                        if (tracks[i].kind === 'subtitles' || tracks[i].kind === 'captions') {
+                            tracks[i].mode = video.muted ? 'showing' : 'hidden'; 
                         }
                     }
                 }
