@@ -27,13 +27,16 @@ if not GITHUB_TOKEN:
 # Shared
 # ========================
 
-TIMEOUT_SECONDS = 8
+TIMEOUT_SECONDS = 10  # slightly higher for slower endpoints
 
 def now_ts():
     return datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 
+def first_line(txt: str) -> str:
+    return (txt.strip().splitlines() or [""])[0] if isinstance(txt, str) else ""
+
 # ========================
-# ABC iView (Akamai + HMAC)
+# ABC iView (Akamai + HMAC)  — PATCHED with retries & logging
 # ========================
 
 SECRET_ABC = b'android.content.res.Resources'
@@ -42,7 +45,8 @@ ABC_AUTH_PATH_TEMPLATE = '/auth/hls/sign?ts={ts}&hn={hn}&d=android-tablet'
 ABC_TOKEN_SPOOF_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (PlayStation 4) AppleWebKit/531.3 (KHTML, like Gecko) SCEE/1.0 Nuanti/2.0',
     'Origin': 'http://tv.iview.abc.net.au',
-    'Referer': 'http://tv.iview.abc.net.au/playstation.php'
+    'Referer': 'http://tv.iview.abc.net.au/playstation.php',
+    'Accept': '*/*',
 }
 ABC_LIVE_STREAM_MAP = {
     'abc-vic': {
@@ -52,21 +56,49 @@ ABC_LIVE_STREAM_MAP = {
     # add more ABC entries if you want
 }
 
-def abc_generate_url(hn, akamai_base_url):
-    try:
-        ts = str(int(time.time()))
-        auth_path = ABC_AUTH_PATH_TEMPLATE.replace('{ts}', ts).replace('{hn}', hn)
-        sig = hmac.new(SECRET_ABC, auth_path.encode('utf-8'), hashlib.sha256).hexdigest()
-        token_url = f"{ABC_API_BASE}{auth_path}&sig={sig}"
-        r = requests.get(token_url, headers=ABC_TOKEN_SPOOF_HEADERS, timeout=TIMEOUT_SECONDS)
-        if not r.ok:
-            print(f"[ABC] Token fetch failed ({r.status_code}) for hn={hn}")
-            return None
-        token = r.text.strip()
-        return f"{akamai_base_url}?hdnea={token}"
-    except Exception as e:
-        print(f"[ABC] Error: {e}")
-        return None
+def abc_generate_url(hn, akamai_base_url, max_retries=3):
+    """
+    Patched: retry token fetch; log status/body; optional M3U8 sanity probe.
+    Returns the final Akamai master URL with hdnea token or None on failure.
+    """
+    ts = str(int(time.time()))
+    auth_path = ABC_AUTH_PATH_TEMPLATE.replace('{ts}', ts).replace('{hn}', hn)
+    sig = hmac.new(SECRET_ABC, auth_path.encode('utf-8'), hashlib.sha256).hexdigest()
+    token_url = f"{ABC_API_BASE}{auth_path}&sig={sig}"
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            r = requests.get(token_url, headers=ABC_TOKEN_SPOOF_HEADERS, timeout=TIMEOUT_SECONDS)
+            if r.ok:
+                token = r.text.strip()
+                final_url = f"{akamai_base_url}?hdnea={token}"
+
+                # Optional quick sanity check (won't fail the run if this errors)
+                try:
+                    m = requests.get(final_url, timeout=TIMEOUT_SECONDS, headers={'User-Agent': 'Python-ABC-Checker'})
+                    fl = first_line(m.text)
+                    if 200 <= m.status_code < 300 and fl.startswith('#EXTM3U'):
+                        print(f"[ABC] M3U8 sanity OK ({m.status_code})")
+                    else:
+                        print(f"[ABC] M3U8 sanity WARN status={m.status_code} firstLine='{fl[:80]}'")
+                except requests.exceptions.RequestException as me:
+                    print(f"[ABC] M3U8 check ERROR: {type(me).__name__}: {me}")
+
+                return final_url
+
+            body = (r.text or '')[:200].replace('\n', ' ')
+            print(f"[ABC] Attempt {attempt}/{max_retries} token fetch failed "
+                  f"({r.status_code}) for hn={hn}; body: {body}")
+
+        except requests.exceptions.RequestException as e:
+            print(f"[ABC] Attempt {attempt}/{max_retries} network error for hn={hn}: {type(e).__name__}: {e}")
+
+        if attempt < max_retries:
+            backoff = 2 ** (attempt - 1)
+            time.sleep(backoff)
+
+    print("[ABC] Giving up after retries.")
+    return None
 
 # ========================
 # 9Now (Nine)
@@ -76,7 +108,7 @@ NINE_NOW_API_BASE = 'https://api.9now.com.au/web/live-experience'
 NINE_REGION = 'vic'
 NINE_CHANNEL_SLUGS = ['channel-9', 'gem', 'go', 'life', 'rush']
 
-def nine_fetch_url(slug, region=NINE_REGION):
+def nine_fetch_url(slug, region=NINE_REGION, max_retries=2):
     params = {
         'device': 'web',
         'slug': slug,
@@ -84,22 +116,28 @@ def nine_fetch_url(slug, region=NINE_REGION):
         'region': region,
         'offset': 0
     }
-    try:
-        r = requests.get(NINE_NOW_API_BASE, params=params, timeout=TIMEOUT_SECONDS)
-        if not r.ok:
-            print(f"[9Now] Fail {r.status_code} for {slug}")
-            return None
-        data = r.json()
-        return (
-            data.get('data', {})
-                .get('getLXP', {})
-                .get('stream', {})
-                .get('video', {})
-                .get('url')
-        )
-    except Exception as e:
-        print(f"[9Now] Error {slug}: {e}")
-        return None
+    for attempt in range(1, max_retries + 1):
+        try:
+            r = requests.get(NINE_NOW_API_BASE, params=params, timeout=TIMEOUT_SECONDS)
+            if not r.ok:
+                print(f"[9Now] Fail {r.status_code} for {slug}")
+            else:
+                data = r.json()
+                url = (
+                    data.get('data', {})
+                        .get('getLXP', {})
+                        .get('stream', {})
+                        .get('video', {})
+                        .get('url')
+                )
+                if url:
+                    return url
+                print(f"[9Now] Missing URL in JSON for {slug}")
+        except requests.exceptions.RequestException as e:
+            print(f"[9Now] Attempt {attempt}/{max_retries} error {slug}: {e}")
+        if attempt < max_retries:
+            time.sleep(1)
+    return None
 
 # ========================
 # SBS (Google DAI / SSAI)
@@ -113,18 +151,24 @@ SBS_CHANNELS = [
     {'name': 'NITV',              'key': 'nitv',      'streamKey': 'nUp81RPuRVSmDcOjT9yOKw'},
 ]
 
-def sbs_fetch_manifest(stream_key):
+def sbs_fetch_manifest(stream_key, max_retries=2):
     endpoint = f"https://pubads.g.doubleclick.net/ssai/event/{stream_key}/streams"
-    try:
-        r = requests.post(endpoint, headers={'Content-Type': 'application/json'}, timeout=TIMEOUT_SECONDS)
-        if not r.ok:
-            print(f"[SBS] SSAI fail {r.status_code} for {stream_key}")
-            return None
-        data = r.json()
-        return data.get('stream_manifest')
-    except Exception as e:
-        print(f"[SBS] Error {stream_key}: {e}")
-        return None
+    for attempt in range(1, max_retries + 1):
+        try:
+            r = requests.post(endpoint, headers={'Content-Type': 'application/json'}, timeout=TIMEOUT_SECONDS)
+            if r.ok:
+                data = r.json()
+                manifest = data.get('stream_manifest')
+                if manifest:
+                    return manifest
+                print(f"[SBS] No stream_manifest for {stream_key}")
+            else:
+                print(f"[SBS] SSAI fail {r.status_code} for {stream_key}")
+        except requests.exceptions.RequestException as e:
+            print(f"[SBS] Attempt {attempt}/{max_retries} error {stream_key}: {e}")
+        if attempt < max_retries:
+            time.sleep(1)
+    return None
 
 # ========================
 # Seven (7plus) – SWM / Brightcove JSON → M3U8
@@ -150,25 +194,27 @@ SEVEN_CHANNEL_CONFIG = {
 }
 SEVEN_MODIFICATION_REGEX = re.compile(r'([A-Z]{2}\.m3u8\?)')
 
-def seven_fetch_url(key):
+def seven_fetch_url(key, max_retries=2):
     api = SEVEN_CHANNEL_CONFIG[key]['API_URL']
-    try:
-        r = requests.get(api, headers={'User-Agent': 'Seven-Grabber'}, allow_redirects=True, timeout=TIMEOUT_SECONDS)
-        if not r.ok:
-            print(f"[Seven] API fail {r.status_code} for {key}")
-            return None
-        data = r.json()
-        src = data.get('media', {}).get('sources', [{}])[0].get('src')
-        if not src:
-            print(f"[Seven] No 'src' for {key}")
-            return None
-        return SEVEN_MODIFICATION_REGEX.sub('.m3u8?', src)
-    except Exception as e:
-        print(f"[Seven] Error {key}: {e}")
-        return None
+    for attempt in range(1, max_retries + 1):
+        try:
+            r = requests.get(api, headers={'User-Agent': 'Seven-Grabber'}, allow_redirects=True, timeout=TIMEOUT_SECONDS)
+            if not r.ok:
+                print(f"[Seven] API fail {r.status_code} for {key}")
+            else:
+                data = r.json()
+                src = data.get('media', {}).get('sources', [{}])[0].get('src')
+                if src:
+                    return SEVEN_MODIFICATION_REGEX.sub('.m3u8?', src)
+                print(f"[Seven] No 'src' for {key}")
+        except requests.exceptions.RequestException as e:
+            print(f"[Seven] Attempt {attempt}/{max_retries} error {key}: {e}")
+        if attempt < max_retries:
+            time.sleep(1)
+    return None
 
 # ========================
-# 10play (Network 10) – HMAC header + Live endpoint → DAI URLs
+# 10play (Network 10) — PATCHED with retries & logging
 # ========================
 
 HEX_KEY_10 = 'b918ff793563080c5821c89ee6c415c363cb36d369db1020369ac4b405a0211d'
@@ -189,22 +235,45 @@ def ten_x_n10_sig(url):
     sig = hmac.new(SECRET_10, msg, hashlib.sha256).hexdigest()
     return f"{ts}_{sig}"
 
-def ten_fetch_config():
+def ten_fetch_config(max_retries=3):
     cfg_url = f"{CONFIG_URL_10}?SystemName=android&manufacturer=nvidia"
-    r = requests.get(cfg_url, headers=HEADERS_10, timeout=TIMEOUT_SECONDS)
-    r.raise_for_status()
-    return r.json()
+    for attempt in range(1, max_retries + 1):
+        try:
+            r = requests.get(cfg_url, headers=HEADERS_10, timeout=TIMEOUT_SECONDS)
+            if r.ok:
+                return r.json()
+            print(f"[10play] Config fail {r.status_code}")
+        except requests.exceptions.RequestException as e:
+            print(f"[10play] Config attempt {attempt}/{max_retries} error: {e}")
+        if attempt < max_retries:
+            time.sleep(1)
+    raise RuntimeError("10play config fetch failed after retries")
 
-def ten_fetch_live_channels(state='VIC'):
+def ten_fetch_live_channels(state='VIC', max_retries=3):
     cfg = ten_fetch_config()
     live_endpoint = cfg['liveTvEndpoint']
-    full = f"{live_endpoint}/{state}?limit=16"
+    full = f"{live_endpoint}/{state}?limit=32"
     headers = {**HEADERS_10, 'X-N10-SIG': ten_x_n10_sig(full)}
-    r = requests.get(full, headers=headers, timeout=TIMEOUT_SECONDS)
-    r.raise_for_status()
-    return r.json().get('channels', [])
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            r = requests.get(full, headers=headers, timeout=TIMEOUT_SECONDS)
+            if r.ok:
+                data = r.json()
+                chs = data.get('channels', [])
+                if chs:
+                    return chs
+                print("[10play] Empty channels list")
+            else:
+                print(f"[10play] Live channels fail {r.status_code}")
+        except requests.exceptions.RequestException as e:
+            print(f"[10play] Live attempt {attempt}/{max_retries} error: {e}")
+        if attempt < max_retries:
+            time.sleep(1)
+    return []
 
 def ten_channel_url_from_streamkey(stream_key):
+    # DAI master
     return f"https://dai.google.com/ssai/event/{stream_key}/master.m3u8"
 
 # ========================
@@ -239,7 +308,7 @@ def github_upload_content(content_str, sha=None, max_retries=3):
     if sha:
         payload["sha"] = sha
 
-    for attempt in range(max_retries):
+    for attempt in range(1, max_retries + 1):
         try:
             r = requests.put(GITHUB_API_URL, headers=headers, data=json.dumps(payload), timeout=30)
             r.raise_for_status()
@@ -247,14 +316,13 @@ def github_upload_content(content_str, sha=None, max_retries=3):
             print(f"[GitHub] Success! {commit_url}")
             return True
         except requests.exceptions.RequestException as e:
-            print(f"[GitHub] Upload failed (attempt {attempt+1}/{max_retries}): {e}")
-            if attempt < max_retries - 1:
-                backoff = 2 ** attempt
-                print(f"Retrying in {backoff}s...")
-                time.sleep(backoff)
-            else:
-                print("[GitHub] Max retries reached.")
-                return False
+            print(f"[GitHub] Upload failed (attempt {attempt}/{max_retries}): {e}")
+        if attempt < max_retries:
+            backoff = 2 ** (attempt - 1)
+            print(f"Retrying in {backoff}s...")
+            time.sleep(backoff)
+    print("[GitHub] Max retries reached.")
+    return False
 
 # ========================
 # Main
@@ -263,7 +331,7 @@ def github_upload_content(content_str, sha=None, max_retries=3):
 def main():
     results = {"timestamp": now_ts()}
 
-    # ABC
+    # ABC (patched)
     for slug, data in ABC_LIVE_STREAM_MAP.items():
         print(f"[ABC] {slug} …")
         url = abc_generate_url(data['hn'], data['akamaiBase'])
@@ -291,7 +359,7 @@ def main():
         if url:
             results[key] = {"url": url}
 
-    # 10play (dynamic list)
+    # 10play (patched)
     try:
         print("[10play] fetching live channels …")
         channels = ten_fetch_live_channels('VIC')
@@ -299,7 +367,7 @@ def main():
             key = ch.get('key')
             sk = ch.get('streamKey')
             if key and sk:
-                # prefix keys with "10-" to avoid collisions and keep flat map
+                # prefix with "10-" to keep flat namespace + avoid collisions
                 results[f"10-{key.lower()}"] = {"url": ten_channel_url_from_streamkey(sk)}
     except Exception as e:
         print(f"[10play] Error fetching channels: {e}")
