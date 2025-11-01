@@ -1,5 +1,8 @@
 {
-  "timestamp": "2025-11-01T12:58:58.513200Z",
+  "timestamp": "2025-11-01T13:12:45.693545Z",
+  "abc-vic": {
+    "url": "https://abc-iview-mediapackagestreams-1.akamaized.net/out/v1/3198d7aadc42410abd6a68b1ac2f4e36/index.m3u8?hdnea=st=1762002705~exp=1762003605~acl=/*~hmac=ecd19eb20674a314d03af67443801c97c8e5bcf297167b1e73a7899657592a42"
+  },
   "channel-9": {
     "url": "https://csm-e-nineext2au-eb.bln1.yospace.com/csm/extlive/nnaprd01,prod-simulcast-mel-ch9-hls-r15-nsa.m3u8?pp=9now_live&iu=%2F133009657%2F9now%2Fweb%2Flive&yo.up=https://9now-livestreams-fhd-t.akamaized.net/u/prod/simulcast/mel/ch9/hls/r1/&url=https://www.9now.com.au/live/channel-9&vid=live-ch9-mel&cmsid=2474123&yo.t.pf=8000&yo.ks=false&yo.pbr=false&yo.br=false&channel=channel-9&market=melbourne&yo.eb.fb=aHR0cHM6Ly85bm93LWxpdmVzdHJlYW1zLWZoZC10LmFrYW1haXplZC5uZXQvdS9wcm9kL3NpbXVsY2FzdC9tZWwvY2g5L2hscy9yMS9pbmRleC5tM3U4&startOver=false&yo.ap=https://p-9now-ys-v2.akamaized.net/"
   },
@@ -16,30 +19,201 @@
     "url": "https://csm-e-nineext2au-eb.bln1.yospace.com/csm/extlive/nnaprd01,prod-simulcast-mel-rush-hls-r13-nsa.m3u8?pp=9now_live&iu=%2F133009657%2F9now%2Fweb%2Flive&yo.up=https://9now-livestreams-fhd-t.akamaized.net/u/prod/simulcast/mel/rush/hls/r1/&url=https://www.9now.com.au/live/rush&vid=live-rush-mel&cmsid=2474123&yo.t.pf=8000&yo.ks=false&yo.pbr=false&yo.br=false&yo.ap=https://p-9now-ys-v2.akamaized.net/&channel=rush&market=melbourne&yo.eb.fb=aHR0cHM6Ly85bm93LWxpdmVzdHJlYW1zLWZoZC10LmFrYW1haXplZC5uZXQvdS9wcm9kL3NpbXVsY2FzdC9tZWwvcnVzaC9obHMvcjEvaW5kZXgubTN1OA==&startOver=false"
   },
   "sbs": {
-    "url": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/Live/geo/channel(sbs)/master.m3u8?hdnea=st=1762001944~exp=1762002244~acl=*~id=be100205-557d-4bb9-9726-526803efdd65~hmac=128e4fcc92edccc6f14d1b79565603c7e359d6e41a745c97543917237d67ddf7&originpath=/linear/hls/pa/event/57xy4s1FS1-sXx624PRryg/stream/c0419f84-9c36-495c-9f7a-4199942efe32:ATL/master.m3u8"
+    "url": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/Live/geo/channel(sbs)/master.m3u8?hdnea=st=1762002768~exp=1762003068~acl=*~id=fc34bb85-1048-498a-b04c-7b50ded1006e~hmac=f71efbe404be9f0cbf47460578aeeecc6e1f30db3876559e239a465ed71473b0&originpath=/linear/hls/pb/event/57xy4s1FS1-sXx624PRryg/stream/a42d0bda-cc23-46fe-95e0-f5e57cfdc16f:TPE2/master.m3u8"
   },
   "sbsfood": {
-    "url": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(food)/master.m3u8?hdnea=st=1762001945~exp=1762002245~acl=*~id=fec1eae8-93ed-4cc8-9620-f81e5079bd88~hmac=5d89baf1250145d6c4961258963daddd68586238689321f7ebca12b1a936dc40&originpath=/linear/hls/pa/event/jebMy0KUTe-xe7RbPTaBDA/stream/8b4b1cad-9349-4b2a-a4c0-27493bdf6667:MRN2/master.m3u8"
+    "url": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(food)/master.m3u8?hdnea=st=1762002768~exp=1762003068~acl=*~id=c50570dc-4a70-45b4-9aaa-108bcd5c5536~hmac=88576dd73374b9faccee665a336f45f4cdcc8e9b1bf76ee636f3c6f4b8e61039&originpath=/linear/hls/pb/event/jebMy0KUTe-xe7RbPTaBDA/stream/052a0ce8-55f8-4aa9-b76e-b2e58ece7877:SIN/master.m3u8"
   },
   "viceland": {
-    "url": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(viceland)/master.m3u8?hdnea=st=1762001945~exp=1762002245~acl=*~id=f3687136-2da2-4a5a-81c8-6ad32865192d~hmac=0d59ffa3686c2d0e0742a3cf7a439f4d1bf02d0f155a450966241923728a5e35&originpath=/linear/hls/pa/event/-55BKEWMTourUcUrCJnKqg/stream/929e09a0-4dfd-4484-a519-e0461b87a4be:CBF2/master.m3u8"
+    "url": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(viceland)/master.m3u8?hdnea=st=1762002770~exp=1762003070~acl=*~id=54b35aa5-f751-4907-921c-77918c297e82~hmac=beb1cbeb596bfec51499752a772d96277674b1680aba36f921fa49e7aeb71c73&originpath=/linear/hls/pb/event/-55BKEWMTourUcUrCJnKqg/stream/06747123-d50d-41d0-80b7-cff6f25c082d:TPE2/master.m3u8"
   },
   "sbsmovies": {
-    "url": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(worldmovies)/master.m3u8?hdnea=st=1762001945~exp=1762002245~acl=*~id=e245ae34-45b6-4ea4-9f53-9368d39c7eb6~hmac=9844b9cd99ab9e540088e70d6f5a811edd8bdf94ca29e92aa407d4db41f619ff&originpath=/linear/hls/pa/event/hk8zv5vkQsS6OO0FkiiHrA/stream/b3a543a0-249d-4432-95de-affe14296a8c:CHS/master.m3u8"
+    "url": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(worldmovies)/master.m3u8?hdnea=st=1762002771~exp=1762003071~acl=*~id=56bc1ea0-963d-44f6-8a6a-83aa0915098c~hmac=bb157800af2b67366f14c18791b7b473a966a075a7b16ede770cf5702d85d6da&originpath=/linear/hls/pb/event/hk8zv5vkQsS6OO0FkiiHrA/stream/52dc6238-013c-462b-b4f2-73d4959df679:TPE2/master.m3u8"
   },
   "nitv": {
-    "url": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(nitv)/master.m3u8?hdnea=st=1762001946~exp=1762002246~acl=*~id=521991ec-bad6-4cc6-86b9-60fc311cd4e9~hmac=b32e919135f45a14851c7c34b2c94455f4b20202ecd178d391b11c10ee90cf12&originpath=/linear/hls/pa/event/nUp81RPuRVSmDcOjT9yOKw/stream/dd54dc93-c3d1-43db-ac15-0ead3c5bec34:DLS/master.m3u8"
+    "url": "https://sbs-live-prod-01.akamaized.net/Content/HLS_AES_TS/live/geo/channel(nitv)/master.m3u8?hdnea=st=1762002772~exp=1762003072~acl=*~id=5c1f999a-5b29-4f26-a7fb-d52d499f73f2~hmac=62d83e2b8f387a59e16c303584e1cd56cf4e15444225b767e06dcc33633006c3&originpath=/linear/hls/pb/event/nUp81RPuRVSmDcOjT9yOKw/stream/89c68aef-7fb1-4ff6-b867-4a5c0e8de419:TPE/master.m3u8"
   },
   "seven": {
-    "url": "https://csm-e-sevenextprdlive-eb.bln1.yospace.com/csm/extlive/sevenprd01,MEL1.m3u8?yo.eb.bp=flat&appId=7plus&deviceType=web&platformType=web&ppId=null&videoType=live&accountId=5650355166001&advertId=null&uaId=null&optinDeviceType=&optinAdTracking=0&tvid=null&pc=3196&deviceId=c33b2962-635c-436e-a9e1-42fa94603da3&ozid=fd471639-2e3b-418f-9223-9150fa68fab2&deviceSubType=desktop&referenceId=MEL1MPL&vid=6363897092112&yo.hb=2000&yo.ac=true&pp=csai-web&sessionid=ZHQtd2Vi_Y2ktMEhOR1AyMTQwQzhVVTowMDAwMDAwRg_ZGktYzMzYjI5NjItNjM1Yy00MzZlLWE5ZTEtNDJmYTk0NjAzZGEz_ci0w&yo.pp=c2Vzc2lvbmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UUXdRemhWVlRvd01EQXdNREF3UmdfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3JmhkbnRzPXN0PTE3NjIwMDE5NDd-ZXhwPTE3NjIwMzA3NDZ-YWNsPS8qfmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UUXdRemhWVlRvd01EQXdNREF3UmdfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3fmhtYWM9ZmNlZTQ0ZTMzNDk1YTYwYWFjM2QzYTVmMGFmNjA1NzQwNTY4NjI5ZTI4ZTk4OWEyMmFmYTI1ODM5NjZkM2NjZiZQb2xpY3k9ZXlKVGRHRjBaVzFsYm5RaU9sdDdJbEpsYzI5MWNtTmxJam9pYUhSMGNITTZMeThxWEZ3fktuTmxjM05wYjI1cFpEMWFTRkYwWkRKV2FWOVpNbXQwVFVWb1QxSXhRWGxOVkZGM1VYcG9WbFpVYjNkTlJFRjNUVVJCZDFKblgxcEhhM1JaZWsxNldXcEpOVTVxU1hST2FrMHhXWGt3TUUxNldteE1WMFUxV2xSRmRFNUVTbTFaVkdzd1RtcEJlbHBIUlhwZlkya3dkeW9pTENKRGIyNWthWFJwYjI0aU9uc2lSR0YwWlV4bGMzTlVhR0Z1SWpwN0lrRlhVenBGY0c5amFGUnBiV1VpT2pFM05qSXdNekEzTkRaOUxDSkVZWFJsUjNKbFlYUmxjbFJvWVc0aU9uc2lRVmRUT2tWd2IyTm9WR2x0WlNJNk1UYzJNakF3TVRrME5uMTlmVjE5JlNpZ25hdHVyZT1jb1F3Q005ZlNYRC1rVG1LT0pRdXZBWDUxdk1Oen4wV1BCSm90SnhJOGFPVlplSkNXMTBuMjluVnR1ZkVpR0ZtNWthVC1xai1XbGlQLTVpdG9ZMmpNNEVuRUwxRjdBbmhjMnpyTVNNdHduVGRsTkNiUDRoWTJkVUthT2F-ZUg2MHJleGYxaVdxRzFveWJBM2RWaFZhRzUtaVNFSFNMQy1nTWZKcmtHNGtodmZ1TVFUa1hvUlZrck1PSmpRYlpKS2Z6QkhKcHFvWkNwTkhYaUFnajhraE1sUWlmVklyTjBZNGF4bDJKaklJfnZPeE0tQ1ZXUkdvUWk2cHYtUXMxaHhETkpZU3Bpfk1YWEN1OVdVdmNEU09STzM4eVZuN2JoMDlLY0hZTGRKdTRRMnBKbTBFNU9lVlphbUFtR1Z-SW94bWRJcWk2fmNNcnE0NDk1MXJrOXNtRmdfXyZLZXktUGFpci1JZD1BUEtBSU9UNE02S042Q1FPQVdFUQ&"
+    "url": "https://csm-e-sevenextprdlive-eb.bln1.yospace.com/csm/extlive/sevenprd01,MEL1.m3u8?yo.eb.bp=flat&appId=7plus&deviceType=web&platformType=web&ppId=null&videoType=live&accountId=5650355166001&advertId=null&uaId=null&optinDeviceType=&optinAdTracking=0&tvid=null&pc=3196&deviceId=c33b2962-635c-436e-a9e1-42fa94603da3&ozid=fd471639-2e3b-418f-9223-9150fa68fab2&deviceSubType=desktop&referenceId=MEL1MPL&vid=6363897092112&yo.hb=2000&yo.ac=true&pp=csai-web&sessionid=ZHQtd2Vi_Y2ktMEhOR1AyMTQwQ1BKMjowMDAwMDAxQQ_ZGktYzMzYjI5NjItNjM1Yy00MzZlLWE5ZTEtNDJmYTk0NjAzZGEz_ci0w&yo.pp=c2Vzc2lvbmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UUXdRMUJLTWpvd01EQXdNREF4UVFfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3JmhkbnRzPXN0PTE3NjIwMDI3NzN-ZXhwPTE3NjIwMzE1MTB-YWNsPS8qfmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UUXdRMUJLTWpvd01EQXdNREF4UVFfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3fmhtYWM9NzU3YTYwZTE3NDgyNTg3MjMwNTZlZjIwOTNkYmIyMGE2MDQwODc5MjkxODEyYzczMTg1YThmNDY0MTM0ZDBkOCZQb2xpY3k9ZXlKVGRHRjBaVzFsYm5RaU9sdDdJbEpsYzI5MWNtTmxJam9pYUhSMGNITTZMeThxWEZ3fktuTmxjM05wYjI1cFpEMWFTRkYwWkRKV2FWOVpNbXQwVFVWb1QxSXhRWGxOVkZGM1VURkNTMDFxYjNkTlJFRjNUVVJCZUZGUlgxcEhhM1JaZWsxNldXcEpOVTVxU1hST2FrMHhXWGt3TUUxNldteE1WMFUxV2xSRmRFNUVTbTFaVkdzd1RtcEJlbHBIUlhwZlkya3dkeW9pTENKRGIyNWthWFJwYjI0aU9uc2lSR0YwWlV4bGMzTlVhR0Z1SWpwN0lrRlhVenBGY0c5amFGUnBiV1VpT2pFM05qSXdNekUxTVRCOUxDSkVZWFJsUjNKbFlYUmxjbFJvWVc0aU9uc2lRVmRUT2tWd2IyTm9WR2x0WlNJNk1UYzJNakF3TWpjM01uMTlmVjE5JlNpZ25hdHVyZT1XanlXeURPR1V-MTlHRUNjajZZVEVkWH43eEJJd29obGxmZ1V3U0ExNXQ4fm5MSk53fjZSSUJnU292TVZSVTNGaFlmNjA4TlY2b3hsR21lM2FhZ3JnTXVVdlZ4QlJaMlJxQXU3b3JYdi10REo4VWxpUG1OdVgzYTQ0N1ZmVXd3dHRsZURhdWZYLTE5dHJBQTloYkYycVd5ZXFYcXlwVkM4SURlVnIyc1psT3M5OG5vVjRwOWJOa25FR3lxMDJ0cktObDViWGt5STZ6REtCOEpScTVtZHdTLUg0OTVoS3FCVzllNXpyUk5HbGhOOUVmTGxGVHB0a0xtck13c3pEQjdqcklwbjhTN3RieXV2RlBjclA5bUxyZVdlQXQ3LWRwYnd1RXIzalVhQkF-eEQ0SHVQeENZU2VBNnJtcWEyODA1UGVOWUY4eE96MzhTd1k4fjdHa3dWfmdfXyZLZXktUGFpci1JZD1BUEtBSU9UNE02S042Q1FPQVdFUQ&"
   },
   "mate": {
-    "url": "https://csm-e-sevenextprdlive-eb.bln1.yospace.com/csm/extlive/sevenprd01,MEL3.m3u8?appId=7plus&deviceType=web&platformType=web&ppId=null&videoType=live&accountId=5650355166001&advertId=null&uaId=null&optinDeviceType=&optinAdTracking=0&tvid=null&pc=3196&deviceId=c33b2962-635c-436e-a9e1-42fa94603da3&ozid=ced4d5ad-ef72-4197-a530-9d990d03f965&deviceSubType=desktop&referenceId=MEL3MPL&vid=6363901773112&yo.hb=2000&yo.ac=true&pp=csai-web&sessionid=ZHQtd2Vi_Y2ktMEhOR05GTlJFMjRPQTowMDAwMDFFNw_ZGktYzMzYjI5NjItNjM1Yy00MzZlLWE5ZTEtNDJmYTk0NjAzZGEz_ci0w&yo.pp=c2Vzc2lvbmlkPVpIUXRkMlZpX1kya3RNRWhPUjA1R1RsSkZNalJQUVRvd01EQXdNREZGTndfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3JmhkbnRzPXN0PTE3NjIwMDE5NTB-ZXhwPTE3NjIwMzA2NTB-YWNsPS8qfmlkPVpIUXRkMlZpX1kya3RNRWhPUjA1R1RsSkZNalJQUVRvd01EQXdNREZGTndfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3fmhtYWM9M2EzMDFjY2IzYjRjZDBhZmI1NDk0ZTUxOWQ3MTA5ODE3YTFlNjc4YzFkNWYzNzg2MDk3MTQ2Y2VjNmU2YzlkZSZQb2xpY3k9ZXlKVGRHRjBaVzFsYm5RaU9sdDdJbEpsYzI5MWNtTmxJam9pYUhSMGNITTZMeThxWEZ3fktuTmxjM05wYjI1cFpEMWFTRkYwWkRKV2FWOVpNbXQwVFVWb1QxSXdOVWRVYkVwR1RXcFNVRkZVYjNkTlJFRjNUVVJHUms1M1gxcEhhM1JaZWsxNldXcEpOVTVxU1hST2FrMHhXWGt3TUUxNldteE1WMFUxV2xSRmRFNUVTbTFaVkdzd1RtcEJlbHBIUlhwZlkya3dkeW9pTENKRGIyNWthWFJwYjI0aU9uc2lSR0YwWlV4bGMzTlVhR0Z1SWpwN0lrRlhVenBGY0c5amFGUnBiV1VpT2pFM05qSXdNekEyTlRCOUxDSkVZWFJsUjNKbFlYUmxjbFJvWVc0aU9uc2lRVmRUT2tWd2IyTm9WR2x0WlNJNk1UYzJNakF3TVRrME9YMTlmVjE5JlNpZ25hdHVyZT1IQ1lMYUJHak1zazFhdjhnRW05ZWxvODdzbmFCRzNaekk2NWNDcEc4V3dIOHMyVUJNZnJrbFFDYTM4YzFXWlFCfmVQS0R-VHNiZUVMR2NIYlpnMHBqM0ZSV2dCRWVvc0wycjJ1QUhtdXVISEdmQWwzNUtwWFYzUERtU3B5N0o2WTl0V1VhbHp5NkYwVnIwbDlsVldqOVluaUNYVHdMR1BNOFM1bUtGN3k4RFVlcDVvVGMwYlZWSFJGMH5XWDRCWVpQamliOVVRUWRzb1AzTWtla054YkZ0YnFWWGtrOUJ3djhDZE9RdVlKTzJpMFJHa0l2ZDJiLW5ITVRRY2FURjZ1bmp-NXZXbHA1U2dmdEliajcwNHJKSHp4ZHdjdEd5b3lsQWd6R3pJRmtjd35LcTJCTXJGNDdLSmN5MW9jbVVzZmp6b1Q0MWs3bUZaVURLSW5lRlpwYlFfXyZLZXktUGFpci1JZD1BUEtBSU9UNE02S042Q1FPQVdFUQ&"
+    "url": "https://csm-e-sevenextprdlive-eb.bln1.yospace.com/csm/extlive/sevenprd01,MEL3.m3u8?appId=7plus&deviceType=web&platformType=web&ppId=null&videoType=live&accountId=5650355166001&advertId=null&uaId=null&optinDeviceType=&optinAdTracking=0&tvid=null&pc=3196&deviceId=c33b2962-635c-436e-a9e1-42fa94603da3&ozid=ced4d5ad-ef72-4197-a530-9d990d03f965&deviceSubType=desktop&referenceId=MEL3MPL&vid=6363901773112&yo.hb=2000&yo.ac=true&pp=csai-web&sessionid=ZHQtd2Vi_Y2ktMEhOR1AyMTQwQ1BKMzowMDAwMDAwNg_ZGktYzMzYjI5NjItNjM1Yy00MzZlLWE5ZTEtNDJmYTk0NjAzZGEz_ci0w&yo.pp=c2Vzc2lvbmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UUXdRMUJLTXpvd01EQXdNREF3TmdfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3JmhkbnRzPXN0PTE3NjIwMDI3NzN-ZXhwPTE3NjIwMzE1MDN-YWNsPS8qfmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UUXdRMUJLTXpvd01EQXdNREF3TmdfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3fmhtYWM9ZDk2NmIyYzYzMjBlNTBmNmNlNDdhZDBiODUwMzZlNjVhNDIwMmExNzViZWM4YTg1MzlhODlmYmJjYzBlYzE1MiZQb2xpY3k9ZXlKVGRHRjBaVzFsYm5RaU9sdDdJbEpsYzI5MWNtTmxJam9pYUhSMGNITTZMeThxWEZ3fktuTmxjM05wYjI1cFpEMWFTRkYwWkRKV2FWOVpNbXQwVFVWb1QxSXhRWGxOVkZGM1VURkNTMDE2YjNkTlJFRjNUVVJCZDA1blgxcEhhM1JaZWsxNldXcEpOVTVxU1hST2FrMHhXWGt3TUUxNldteE1WMFUxV2xSRmRFNUVTbTFaVkdzd1RtcEJlbHBIUlhwZlkya3dkeW9pTENKRGIyNWthWFJwYjI0aU9uc2lSR0YwWlV4bGMzTlVhR0Z1SWpwN0lrRlhVenBGY0c5amFGUnBiV1VpT2pFM05qSXdNekUxTUROOUxDSkVZWFJsUjNKbFlYUmxjbFJvWVc0aU9uc2lRVmRUT2tWd2IyTm9WR2x0WlNJNk1UYzJNakF3TWpjM01uMTlmVjE5JlNpZ25hdHVyZT1jeWZ3bUNWQUpVOW16NWtrR0hVeGd5YzhGazVsaGxtSEFTZmhoMDBCbGdqcmNMOTRHSG1YTGl5ZzdyclJzd0dNcy14M3R5WkktWlR1SjdpZGp5bXZ2WEM0Y0o0MWh1dm54TUJhSnNiQnFwaGhkdzFDUlJONVN2SmdleFg3fkFvUjVzVzVlRXZXSE8wNEdxd25rcGVGSlpvZjh0czZjZzVWZDdLc0hTUWpLejlvS35mWnViOWdpM0RjUGlJdW54ODRoMnFYdk9oV2thV3FEcldBOWZNYmczR2tRUWpHNGNpTTU2T2gzVn5JRDVLdUZDakM5US1rTnBoekU4cHlEV2x6bHFZR1d0Z2JGYXFLR3lFS1RRZmZaQWs3Y3ZwZjdLTTMyQTJjSmNjYi1TZURoLUFPTGd1RExBY293UnptTkVGRThBR2hsd254SzM2RXFlSDE5WGZEVmdfXyZLZXktUGFpci1JZD1BUEtBSU9UNE02S042Q1FPQVdFUQ&"
   },
   "seven2": {
-    "url": "https://csm-e-sevenextprdlive-eb.bln1.yospace.com/csm/extlive/sevenprd01,MEL2.m3u8?appId=7plus&deviceType=web&platformType=web&ppId=null&videoType=live&accountId=5650355166001&advertId=null&uaId=null&optinDeviceType=&optinAdTracking=0&tvid=null&pc=3196&deviceId=c33b2962-635c-436e-a9e1-42fa94603da3&ozid=ebc45ca8-cb92-4a6b-8e54-1185287ac232&deviceSubType=desktop&referenceId=MEL2MPL&vid=6371773836112&yo.hb=2000&yo.ac=true&pp=csai-web&sessionid=ZHQtd2Vi_Y2ktMEhOR05GTlJFMVRTTTowMDAwMDM0MA_ZGktYzMzYjI5NjItNjM1Yy00MzZlLWE5ZTEtNDJmYTk0NjAzZGEz_ci0w&yo.pp=c2Vzc2lvbmlkPVpIUXRkMlZpX1kya3RNRWhPUjA1R1RsSkZNVlJUVFRvd01EQXdNRE0wTUFfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3JmhkbnRzPXN0PTE3NjIwMDE5NTF-ZXhwPTE3NjIwMzA2ODZ-YWNsPS8qfmlkPVpIUXRkMlZpX1kya3RNRWhPUjA1R1RsSkZNVlJUVFRvd01EQXdNRE0wTUFfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3fmhtYWM9ZGMzNjMyMWI3MTczMTdhYjdkZWU3YmE4OWI4ZTFkOGQ5MGFhYjk5ZWQ4MDE5OGI3NGY3NDMxMmYyYjg5MDUxMCZQb2xpY3k9ZXlKVGRHRjBaVzFsYm5RaU9sdDdJbEpsYzI5MWNtTmxJam9pYUhSMGNITTZMeThxWEZ3fktuTmxjM05wYjI1cFpEMWFTRkYwWkRKV2FWOVpNbXQwVFVWb1QxSXdOVWRVYkVwR1RWWlNWRlJVYjNkTlJFRjNUVVJOTUUxQlgxcEhhM1JaZWsxNldXcEpOVTVxU1hST2FrMHhXWGt3TUUxNldteE1WMFUxV2xSRmRFNUVTbTFaVkdzd1RtcEJlbHBIUlhwZlkya3dkeW9pTENKRGIyNWthWFJwYjI0aU9uc2lSR0YwWlV4bGMzTlVhR0Z1SWpwN0lrRlhVenBGY0c5amFGUnBiV1VpT2pFM05qSXdNekEyT0RaOUxDSkVZWFJsUjNKbFlYUmxjbFJvWVc0aU9uc2lRVmRUT2tWd2IyTm9WR2x0WlNJNk1UYzJNakF3TVRrMU1IMTlmVjE5JlNpZ25hdHVyZT1Kd0FoQ3R5anRoTlFXaUhFc1R5dn54V2VHfk4zeFhKNUs2Q35reHY1Z0prdzNqZlJLcThNU1ZSQklhVTd3M0t5cER3d00waE9JRU5HVDI4bWR-M1FjcG1hclpsQjB1TGVGem1lNTdSYzBneUY3T0M0MS1FVWx4SmduNTB0VUlTTXVYVEZiNEcxZU1iSm1wZno2Y0FPaE5ZYks0WTlrZW8wUGYzdko3VG1uSkh3NVo5SlFTcjJtQXp1ajE2MWZucX5kYjljbHFDdmhoRkN3LXpSSXI5UDVlVUR1clV0bDRldHRvMm9-N3lVQlVFczlocDZ1YWFQbkxVUWVXMHhSfkNKRTc0aTNJS3NwWTJnfkNyc3o1VzIzQk04aFRNMm1ucGFzdHhlTm9VMHpUQ354NHFONHhLZW5sMEVNT3ptSUQ3TllXQkdwNDRpaTllVjZRV0NrbHZicmdfXyZLZXktUGFpci1JZD1BUEtBSU9UNE02S042Q1FPQVdFUQ"
+    "url": "https://csm-e-sevenextprdlive-eb.bln1.yospace.com/csm/extlive/sevenprd01,MEL2.m3u8?appId=7plus&deviceType=web&platformType=web&ppId=null&videoType=live&accountId=5650355166001&advertId=null&uaId=null&optinDeviceType=&optinAdTracking=0&tvid=null&pc=3196&deviceId=c33b2962-635c-436e-a9e1-42fa94603da3&ozid=ebc45ca8-cb92-4a6b-8e54-1185287ac232&deviceSubType=desktop&referenceId=MEL2MPL&vid=6371773836112&yo.hb=2000&yo.ac=true&pp=csai-web&sessionid=ZHQtd2Vi_Y2ktMEhOR1AyMTZVS1ZWUTowMDAwMDE4RA_ZGktYzMzYjI5NjItNjM1Yy00MzZlLWE5ZTEtNDJmYTk0NjAzZGEz_ci0w&yo.pp=c2Vzc2lvbmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UWlZTMVpXVVRvd01EQXdNREU0UkFfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3JmhkbnRzPXN0PTE3NjIwMDI3NzN-ZXhwPTE3NjIwMzE1MjN-YWNsPS8qfmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UWlZTMVpXVVRvd01EQXdNREU0UkFfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3fmhtYWM9MGI2YTRhNmQ2MzM1Y2UyNGU2MzVhMWMyYTc4MDhiYTJiNmZiODY2NzdiNjBjZGU4NGYwMTIzZDc5YmQ3MTU0NSZQb2xpY3k9ZXlKVGRHRjBaVzFsYm5RaU9sdDdJbEpsYzI5MWNtTmxJam9pYUhSMGNITTZMeThxWEZ3fktuTmxjM05wYjI1cFpEMWFTRkYwWkRKV2FWOVpNbXQwVFVWb1QxSXhRWGxOVkZwV1V6RmFWMVZVYjNkTlJFRjNUVVJGTkZKQlgxcEhhM1JaZWsxNldXcEpOVTVxU1hST2FrMHhXWGt3TUUxNldteE1WMFUxV2xSRmRFNUVTbTFaVkdzd1RtcEJlbHBIUlhwZlkya3dkeW9pTENKRGIyNWthWFJwYjI0aU9uc2lSR0YwWlV4bGMzTlVhR0Z1SWpwN0lrRlhVenBGY0c5amFGUnBiV1VpT2pFM05qSXdNekUxTWpOOUxDSkVZWFJsUjNKbFlYUmxjbFJvWVc0aU9uc2lRVmRUT2tWd2IyTm9WR2x0WlNJNk1UYzJNakF3TWpjM01uMTlmVjE5JlNpZ25hdHVyZT1TWldhWm5XZXcxVmhxTEp5QW9kRzdHVndPOXRhNzRZMVJhd29JdXFCUlp4cDhGSFRHRldmaENqTkdxeU9RLU9Id3JkbW1BMFFEeFNkenpJbmJYS0d6ZjNmNThSbXp2RmNldjVJSVZWbkVtVzNlV0cxRENOdTgwM3lxVWNpUlc2TktsTjBBbDRyNkotbWo1bHNmdGY2flRJNTZoV3FvT3VOZjVlU2haQnduMmhNQ0Q4WHR2aDJXTUp5N1pRRVY2MjdzWVR-VHFwQUdBaE0yc0kzNVNGNDJlcnhGU1VseXlRUmQ4UUxGenBnSHdDcG9wZmx1T1daSExEQ0tJNlVLdXBDNldINmRBc1JrdDRXMDZNOFNyNk05RThkaThvbE9WQzRRVlRuN21DZmUtNTNYVnlrMWc4S1gzTko3WWEzek03MlhpejhORmJma1pPblJKTXNFVFV-NFFfXyZLZXktUGFpci1JZD1BUEtBSU9UNE02S042Q1FPQVdFUQ"
   },
   "flix": {
-    "url": "https://csm-e-sevenextprdlive-eb.bln1.yospace.com/csm/extlive/sevenprd01,MEL6.m3u8?appId=7plus&deviceType=web&platformType=web&ppId=null&videoType=live&accountId=5650355166001&advertId=null&uaId=null&optinDeviceType=&optinAdTracking=0&tvid=null&pc=3196&deviceId=c33b2962-635c-436e-a9e1-42fa94603da3&ozid=d0f3cec1-5844-4f3e-b6e3-312245d17563&deviceSubType=desktop&referenceId=MEL6MPL&vid=6371776210112&yo.hb=2000&yo.ac=true&pp=csai-web&sessionid=ZHQtd2Vi_Y2ktMEhOR1AyMTQwQ1BFOTowMDAwMDAwMg_ZGktYzMzYjI5NjItNjM1Yy00MzZlLWE5ZTEtNDJmYTk0NjAzZGEz_ci0w&yo.pp=c2Vzc2lvbmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UUXdRMUJGT1Rvd01EQXdNREF3TWdfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3JmhkbnRzPXN0PTE3NjIwMDE5NTJ-ZXhwPTE3NjIwMzA2NjV-YWNsPS8qfmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UUXdRMUJGT1Rvd01EQXdNREF3TWdfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3fmhtYWM9MTUyZDNjMTk3MDZhZTYzM2JmZjE2ODdiOWMzNjc1OTJlODE2NWM4YTNmM2QwMWUzZjI0NmY1NGM1MjNlOTE5MCZQb2xpY3k9ZXlKVGRHRjBaVzFsYm5RaU9sdDdJbEpsYzI5MWNtTmxJam9pYUhSMGNITTZMeThxWEZ3fktuTmxjM05wYjI1cFpEMWFTRkYwWkRKV2FWOVpNbXQwVFVWb1QxSXhRWGxOVkZGM1VURkNSazlVYjNkTlJFRjNUVVJCZDAxblgxcEhhM1JaZWsxNldXcEpOVTVxU1hST2FrMHhXWGt3TUUxNldteE1WMFUxV2xSRmRFNUVTbTFaVkdzd1RtcEJlbHBIUlhwZlkya3dkeW9pTENKRGIyNWthWFJwYjI0aU9uc2lSR0YwWlV4bGMzTlVhR0Z1SWpwN0lrRlhVenBGY0c5amFGUnBiV1VpT2pFM05qSXdNekEyTmpWOUxDSkVZWFJsUjNKbFlYUmxjbFJvWVc0aU9uc2lRVmRUT2tWd2IyTm9WR2x0WlNJNk1UYzJNakF3TVRrMU1YMTlmVjE5JlNpZ25hdHVyZT1oeUdSbHJndURMZ3Fpa0p2flN1fm1BYjlvTzRMS1hMejZ-ZEVTTElWZlFOdEx3eTB0aVp0NVZBcnk2V1YzTUE1U0djZGpsenhhdnF6dldnTTlhYTJpazFXWTc2R01VbmVHNjd-N1F2LTJwNTZWOWFZN0NLcUFzUTZvSS1FWX5HenRsa0d5b3NYamFTOHh1d1VSTkFYbEpjY2JJMVBOajlHWThYSzdPaGRjenE3WFp0RkJURFpZSXRoTXhPbFE0eFdVc3hSc0ZjSmtSNTBMaWM4V3ctVjJVTkNiaGtUWTh3V3hpaTB2NlY2T0VjdDRUZEtqdW90U1NabFl6TXlwNDdSa3phUWtJS2dhbHl1MXpLZ35NV25ibWJVWS0yZlU2OW1KY0xDMFdMR01rUjJCTUhkQ1FtRG80VkZ1Y0pndnMyZGV5WVQ4b0FISDdpaXFzUW95ZWVKY3dfXyZLZXktUGFpci1JZD1BUEtBSU9UNE02S042Q1FPQVdFUQ"
+    "url": "https://csm-e-sevenextprdlive-eb.bln1.yospace.com/csm/extlive/sevenprd01,MEL6.m3u8?appId=7plus&deviceType=web&platformType=web&ppId=null&videoType=live&accountId=5650355166001&advertId=null&uaId=null&optinDeviceType=&optinAdTracking=0&tvid=null&pc=3196&deviceId=c33b2962-635c-436e-a9e1-42fa94603da3&ozid=d0f3cec1-5844-4f3e-b6e3-312245d17563&deviceSubType=desktop&referenceId=MEL6MPL&vid=6371776210112&yo.hb=2000&yo.ac=true&pp=csai-web&sessionid=ZHQtd2Vi_Y2ktMEhOR1AyMTZVTDA1VTowMDAwMDAwNw_ZGktYzMzYjI5NjItNjM1Yy00MzZlLWE5ZTEtNDJmYTk0NjAzZGEz_ci0w&yo.pp=c2Vzc2lvbmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UWlZUREExVlRvd01EQXdNREF3TndfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3JmhkbnRzPXN0PTE3NjIwMDI3NzR-ZXhwPTE3NjIwMzE1Njd-YWNsPS8qfmlkPVpIUXRkMlZpX1kya3RNRWhPUjFBeU1UWlZUREExVlRvd01EQXdNREF3TndfWkdrdFl6TXpZakk1TmpJdE5qTTFZeTAwTXpabExXRTVaVEV0TkRKbVlUazBOakF6WkdFel9jaTB3fmhtYWM9NGQxOTIwMmRmZjlkMmM3ZWY2OWM1NzJlYzk1Mjk4ZDBlN2QyZTc0N2I2NjliNTUwNDBjOTdkZTIzOWE4OWJlZCZQb2xpY3k9ZXlKVGRHRjBaVzFsYm5RaU9sdDdJbEpsYzI5MWNtTmxJam9pYUhSMGNITTZMeThxWEZ3fktuTmxjM05wYjI1cFpEMWFTRkYwWkRKV2FWOVpNbXQwVFVWb1QxSXhRWGxOVkZwV1ZFUkJNVlpVYjNkTlJFRjNUVVJCZDA1M1gxcEhhM1JaZWsxNldXcEpOVTVxU1hST2FrMHhXWGt3TUUxNldteE1WMFUxV2xSRmRFNUVTbTFaVkdzd1RtcEJlbHBIUlhwZlkya3dkeW9pTENKRGIyNWthWFJwYjI0aU9uc2lSR0YwWlV4bGMzTlVhR0Z1SWpwN0lrRlhVenBGY0c5amFGUnBiV1VpT2pFM05qSXdNekUxTmpkOUxDSkVZWFJsUjNKbFlYUmxjbFJvWVc0aU9uc2lRVmRUT2tWd2IyTm9WR2x0WlNJNk1UYzJNakF3TWpjM00zMTlmVjE5JlNpZ25hdHVyZT1KdmJYMzMwREVQazFQTHZPWndkUWNscHdkRlJPdFAxN0N5b0pNTkt3REIwUkw5ZzlNSVFKa0U4a0hScnNVWmNCUWp5eVcxOFJMaHlwQ3Njd1Z5aUlrd0Q2MTNJc3owcWlGRk8yOWwySUZEQkVxYy1HSndJaFZsS1ZzdDVmQnM2Ymoyb0xrSm5HSUx6bHpxY282NGZSSDI4emVZMTktd2tDVTNXY3hPd1VTa2ZGdHhodmlzMk9TN0pyOVRGdkhMSENjfm5MbmhEek50cEhYRHYwbmw4YXViN2JNQnpYNEVyYk1SMzFxNHVVSXRhd1FWSHl-RWQ0LUk4WVc4MkxOfm9aWW5-RlAySnVUbEdRRVpnb3BydFBQMW4zRkh0RmlXY0x6M2F5UlFqMkJXWXhFMlU4Vm5rZmlqRE85dk5hWVVTWlFYaHJiUzduWlduSjBvZ1NuZHpBRkFfXyZLZXktUGFpci1JZD1BUEtBSU9UNE02S042Q1FPQVdFUQ"
+  },
+  "10-ten": {
+    "url": "https://dai.google.com/ssai/event/52M7ojCHQCy4vEFD7YTPpQ/master.m3u8"
+  },
+  "10-tenbold": {
+    "url": "https://dai.google.com/ssai/event/g0vxZF8uTCCD8bKoA4nySQ/master.m3u8"
+  },
+  "10-tenpeach": {
+    "url": "https://dai.google.com/ssai/event/lpej3mYjS86kyzomBIkyng/master.m3u8"
+  },
+  "10-tenshake": {
+    "url": "https://dai.google.com/ssai/event/NFs6K84rS1e8e0DtWjKIvQ/master.m3u8"
+  },
+  "10-south-park": {
+    "url": "https://dai.google.com/ssai/event/H1yf0PwIQACoUfCqwSkjjQ/master.m3u8"
+  },
+  "10-moviesphere": {
+    "url": "https://dai.google.com/ssai/event/ynK_uI7bRSeYMb_6KL9TbA/master.m3u8"
+  },
+  "10-nicktoons": {
+    "url": "https://dai.google.com/ssai/event/srJbbHmDT-6UxEKb47pGbQ/master.m3u8"
+  },
+  "10-prisoner-cell-block-h": {
+    "url": "https://dai.google.com/ssai/event/fyziAodMQgCd0jAE3mH3JA/master.m3u8"
+  },
+  "10-cheapseats": {
+    "url": "https://dai.google.com/ssai/event/HWeCCtszQ96CEOVyjUtdGA/master.m3u8"
+  },
+  "10-grahamnorton": {
+    "url": "https://dai.google.com/ssai/event/WazfGj4sR_2eMpzIi6CdhQ/master.m3u8"
+  },
+  "10-eightoutof10cats": {
+    "url": "https://dai.google.com/ssai/event/gf9e9NZQSYukuBzMHqI7ow/master.m3u8"
+  },
+  "10-mtvridiculousness": {
+    "url": "https://dai.google.com/ssai/event/uAlQe9K7RdCudywMJ3cQGQ/master.m3u8"
+  },
+  "10-haveyoubeenpayingattention": {
+    "url": "https://dai.google.com/ssai/event/eMP5QwtJR96r63DY9NlEiw/master.m3u8"
+  },
+  "10-thankgodyourehere": {
+    "url": "https://dai.google.com/ssai/event/AFa01UMuT063vfoHyojt7/master.m3u8"
+  },
+  "10-south-park-two": {
+    "url": "https://dai.google.com/ssai/event/cwts9WFlRiWyDJtPBB93cA/master.m3u8"
+  },
+  "10-adultanimation": {
+    "url": "https://dai.google.com/ssai/event/6885G93zTmyzbak-8UU-dw/master.m3u8"
+  },
+  "10-becker": {
+    "url": "https://dai.google.com/ssai/event/EeIWvRTXQ-2uYMHsz-BCWA/master.m3u8"
+  },
+  "10-fridaythe13th": {
+    "url": "https://dai.google.com/ssai/event/4JWdwrbmR1S6kQ7mRzcI8A/master.m3u8"
+  },
+  "10-aussiedramapopup": {
+    "url": "https://dai.google.com/ssai/event/uDKRbOJFQrSFElWu49cdsg/master.m3u8"
+  },
+  "10-the-twilight-zone": {
+    "url": "https://dai.google.com/ssai/event/7er3mnaZSb264KAl3QFy_Q/master.m3u8"
+  },
+  "10-diagnosismurder": {
+    "url": "https://dai.google.com/ssai/event/BlXqeUGwThGO7fVZRKkKBA/master.m3u8"
+  },
+  "10-projectrunway": {
+    "url": "https://dai.google.com/ssai/event/HtXtLOQ2TS2MagSoIjEg8A/master.m3u8"
+  },
+  "10-americas-next-top-model": {
+    "url": "https://dai.google.com/ssai/event/b6iy1wuNTP-wuixixRXioA/master.m3u8"
+  },
+  "10-australias-next-top-model": {
+    "url": "https://dai.google.com/ssai/event/VPHB6wr7SjmI29mKuM9b0A/master.m3u8"
+  },
+  "10-masterchef": {
+    "url": "https://dai.google.com/ssai/event/-Xbq7rGcSey_sBmHdRiGOA/master.m3u8"
+  },
+  "10-world-of-survivor": {
+    "url": "https://dai.google.com/ssai/event/98ajzpAtT6GqU0rh-KSoiw/master.m3u8"
+  },
+  "10-thedoghouse": {
+    "url": "https://dai.google.com/ssai/event/AoUDD1cMQMWXgvwzpeK_qg/master.m3u8"
+  },
+  "10-mtvgeordieshore": {
+    "url": "https://dai.google.com/ssai/event/5SD7fzN4RTW9-nrFZ6MBgg/master.m3u8"
+  },
+  "10-mtv-jersey-shore": {
+    "url": "https://dai.google.com/ssai/event/4Y1HRKCDTBmbPatI8SGDNw/master.m3u8"
+  },
+  "10-mtv-reality": {
+    "url": "https://dai.google.com/ssai/event/_73ucMZaTzCHX0KQnLAHTg/master.m3u8"
+  },
+  "10-undercoverboss": {
+    "url": "https://dai.google.com/ssai/event/uSRPvxsiRtGFfNWPMLNijg/master.m3u8"
+  },
+  "10-hardcorepawn": {
+    "url": "https://dai.google.com/ssai/event/WG94OC1uSjmBz9TiSxdJ5w/master.m3u8"
+  },
+  "10-embarrassing-bodies": {
+    "url": "https://dai.google.com/ssai/event/zsH8Gm6CT7eFZkLJAq2WDQ/master.m3u8"
+  },
+  "10-highwaythruhell": {
+    "url": "https://dai.google.com/ssai/event/hF4Ie2vMQFO3LpphDGzK1A/master.m3u8"
+  },
+  "10-cops": {
+    "url": "https://dai.google.com/ssai/event/OXKmKfhSSaGi0E0G3pu7vQ/master.m3u8"
+  },
+  "10-judge-judy": {
+    "url": "https://dai.google.com/ssai/event/Lz_k3PqgS5C--gzfSd_Y6A/master.m3u8"
+  },
+  "10-medical-emergency": {
+    "url": "https://dai.google.com/ssai/event/TkQrelvOQWCmdTZwLt1XMA/master.m3u8"
+  },
+  "10-deadlywomen": {
+    "url": "https://dai.google.com/ssai/event/7ysI2XVSS_G3PH-QX2qikQ/master.m3u8"
+  },
+  "10-crime-time": {
+    "url": "https://dai.google.com/ssai/event/oO7UNo45SCOmonWYG2j4nA/master.m3u8"
+  },
+  "10-crime-hunters": {
+    "url": "https://dai.google.com/ssai/event/wi89ITUMQyyPp3Jyp0cHcg/master.m3u8"
+  },
+  "10-forty-eight-hours": {
+    "url": "https://dai.google.com/ssai/event/fSgdoXm-R_aErKhotQBb7A/master.m3u8"
+  },
+  "10-true-stories": {
+    "url": "https://dai.google.com/ssai/event/ObeG614fSKOcAMkorKZjyw/master.m3u8"
+  },
+  "10-haunt-tv": {
+    "url": "https://dai.google.com/ssai/event/0hhOsOdMToCB3JbS2528jQ/master.m3u8"
+  },
+  "10-ghost_hunters": {
+    "url": "https://dai.google.com/ssai/event/R8D2Icp4Svyk2efJ3ohr6Q/master.m3u8"
+  },
+  "10-anthonybourdain": {
+    "url": "https://dai.google.com/ssai/event/Bq73CiC7S5yYOroR_-PlDg/master.m3u8"
+  },
+  "10-good-chef-bad-chef": {
+    "url": "https://dai.google.com/ssai/event/6Xt-RLfjTu-Hx6UE_kzoLA/master.m3u8"
+  },
+  "10-documentaryshell": {
+    "url": "https://dai.google.com/ssai/event/QO37sxmASZ6032TaU4XbaA/master.m3u8"
+  },
+  "10-wicked-tuna": {
+    "url": "https://dai.google.com/ssai/event/l-N4-xRZTzikHGqTSZR5gQ/master.m3u8"
+  },
+  "10-naturetime": {
+    "url": "https://dai.google.com/ssai/event/Gw-ZMKv9TWq0NKD_hup70g/master.m3u8"
+  },
+  "10-houseofhorror": {
+    "url": "https://dai.google.com/ssai/event/W30E4mWuQKiCoyW69j_APA/master.m3u8"
+  },
+  "10-seasonalmovies": {
+    "url": "https://dai.google.com/ssai/event/y4cLpk6XT9iWyrwB7zoneQ/master.m3u8"
+  },
+  "10-nick-jr": {
+    "url": "https://dai.google.com/ssai/event/BNQotvteTASZaD7fBNKdbw/master.m3u8"
+  },
+  "10-spongebobsquarepants": {
+    "url": "https://dai.google.com/ssai/event/1nOSQsd2Tty6ZD8yOg0aYA/master.m3u8"
+  },
+  "10-nicktoons-90s": {
+    "url": "https://dai.google.com/ssai/event/6u_sxN5IRZ2W22tdrqhsTA/master.m3u8"
+  },
+  "10-nickteen": {
+    "url": "https://dai.google.com/ssai/event/qGM7kLD1R8CLZMqKq_P5Vg/master.m3u8"
+  },
+  "10-geckotv": {
+    "url": "https://dai.google.com/ssai/event/6zU39nI8QGGS1FYM0a7fMw/master.m3u8"
+  },
+  "10-youtv": {
+    "url": "https://dai.google.com/ssai/event/r1G8HcWYQz25RGuF7yF48g/master.m3u8"
   }
 }
