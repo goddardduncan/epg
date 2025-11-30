@@ -462,7 +462,28 @@
                         }
                     }
                 });
+                document.addEventListener("contextmenu", sendStandbyRequest);
+                async function sendStandbyRequest(event) {
+                    // Prevent the default browser context menu from appearing
+                    event.preventDefault();
+                    console.log('Context menu triggered. Attempting to send standby request...');
+                    const standbyUrl = 'https://dj.dunc.app/control/standby';
 
+                    try {
+                        const response = await fetch(standbyUrl, {
+                            method: 'POST',
+                        });
+                        if (response.ok) {
+                            console.log('Standby command sent successfully.');
+                            // Optionally provide visual feedback to the user (e.g., a temporary on-screen message)
+                        } else {
+                            console.error(`Failed to send standby command. Status: ${response.status}`);
+                        }
+                    } catch (error) {
+                        console.error('Error sending standby request:', error);
+                        }
+                }
+                
                 function scrollSelectedRowIntoView() {
                     const tableRows = document.querySelectorAll('table tr');
                     const selectedRow = tableRows[selectedRowIndex];
