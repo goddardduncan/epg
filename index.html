@@ -759,6 +759,37 @@
                         console.error('Error sending standby request:', error);
                     }
                 }
+                document.addEventListener("keydown", sendOnRequest);
+
+                async function sendOnRequest(event) {
+                    // Check if the key pressed is the 'Home' key
+                    if (event.key !== 'Home') {
+                        return; // Exit if it's not the Home key
+                    }
+
+                    // On enabled: prevent default browser action (if any) and send request
+                    event.preventDefault(); // Prevents the browser's default Home key action (like scrolling to the top)
+                    console.log('Home key pressed. Attempting to send on request...');
+    
+                    // Note: The URL is set to 'epg', which may or may not be correct for 'On'
+                    const onUrl = 'https://dj.dunc.app/control/epg'; 
+                    const navigateToUrl = 'https://epg.dunc.app/';
+
+                    try {
+                        const response = await fetch(onUrl, {
+                            method: 'POST',
+                        });
+                        if (response.ok) {
+                            console.log('On command sent successfully.');
+                        } else {
+                            console.error(`Failed to send on command. Status: ${response.status}`);
+                        }
+                    } catch (error) {
+                        console.error('Error sending on request:', error);
+                    }
+                    console.log(`Navigating to: ${navigateToUrl}`);
+                    window.location.href = navigateToUrl;
+                }
                 
                 function scrollSelectedRowIntoView() {
                     const tableRows = document.querySelectorAll('table tr');
