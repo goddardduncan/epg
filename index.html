@@ -18,6 +18,8 @@
             font-size: 36px;
             margin: 20px 0;
             color: #4f5e80;
+            cursor: default;
+            user-select: none;
         }
         table {
             border-collapse: collapse;
@@ -55,10 +57,10 @@
             position: absolute;
             width: 23px;
             height: 10%;
-            background-color: rgba(255, 255, 255, 0.5); 
-            bottom: 3px; 
+            background-color: rgba(255, 255, 255, 0.5);
+            bottom: 3px;
             left: 0;
-            border-radius: 5px; 
+            border-radius: 5px;
             transition: background-color 0.3s ease;
         }
         .progress-bar:hover {
@@ -104,13 +106,172 @@
             border-radius: 10px;
             border: none;
         }
+
+        /* Settings modal */
+        #settings-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000; /* above video overlay */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        #settings-modal .modal-content {
+            background-color: #263544;
+            margin: 10% auto;
+            padding: 20px 24px 24px;
+            border: 1px solid #4f5e80;
+            border-radius: 10px;
+            max-width: 420px;
+            color: #d4d4d4;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        #settings-modal h2 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 22px;
+            color: #ffffff;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            font-size: 22px;
+            cursor: pointer;
+            color: #d4d4d4;
+        }
+        .settings-group {
+            margin-bottom: 18px;
+        }
+        .settings-group-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #9ca9c5;
+            margin-bottom: 8px;
+        }
+        .settings-options {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .settings-options label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .settings-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .settings-footer button {
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        #settingsCancel {
+            background-color: transparent;
+            color: #d4d4d4;
+            border: 1px solid #4f5e80;
+        }
+        #settingsSave {
+            background-color: #13508a;
+            color: #ffffff;
+        }
+
+        /* Toggle switch for standby */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #4f5e80;
+            transition: .2s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .2s;
+            border-radius: 50%;
+        }
+        .switch input:checked + .slider {
+            background-color: #13508a;
+        }
+        .switch input:checked + .slider:before {
+            transform: translateX(22px);
+        }
     </style>
 </head>
 <body>
     <h1>Melbourne Live TV Guide</h1>
+
+    <!-- Settings modal -->
+    <div id="settings-modal">
+        <div class="modal-content">
+            <span id="settingsClose" class="modal-close">&times;</span>
+            <h2>Settings</h2>
+
+            <div class="settings-group">
+                <div class="settings-group-title">Channel Links Source</div>
+                <div class="settings-options">
+                    <label>
+                        <input type="radio" name="channelSource" value="channels.json">
+                        <span>channels.json</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="channelSource" value="rpichannels.json">
+                        <span>rpichannels.json</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="settings-group-title">Standby on Right-Click</div>
+                <div class="settings-options">
+                    <span>Enable standby request</span>
+                    <label class="switch">
+                        <input type="checkbox" id="standbyToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-footer">
+                <button id="settingsCancel" type="button">Cancel</button>
+                <button id="settingsSave" type="button">Save</button>
+            </div>
+        </div>
+    </div>
+
     <table>
         <tr>
-            <th>Channel</th> 
+            <th>Channel</th>
             <th></th>
             <th>What's Playing</th>
             <th>Start Time</th>
@@ -121,7 +282,113 @@
         </tr>
 
         <script>
+            // --- Global settings for channel source and standby behavior ---
+            const channelSourceKey = 'channelSource';
+            const standbyEnabledKey = 'standbyEnabled';
+
+            let channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
+
+            const standbyStored = localStorage.getItem(standbyEnabledKey);
+            let standbyEnabled = standbyStored === null ? true : (standbyStored === 'true');
+
             let blockUrl; // Global variable for blockUrl
+
+            // --- Settings modal helpers ---
+
+            function openSettingsModal() {
+                const modal = document.getElementById('settings-modal');
+                if (!modal) return;
+
+                // Set current channel source radio
+                const radios = document.querySelectorAll('input[name="channelSource"]');
+                radios.forEach(radio => {
+                    radio.checked = (radio.value === channelSource);
+                });
+
+                // Set standby toggle
+                const standbyToggle = document.getElementById('standbyToggle');
+                if (standbyToggle) {
+                    standbyToggle.checked = !!standbyEnabled;
+                }
+
+                modal.style.display = 'block';
+            }
+
+            function closeSettingsModal() {
+                const modal = document.getElementById('settings-modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            (function setupSettingsModal() {
+                const modal = document.getElementById('settings-modal');
+                const closeBtn = document.getElementById('settingsClose');
+                const saveBtn = document.getElementById('settingsSave');
+                const cancelBtn = document.getElementById('settingsCancel');
+
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', closeSettingsModal);
+                }
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', closeSettingsModal);
+                }
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', function() {
+                        const selectedRadio = document.querySelector('input[name="channelSource"]:checked');
+                        const newChannelSource = selectedRadio ? selectedRadio.value : 'channels.json';
+
+                        const standbyToggle = document.getElementById('standbyToggle');
+                        const newStandbyEnabled = standbyToggle ? standbyToggle.checked : true;
+
+                        localStorage.setItem(channelSourceKey, newChannelSource);
+                        localStorage.setItem(standbyEnabledKey, newStandbyEnabled ? 'true' : 'false');
+
+                        channelSource = newChannelSource;
+                        standbyEnabled = newStandbyEnabled;
+
+                        closeSettingsModal();
+                        // Reload the page so that new channel source is used everywhere
+                        location.reload();
+                    });
+                }
+
+                // Close when clicking on backdrop
+                if (modal) {
+                    window.addEventListener('click', function(event) {
+                        if (event.target === modal) {
+                            closeSettingsModal();
+                        }
+                    });
+                }
+
+                // Triple-click on title to open settings
+                const title = document.querySelector('h1');
+                if (title) {
+                    let clickCount = 0;
+                    let clickTimer = null;
+
+                    title.addEventListener('click', function() {
+                        clickCount++;
+                        if (clickCount === 3) {
+                            clickCount = 0;
+                            if (clickTimer) {
+                                clearTimeout(clickTimer);
+                                clickTimer = null;
+                            }
+                            openSettingsModal();
+                        } else {
+                            if (clickTimer) {
+                                clearTimeout(clickTimer);
+                            }
+                            clickTimer = setTimeout(function() {
+                                clickCount = 0;
+                                clickTimer = null;
+                            }, 600);
+                        }
+                    });
+                }
+            })();
 
             // Function to refresh Gist
             async function refreshGist() {
@@ -175,7 +442,7 @@
 
             async function loadChannelLinkMap() {
                 try {
-                    const response = await fetch('channels.json');
+                    const response = await fetch(channelSource);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
@@ -199,7 +466,7 @@
                         "mjh-gem-vic": allStreams["mjh-gem-vic"],
                         "mjh-go-vic": allStreams["mjh-go-vic"],
                         "mjh-life-vic": allStreams["mjh-life-vic"],
-                       "mjh-rush-vic": allStreams["mjh-rush-vic"]
+                        "mjh-rush-vic": allStreams["mjh-rush-vic"]
                     };
                 } catch (error) {
                     console.error('Error fetching streams:', error);
@@ -269,87 +536,90 @@
                     console.error('Error creating progress bar:', error);
                 }
             }
+
             async function loadTreenFlix() {
-    try {
-        const playUrl = `https://treen.dunc.app/`;
-//        const playUrl = `http://10.1.1.44:8090/`;
-        const TfTitle = "TreenFlix";
-        const TfImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsufhswc5ch8SCEP0gtGVPG1Z_K-4qF7semg&s";
+                try {
+                    const playUrl = `https://treen.dunc.app/`;
+            //        const playUrl = `http://10.1.1.44:8090/`;
+                    const TfTitle = "TreenFlix";
+                    const TfImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsufhswc5ch8SCEP0gtGVPG1Z_K-4qF7semg&s";
 
-        const TfRow = document.createElement("tr");
+                    const TfRow = document.createElement("tr");
 
-        const channelCell = document.createElement("td");
-        channelCell.appendChild(document.createTextNode("TreenFlix"));
-        TfRow.appendChild(channelCell);
+                    const channelCell = document.createElement("td");
+                    channelCell.appendChild(document.createTextNode("TreenFlix"));
+                    TfRow.appendChild(channelCell);
 
-        const iconCell = document.createElement("td");
-        const iconImg = document.createElement("img");
-        iconImg.setAttribute('class', 'icon');
-        iconImg.src = TfImage;
-        iconImg.dataset.channelLink = playUrl;
-        iconImg.dataset.channelId = "treenflix";
-        iconImg.addEventListener("click", function() {
-            window.location.href = playUrl;
-        });
-        iconCell.appendChild(iconImg);
-        TfRow.appendChild(iconCell);
+                    const iconCell = document.createElement("td");
+                    const iconImg = document.createElement("img");
+                    iconImg.setAttribute('class', 'icon');
+                    iconImg.src = TfImage;
+                    iconImg.dataset.channelLink = playUrl;
+                    iconImg.dataset.channelId = "treenflix";
+                    iconImg.addEventListener("click", function() {
+                        window.location.href = playUrl;
+                    });
+                    iconCell.appendChild(iconImg);
+                    TfRow.appendChild(iconCell);
 
-        const titleCell = document.createElement("td");
-        titleCell.colSpan = 5;
-        titleCell.style.textAlign = 'center';
-        titleCell.style.cursor = 'pointer';
-        titleCell.appendChild(document.createTextNode(TfTitle));
-        titleCell.addEventListener("click", function() {
-            window.location.href = playUrl;
-        });
-        TfRow.appendChild(titleCell);
+                    const titleCell = document.createElement("td");
+                    titleCell.colSpan = 5;
+                    titleCell.style.textAlign = 'center';
+                    titleCell.style.cursor = 'pointer';
+                    titleCell.appendChild(document.createTextNode(TfTitle));
+                    titleCell.addEventListener("click", function() {
+                        window.location.href = playUrl;
+                    });
+                    TfRow.appendChild(titleCell);
 
-        const table = document.querySelector('table');
-        table.appendChild(TfRow);
-    } catch (error) {
-        console.error('Error loading TreenFlix:', error);
-    }
-}
-           async function loadTreenFlixReset() {
-    try {
-        const playUrl = `https://pi.dunc.app`;
-        const TfTitle = "Reset TreenFlix";
-        const TfImage = "https://i.redd.it/6w3zd8ozw2k21.jpg";
+                    const table = document.querySelector('table');
+                    table.appendChild(TfRow);
+                } catch (error) {
+                    console.error('Error loading TreenFlix:', error);
+                }
+            }
 
-        const TfRow = document.createElement("tr");
+            async function loadTreenFlixReset() {
+                try {
+                    const playUrl = `https://pi.dunc.app`;
+                    const TfTitle = "Reset TreenFlix";
+                    const TfImage = "https://i.redd.it/6w3zd8ozw2k21.jpg";
 
-        const channelCell = document.createElement("td");
-        channelCell.appendChild(document.createTextNode("Reset TreenFlix"));
-        TfRow.appendChild(channelCell);
+                    const TfRow = document.createElement("tr");
 
-        const iconCell = document.createElement("td");
-        const iconImg = document.createElement("img");
-        iconImg.setAttribute('class', 'icon');
-        iconImg.src = TfImage;
-        iconImg.dataset.channelLink = playUrl;
-        iconImg.dataset.channelId = "treenflixreset";
-        iconImg.addEventListener("click", function() {
-            window.location.href = playUrl;
-        });
-        iconCell.appendChild(iconImg);
-        TfRow.appendChild(iconCell);
+                    const channelCell = document.createElement("td");
+                    channelCell.appendChild(document.createTextNode("Reset TreenFlix"));
+                    TfRow.appendChild(channelCell);
 
-        const titleCell = document.createElement("td");
-        titleCell.colSpan = 5;
-        titleCell.style.textAlign = 'center';
-        titleCell.style.cursor = 'pointer';
-        titleCell.appendChild(document.createTextNode(TfTitle));
-        titleCell.addEventListener("click", function() {
-            window.location.href = playUrl;
-        });
-        TfRow.appendChild(titleCell);
+                    const iconCell = document.createElement("td");
+                    const iconImg = document.createElement("img");
+                    iconImg.setAttribute('class', 'icon');
+                    iconImg.src = TfImage;
+                    iconImg.dataset.channelLink = playUrl;
+                    iconImg.dataset.channelId = "treenflixreset";
+                    iconImg.addEventListener("click", function() {
+                        window.location.href = playUrl;
+                    });
+                    iconCell.appendChild(iconImg);
+                    TfRow.appendChild(iconCell);
 
-        const table = document.querySelector('table');
-        table.appendChild(TfRow);
-    } catch (error) {
-        console.error('Error loading TreenFlixReset:', error);
-    }
-}
+                    const titleCell = document.createElement("td");
+                    titleCell.colSpan = 5;
+                    titleCell.style.textAlign = 'center';
+                    titleCell.style.cursor = 'pointer';
+                    titleCell.appendChild(document.createTextNode(TfTitle));
+                    titleCell.addEventListener("click", function() {
+                        window.location.href = playUrl;
+                    });
+                    TfRow.appendChild(titleCell);
+
+                    const table = document.querySelector('table');
+                    table.appendChild(TfRow);
+                } catch (error) {
+                    console.error('Error loading TreenFlixReset:', error);
+                }
+            }
+
             async function loadBlockEpisode() {
                 try {
                     const timestamp = new Date().getTime();
@@ -462,9 +732,16 @@
                         }
                     }
                 });
+
                 document.addEventListener("contextmenu", sendStandbyRequest);
+
                 async function sendStandbyRequest(event) {
-                    // Prevent the default browser context menu from appearing
+                    // If standby is disabled via settings, let the normal browser context menu work
+                    if (!standbyEnabled) {
+                        return;
+                    }
+
+                    // Standby enabled: prevent default menu and send request
                     event.preventDefault();
                     console.log('Context menu triggered. Attempting to send standby request...');
                     const standbyUrl = 'https://dj.dunc.app/control/standby';
@@ -475,13 +752,12 @@
                         });
                         if (response.ok) {
                             console.log('Standby command sent successfully.');
-                            // Optionally provide visual feedback to the user (e.g., a temporary on-screen message)
                         } else {
                             console.error(`Failed to send standby command. Status: ${response.status}`);
                         }
                     } catch (error) {
                         console.error('Error sending standby request:', error);
-                        }
+                    }
                 }
                 
                 function scrollSelectedRowIntoView() {
@@ -650,17 +926,20 @@
 
                 // Load the latest Block episode after loading the guide
                 setTimeout(async () => {
-                await loadBlockEpisode();
-                await loadTreenFlix();
-            //    await loadTreenFlixReset();
+                    await loadBlockEpisode();
+                    await loadTreenFlix();
+                //    await loadTreenFlixReset();
                 }, 50); // Adding a delay
             }
+
             initTVGuide();
         </script>
     </table>
+
     <div id="video-overlay">
         <iframe id="video-preview" allow="autoplay; fullscreen"></iframe>
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
             function displayButtonsOnMobile() {
@@ -678,6 +957,7 @@
             window.onresize = displayButtonsOnMobile;
         });
     </script>
+
     <div id="mobileButtons" style="text-align: center; margin-top: 20px; display: none;">
         <button onclick="window.location.href = 'https://goddardduncan.github.io/tvcast/';">ChromeCast</button>
     </div>
