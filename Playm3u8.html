@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live TV</title>
+
     <style>
         html, body, #video-container {
             margin: 0;
@@ -12,7 +13,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            position: relative; /* Ensure the container is relative for absolute positioning of description */
+            position: relative;
         }
 
         #video {
@@ -22,287 +23,315 @@
 
         #video-description {
             position: absolute;
-            bottom: 20px; /* Adjust based on your needs */
+            bottom: 20px;
             left: 0;
             width: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-            color: #fff; /* White text color */
-            text-align: center;
+            background-color: rgba(0,0,0,0.5);
+            color: #fff;
             padding: 10px;
-            box-sizing: border-box;
-            display: none; /* Initially hidden */
-            font-family: 'Roboto', sans-serif; /* Custom font */
+            text-align: center;
             font-size: 1.5em;
+            font-family: 'Roboto', sans-serif;
+            box-sizing: border-box;
+            display: none;
+        }
+
+        /* Optional small debug label (disabled by default) */
+        #channel-source-debug {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: rgba(0,0,0,0.4);
+            padding: 4px 8px;
+            color: #fff;
+            font-size: 12px;
+            border-radius: 4px;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
     <div id="video-container">
         <video id="video" autoplay controls></video>
-        <div id="video-description">Description goes here</div>
+        <div id="video-description"></div>
+
+        <!-- Debug overlay to show which JSON is being used -->
+        <div id="channel-source-debug"></div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
     <script>
-        // Shared with the guide: choose channels.json or rpichannels.json
-        const CHANNEL_FILE_KEY = 'channelFileSetting';
+        /********************************************
+         *  SHARED SETTING FROM THE MAIN TV GUIDE   *
+         ********************************************/
+        const channelSourceKey = 'channelSource';
+        const channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
 
-        function getChannelFileSetting() {
-            try {
-                return localStorage.getItem(CHANNEL_FILE_KEY) || 'channels.json';
-            } catch (e) {
-                console.error('Error reading channelFileSetting from localStorage:', e);
-                return 'channels.json';
-            }
-        }
+        // Show debug indicator
+        document.getElementById('channel-source-debug').innerText = channelSource;
 
+
+        /***********************
+         * CHANNEL ORDER LOADING
+         ***********************/
         async function loadChannelOrder() {
             try {
                 const response = await fetch('channelorder.json');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const channelOrder = await response.json();
-                return channelOrder;
-            } catch (error) {
-                console.error('Failed to load channel order:', error);
-                return []; // Return an empty array in case of an error
+                if (!response.ok) throw new Error('Channel order load error');
+                return await response.json();
+            } catch (e) {
+                console.error('Failed to load channelorder.json:', e);
+                return [];
             }
         }
 
-        // Function to load channel link map from channels.json or rpichannels.json
+
+        /************************************
+         * LOAD LINKS FROM THE SELECTED JSON
+         ************************************/
         async function loadChannelLinkMap() {
             try {
-                const channelFile = getChannelFileSetting();
-                const response = await fetch(channelFile);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const channelLinkMap = await response.json();
-                console.log('Loaded channel links from', channelFile);
-                return channelLinkMap;
-            } catch (error) {
-                console.error('Failed to load channel links:', error);
-                return {}; // Return an empty map in case of an error
+                const response = await fetch(channelSource);
+                if (!response.ok) throw new Error('Link map load error');
+                const map = await response.json();
+                console.log('Loaded links from', channelSource);
+                return map;
+            } catch (e) {
+                console.error('Failed to load channel link map:', e);
+                return {};
             }
+        }
+
+
+        /***************************
+         * URL PARAM GETTER HELPERS
+         ***************************/
+        function getUrlParameter(name) {
+            const regex = new RegExp('[?&]' + name + '=([^&#]*)');
+            const result = regex.exec(location.search);
+            return result ? decodeURIComponent(result[1]) : '';
         }
 
         function getUrlParameterCheck(name, url) {
-            var startIndex = url.indexOf('https://goddardduncan.github.io/epg/') + 'https://goddardduncan.github.io/epg/'.length;
-            return url.slice(startIndex);
+            const base = 'https://goddardduncan.github.io/epg/';
+            return url.slice(url.indexOf(base) + base.length);
         }
 
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        }
 
+        /********************
+         * HLS STREAM LOADER
+         ********************/
         async function loadAndPlayStream(url) {
             const video = document.getElementById('video');
+
             if (Hls.isSupported()) {
                 const hls = new Hls();
                 hls.loadSource(url);
                 hls.attachMedia(video);
-                
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play();
-                });
+                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
                 video.play();
             } else {
-                alert('Your browser does not support HLS.js or native HLS playback.');
+                alert("HLS playback not supported.");
             }
         }
 
+
+        /*********************************
+         * AUTO-DISABLE SUBTITLE TRACKS
+         *********************************/
         function disableSubtitles() {
             const video = document.getElementById('video');
-            if (!video) return; // Exit if video element isn't found
-
             const tracks = video.textTracks;
-            let tracksFound = false;
+            let found = false;
 
-            for (let i = 0; i < tracks.length; i++) {
-                const track = tracks[i];
-                // Target 'subtitles' and 'captions' tracks
-                if (track.kind === 'subtitles' || track.kind === 'captions') {
-                    // Forcefully set mode to 'hidden'
-                    track.mode = 'hidden'; 
-                    tracksFound = true;
-                    console.log(`Subtitle track ${i} set to hidden.`);
+            for (let t of tracks) {
+                if (t.kind === 'subtitles' || t.kind === 'captions') {
+                    t.mode = 'hidden';
+                    found = true;
                 }
             }
-            if (!tracksFound) {
-                console.log("No subtitle tracks found yet. Will re-attempt shortly.");
-            }
-            return tracksFound;
+            return found;
         }
-        
-        document.addEventListener("DOMContentLoaded", async function() {
+
+
+        /*******************************
+         * MAIN PLAYER INITIALIZATION
+         *******************************/
+        document.addEventListener("DOMContentLoaded", async () => {
+
             const channelsOrder = await loadChannelOrder();
             const channelLinkMap = await loadChannelLinkMap();
 
-            var urlParameter = getUrlParameter('url');
-            var streamKey = getUrlParameter('stream');
-            var url = window.location.href;
-            var urlParameterCheck = getUrlParameterCheck('url', url);
-            
-            // Get the video element reference for use in event listeners and DOMContentLoaded
+            const urlParameter = getUrlParameter('url');
+            const streamKey = getUrlParameter('stream');
+            const urlCheck = getUrlParameterCheck('url', location.href);
+
             const video = document.getElementById('video');
 
+
+            /*****************************
+             * LOAD STREAM BASED ON URL
+             *****************************/
             if (urlParameter) {
-                // If a direct URL is provided, use it
                 loadAndPlayStream(urlParameter);
+
             } else if (streamKey) {
-                // If no URL is provided, check for the stream key in localStorage
-                const m3u8Files = JSON.parse(localStorage.getItem('m3u8Files'));
-                if (m3u8Files && m3u8Files[streamKey]) {
-                    const m3u8Content = m3u8Files[streamKey];
-                    const blob = new Blob([m3u8Content], { type: 'application/vnd.apple.mpegurl' });
-                    const streamUrl = URL.createObjectURL(blob);
-                    loadAndPlayStream(streamUrl);
+                const stored = JSON.parse(localStorage.getItem('m3u8Files') || '{}');
+                if (stored[streamKey]) {
+                    const blob = new Blob([stored[streamKey]], { type: 'application/vnd.apple.mpegurl' });
+                    loadAndPlayStream(URL.createObjectURL(blob));
                 } else {
-                    alert('Stream not found in localStorage.');
+                    alert("Stream not found in localStorage.");
                 }
             }
-            
-            const subtitleCheckInterval = setInterval(() => {
-                const tracksDisabled = disableSubtitles();
-                
-                if (tracksDisabled) {
-                    setTimeout(() => {
-                         // Check one more time before clearing
-                        disableSubtitles(); 
-                        clearInterval(subtitleCheckInterval);
-                        console.log("Subtitle disabling interval cleared.");
-                    }, 2000); // Wait 2 seconds before clearing the interval
-                }
-            }, 500); // Check every half second (500ms)
 
-            var isMatch = false;
-            var storedChannel = localStorage.getItem('selectedChannel');
-            if (storedChannel && channelLinkMap.hasOwnProperty(storedChannel)) {
-                var desiredChannelUrl = channelLinkMap[storedChannel];
-                if (urlParameterCheck === desiredChannelUrl) {
-                    isMatch = true;
+
+            /***************************************
+             * SUBTITLE DISABLING LOOP (AUTO-HIDE)
+             ***************************************/
+            const subtitleInterval = setInterval(() => {
+                if (disableSubtitles()) {
+                    setTimeout(disableSubtitles, 2000);
+                    clearInterval(subtitleInterval);
                 }
+            }, 500);
+
+
+            /*********************
+             * DETERMINE CHANNEL
+             *********************/
+            let selectedChannel = localStorage.getItem('selectedChannel');
+            let isMatch = false;
+
+            if (selectedChannel && channelLinkMap[selectedChannel] === urlCheck) {
+                isMatch = true;
             }
-            
-            if (!isMatch && urlParameterCheck) {
-                for (var channelId in channelLinkMap) {
-                    if (channelLinkMap.hasOwnProperty(channelId)) {
-                        if (channelLinkMap[channelId] === urlParameterCheck) {
-                            storedChannel = channelId;
-                            localStorage.setItem('selectedChannel', storedChannel);
-                            break;
-                        }
+
+            if (!isMatch && urlCheck) {
+                for (const id in channelLinkMap) {
+                    if (channelLinkMap[id] === urlCheck) {
+                        selectedChannel = id;
+                        localStorage.setItem('selectedChannel', id);
+                        break;
                     }
                 }
             }
 
-            var currentIndex = channelsOrder.findIndex(channel => channel.id === storedChannel);
-            var backChannel = localStorage.getItem('prevChannel');
-            var backChannelIndex = channelsOrder.findIndex(channel => channel.id === backChannel);
-            var currentChannel = channelsOrder.find(channel => channel.id === storedChannel);
-            document.title = currentChannel ? currentChannel.name : "Live TV";
+            const currentIndex = channelsOrder.findIndex(c => c.id === selectedChannel);
+            const prevId = localStorage.getItem('prevChannel');
+            const prevIndex = channelsOrder.findIndex(c => c.id === prevId);
 
-            localStorage.setItem('Matchey', isMatch.toString());
+            const currentChannelObj = channelsOrder.find(c => c.id === selectedChannel);
+            document.title = currentChannelObj ? currentChannelObj.name : "Live TV";
 
-            function toggleSubtitles() {
-                var tracks = video.textTracks;
-                for (var i = 0; i < tracks.length; i++) {
-                    var track = tracks[i];
-                    // Toggle the mode between 'showing' and 'hidden' for captions/subtitles.
-                    if (track.kind === 'subtitles' || track.kind === 'captions') {
-                        track.mode = track.mode === 'showing' ? 'hidden' : 'showing';
-                    }
+            localStorage.setItem("Matchey", String(isMatch));
+
+
+            /*****************************************
+             * ENABLE RIGHT-CLICK TOGGLE SUBTITLES
+             *****************************************/
+            video.addEventListener("contextmenu", ev => {
+                ev.preventDefault();
+                const tracks = video.textTracks;
+                for (let t of tracks) {
+                    if (t.kind === 'subtitles' || t.kind === 'captions')
+                        t.mode = t.mode === 'showing' ? 'hidden' : 'showing';
                 }
-            }
-
-            video.addEventListener('contextmenu', function(event) {
-                event.preventDefault();
-                toggleSubtitles();
             });
 
-            window.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
+
+            /*****************************
+             * KEYBOARD NAVIGATION LOGIC
+             *****************************/
+            window.addEventListener("keydown", ev => {
+
+                if (ev.key === "Enter") {
                     video.play();
-                } else if (event.key === 'Escape' || (event.key === 'ArrowLeft' && event.metaKey)) {
-                    event.preventDefault();
-                    var backIndex = (backChannelIndex) % channelsOrder.length;
-                    var backbuttonChannel = channelsOrder[backIndex];
-                    var backChannelLink = channelLinkMap[backbuttonChannel.id];
-                    localStorage.setItem('prevChannel', backbuttonChannel.id);
-                    window.location.href = backChannelLink;
-                } else if (event.key === 'ArrowLeft') {
-                    var previousIndex = currentIndex - 1;
-                    if (previousIndex < 0) {
-                        previousIndex = channelsOrder.length - 1;
-                    }
-                    var previousChannel = channelsOrder[previousIndex];
-                    var previousChannelLink = channelLinkMap[previousChannel.id];
-                    localStorage.setItem('selectedChannel', previousChannel.id);
-                    window.location.href = previousChannelLink;
-                } else if (event.key === 'ArrowRight') {
-                    var nextIndex = (currentIndex + 1) % channelsOrder.length;
-                    var nextChannel = channelsOrder[nextIndex];
-                    var nextChannelLink = channelLinkMap[nextChannel.id];
-                    localStorage.setItem('selectedChannel', nextChannel.id);
-                    window.location.href = nextChannelLink;
-                } else if (event.key === 'ArrowUp') {
-                    var videoDescription = document.getElementById('video-description');
-                    if (videoDescription.style.display === 'none' || videoDescription.style.display === '') {
-                        videoDescription.style.display = 'block';
-                    } else {
-                        videoDescription.style.display = 'none';
-                    }
-                } else if (event.key === 'ArrowDown') {
-                    // Toggle mute/unmute on the video player
+                }
+
+                else if (ev.key === "Escape" ||
+                        (ev.key === "ArrowLeft" && ev.metaKey)) {
+                    ev.preventDefault();
+                    const back = channelsOrder[prevIndex];
+                    if (!back) return;
+                    localStorage.setItem('prevChannel', back.id);
+                    location.href = channelLinkMap[back.id];
+                }
+
+                else if (ev.key === "ArrowLeft") {
+                    let idx = currentIndex - 1;
+                    if (idx < 0) idx = channelsOrder.length - 1;
+                    const prev = channelsOrder[idx];
+                    localStorage.setItem('selectedChannel', prev.id);
+                    location.href = channelLinkMap[prev.id];
+                }
+
+                else if (ev.key === "ArrowRight") {
+                    let idx = (currentIndex + 1) % channelsOrder.length;
+                    const next = channelsOrder[idx];
+                    localStorage.setItem('selectedChannel', next.id);
+                    location.href = channelLinkMap[next.id];
+                }
+
+                else if (ev.key === "ArrowUp") {
+                    const desc = document.getElementById('video-description');
+                    desc.style.display = desc.style.display === 'block' ? 'none' : 'block';
+                }
+
+                else if (ev.key === "ArrowDown") {
                     video.muted = !video.muted;
-                    
-                    // Enable/disable subtitles based on mute state
-                    var tracks = video.textTracks;
-                    for (var i = 0; i < tracks.length; i++) {
-                         // Only affect subtitle/caption tracks
-                        if (tracks[i].kind === 'subtitles' || tracks[i].kind === 'captions') {
-                            tracks[i].mode = video.muted ? 'showing' : 'hidden'; 
+
+                    // Auto enable subtitles if muted
+                    const tracks = video.textTracks;
+                    for (let t of tracks) {
+                        if (t.kind === 'subtitles' || t.kind === 'captions') {
+                            t.mode = video.muted ? 'showing' : 'hidden';
                         }
                     }
                 }
             });
 
-            const xmlData = "https://epg.dunc.app/epg.xml";
-            const selectedChannelId = localStorage.getItem('selectedChannel');
 
-            if (selectedChannelId) {
-                fetch(xmlData)
-                    .then(response => response.text())
-                    .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
-                    .then(data => {
-                        const currentTime = new Date();
-                        const timezoneOffsetInMinutes = currentTime.getTimezoneOffset();
-                        currentTime.setTime(currentTime.getTime() + (timezoneOffsetInMinutes * 60 * 1000));
-                        const programmes = data.getElementsByTagName("programme");
+            /**********************************
+             * LOAD CURRENT PROGRAM DESCRIPTION
+             **********************************/
+            const xmlUrl = "https://epg.dunc.app/epg.xml";
 
-                        for (let program of programmes) {
-                            if (program.getAttribute("channel") === selectedChannelId) {
-                                const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-                                const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+            if (selectedChannel) {
+                fetch(xmlUrl)
+                    .then(r => r.text())
+                    .then(t => new DOMParser().parseFromString(t, "text/xml"))
+                    .then(xml => {
+                        const now = new Date();
+                        now.setMinutes(now.getMinutes() + now.getTimezoneOffset());
 
-                                if (currentTime >= start && currentTime <= end) {
-                                    const descElements = program.getElementsByTagName("desc");
-                                    const desc = descElements.length > 0 ? descElements[0].textContent : 'No description available';
-                                    localStorage.setItem('descripto', desc);
-                                    document.getElementById('video-description').textContent = desc;
-                                    break;
-                                }
+                        const progs = xml.getElementsByTagName("programme");
+                        for (const p of progs) {
+                            if (p.getAttribute("channel") !== selectedChannel) continue;
+
+                            const start = parseEpgDate(p.getAttribute("start"));
+                            const stop  = parseEpgDate(p.getAttribute("stop"));
+
+                            if (now >= start && now <= stop) {
+                                const desc = p.getElementsByTagName("desc")[0];
+                                const text = desc ? desc.textContent : "No description available";
+                                document.getElementById("video-description").innerText = text;
+                                localStorage.setItem("descripto", text);
+                                break;
                             }
                         }
-                    })
-                    .catch(error => console.error('Error fetching or parsing XML:', error));
-            } else {
-                console.log("No selected channel found in localStorage.");
+                    });
+            }
+
+            function parseEpgDate(str) {
+                return new Date(
+                    str.replace(" +0000", "")
+                       .replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/,
+                                "$1-$2-$3T$4:$5:$6")
+                );
             }
         });
     </script>
