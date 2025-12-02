@@ -733,63 +733,88 @@
                     }
                 });
 
-                document.addEventListener("contextmenu", sendStandbyRequest);
+// --- Configuration ---
+const DOUBLE_CLICK_TIME_MS = 500; // Time window for double-click (500ms = 0.5 seconds)
+const STANDBY_URL = 'https://dj.dunc.app/control/standby';
+const ON_URL = 'https://dj.dunc.app/control/epg';
+const NAVIGATE_TO_URL = 'https://epg.dunc.app/';
 
-                async function sendStandbyRequest(event) {
-                    // If standby is disabled via settings, let the normal browser context menu work
-                    if (!standbyEnabled) {
-                        return;
-                    }
+// --- State Variables ---
+let lastContextMenuTimestamp = 0; // Stores the time of the last contextmenu event
+let contextMenuTimer = null; // Stores the timeout ID for the single-click action
 
-                    // Standby enabled: prevent default menu and send request
-                    event.preventDefault();
-                    console.log('Context menu triggered. Attempting to send standby request...');
-                    const standbyUrl = 'https://dj.dunc.app/control/standby';
+// NOTE: The 'standbyEnabled' check is removed as the double-click/context menu is now the primary trigger.
+// If you still need a setting to disable this, you'll need to define and check a global 'standbyEnabled' or similar variable.
 
-                    try {
-                        const response = await fetch(standbyUrl, {
-                            method: 'POST',
-                        });
-                        if (response.ok) {
-                            console.log('Standby command sent successfully.');
-                        } else {
-                            console.error(`Failed to send standby command. Status: ${response.status}`);
-                        }
-                    } catch (error) {
-                        console.error('Error sending standby request:', error);
-                    }
-                }
-                document.addEventListener("keydown", sendOnRequest);
+// 1. Standby Request (Double-Click via Context Menu)
+// The 'contextmenu' event fires when the right mouse button is pressed.
+document.addEventListener("contextmenu", handleContextMenu);
 
-                async function sendOnRequest(event) {
-                    // Check if the key pressed is the 'Home' key
-                    if (event.key !== 'Home') {
-                        return; // Exit if it's not the Home key
-                    }
+async function handleContextMenu(event) {
+    // **Prevent the default browser context menu** immediately for both single and double clicks.
+    event.preventDefault();
 
-                    // On enabled: prevent default browser action (if any) and send request
-                    event.preventDefault(); // Prevents the browser's default Home key action (like scrolling to the top)
-                    console.log('Home key pressed. Attempting to send on request...');
-    
-                    // Note: The URL is set to 'epg', which may or may not be correct for 'On'
-                    const onUrl = 'https://dj.dunc.app/control/epg'; 
-                    const navigateToUrl = 'https://epg.dunc.app/';
+    const currentTime = Date.now();
+    const timeSinceLastClick = currentTime - lastContextMenuTimestamp;
 
-                    try {
-                        const response = await fetch(onUrl, {
-                            method: 'POST',
-                        });
-                        if (response.ok) {
-                            console.log('On command sent successfully.');
-                        } else {
-                            console.error(`Failed to send on command. Status: ${response.status}`);
-                        }
-                    } catch (error) {
-                        console.error('Error sending on request:', error);
-                    }
-                    console.log(`Navigating to: ${navigateToUrl}`);
-                    window.location.href = navigateToUrl;
-                }
+    // Check for **Double-Click**
+    if (timeSinceLastClick < DOUBLE_CLICK_TIME_MS) {
+        // Double-click detected (right-click twice within the time window)
+
+        // Clear any pending single-click action
+        clearTimeout(contextMenuTimer);
+        contextMenuTimer = null;
+        lastContextMenuTimestamp = 0; // Reset timestamp to prevent triple-click issues
+
+        console.log('Double-click detected (right-click twice). Attempting to send standby request...');
+        await sendRequest(STANDBY_URL, 'Standby');
+    } else {
+        // This is the first click, set up the Single-Click timer
+
+        // Clear any previous timer just in case
+        if (contextMenuTimer) {
+             clearTimeout(contextMenuTimer);
+        }
+
+        // Set a timer for the single-click action
+        contextMenuTimer = setTimeout(async () => {
+            // Single-click action: The second click didn't happen in time, so fire the 'On' request
+            console.log('Single-click detected (right-click once). Attempting to send on request...');
+            await sendRequest(ON_URL, 'On');
+
+            console.log(`Navigating to: ${NAVIGATE_TO_URL}`);
+            window.location.href = NAVIGATE_TO_URL;
+
+            // Reset the timer and timestamp after execution
+            contextMenuTimer = null;
+            lastContextMenuTimestamp = 0;
+        }, DOUBLE_CLICK_TIME_MS);
+
+        // Update the timestamp for the first click
+        lastContextMenuTimestamp = currentTime;
+    }
+}
+
+// 2. Generic Request Sender Function
+async function sendRequest(url, commandName) {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+        });
+        if (response.ok) {
+            console.log(`${commandName} command sent successfully.`);
+        } else {
+            console.error(`Failed to send ${commandName} command. Status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error(`Error sending ${commandName} request:`, error);
+    }
+}
+
+// Optional: Remove the old keydown listener
+document.removeEventListener("keydown", sendOnRequest);
+
+// NOTE: The function sendOnRequest is now unnecessary and removed.
                 
                 function scrollSelectedRowIntoView() {
                     const tableRows = document.querySelectorAll('table tr');
