@@ -60,19 +60,9 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <script>
-        /********************************************
-         *  SHARED SETTING FROM THE MAIN TV GUIDE   *
-         ********************************************/
         const channelSourceKey = 'channelSource';
         const channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
 
-        // Show debug indicator
- //       document.getElementById('channel-source-debug').innerText = channelSource;
-
-
-        /***********************
-         * CHANNEL ORDER LOADING
-         ***********************/
         async function loadChannelOrder() {
             try {
                 const response = await fetch('channelorder.json');
@@ -84,10 +74,6 @@
             }
         }
 
-
-        /************************************
-         * LOAD LINKS FROM THE SELECTED JSON
-         ************************************/
         async function loadChannelLinkMap() {
             try {
                 const response = await fetch(channelSource);
@@ -101,10 +87,6 @@
             }
         }
 
-
-        /***************************
-         * URL PARAM GETTER HELPERS
-         ***************************/
         function getUrlParameter(name) {
             const regex = new RegExp('[?&]' + name + '=([^&#]*)');
             const result = regex.exec(location.search);
@@ -116,10 +98,6 @@
             return url.slice(url.indexOf(base) + base.length);
         }
 
-
-        /********************
-         * HLS STREAM LOADER
-         ********************/
         async function loadAndPlayStream(url) {
             const video = document.getElementById('video');
 
@@ -136,10 +114,6 @@
             }
         }
 
-
-        /*********************************
-         * AUTO-DISABLE SUBTITLE TRACKS
-         *********************************/
         function disableSubtitles() {
             const video = document.getElementById('video');
             const tracks = video.textTracks;
@@ -154,10 +128,6 @@
             return found;
         }
 
-
-        /*******************************
-         * MAIN PLAYER INITIALIZATION
-         *******************************/
         document.addEventListener("DOMContentLoaded", async () => {
 
             const channelsOrder = await loadChannelOrder();
@@ -169,10 +139,6 @@
 
             const video = document.getElementById('video');
 
-
-            /*****************************
-             * LOAD STREAM BASED ON URL
-             *****************************/
             if (urlParameter) {
                 loadAndPlayStream(urlParameter);
 
@@ -186,10 +152,6 @@
                 }
             }
 
-
-            /***************************************
-             * SUBTITLE DISABLING LOOP (AUTO-HIDE)
-             ***************************************/
             const subtitleInterval = setInterval(() => {
                 if (disableSubtitles()) {
                     setTimeout(disableSubtitles, 2000);
@@ -197,10 +159,6 @@
                 }
             }, 500);
 
-
-            /*********************
-             * DETERMINE CHANNEL
-             *********************/
             let selectedChannel = localStorage.getItem('selectedChannel');
             let isMatch = false;
 
@@ -227,10 +185,6 @@
 
             localStorage.setItem("Matchey", String(isMatch));
 
-
-            /*****************************************
-             * ENABLE RIGHT-CLICK TOGGLE SUBTITLES
-             *****************************************/
             video.addEventListener("contextmenu", ev => {
                 ev.preventDefault();
                 const tracks = video.textTracks;
@@ -240,10 +194,6 @@
                 }
             });
 
-
-            /*****************************
-             * KEYBOARD NAVIGATION LOGIC
-             *****************************/
             window.addEventListener("keydown", ev => {
 
                 if (ev.key === "Enter") {
@@ -292,10 +242,6 @@
                 }
             });
 
-
-            /**********************************
-             * LOAD CURRENT PROGRAM DESCRIPTION
-             **********************************/
             const xmlUrl = "https://epg.dunc.app/epg.xml";
 
             if (selectedChannel) {
