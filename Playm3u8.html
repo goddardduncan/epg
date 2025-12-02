@@ -63,7 +63,102 @@
         const channelSourceKey = 'channelSource';
         const channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
 
+        // --- NEW CLICK LOGIC & SUBTITLE CONFIGURATION ---
+        const DOUBLE_CLICK_TIME_MS = 500; // 0.5 seconds time window
+        const STANDBY_URL = 'https://dj.dunc.app/control/standby';
+        const ON_URL = 'https://dj.dunc.app/control/epg';
+        const NAVIGATE_TO_URL = 'https://epg.dunc.app/';
+
+        // --- NEW CLICK LOGIC STATE VARIABLES ---
+        let lastContextMenuTimestamp = 0;
+        let contextMenuTimer = null;
+        const video = document.getElementById('video');
+
+        // --- Subtitle Toggle Function (Now separate) ---
+        function toggleSubtitles() {
+            const tracks = video.textTracks;
+            for (let t of tracks) {
+                if (t.kind === 'subtitles' || t.kind === 'captions') {
+                    t.mode = t.mode === 'showing' ? 'hidden' : 'showing';
+                }
+            }
+        }
+
+        // --- ON/STANDBY Request Sender Function ---
+        async function sendRequest(url, commandName) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                });
+                if (response.ok) {
+                    console.log(`${commandName} command sent successfully.`);
+                } else {
+                    console.error(`Failed to send ${commandName} command. Status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error(`Error sending ${commandName} request:`, error);
+            }
+        }
+
+        // --- Context Menu Handler (Master Logic) ---
+        async function handleContextMenu(event) {
+            // 1. Always prevent the default browser context menu
+            event.preventDefault();
+
+            const currentTime = Date.now();
+            const timeSinceLastClick = currentTime - lastContextMenuTimestamp;
+
+            // 2. Check for **Double-Click** (Standby)
+            if (timeSinceLastClick < DOUBLE_CLICK_TIME_MS) {
+                // DOUBLE-CLICK DETECTED: Fire Standby Command
+
+                // Clear the pending single-click (On) action
+                clearTimeout(contextMenuTimer);
+                contextMenuTimer = null;
+                lastContextMenuTimestamp = 0; // Reset timestamp
+
+                console.log('Double-click detected. Triggering Standby.');
+                await sendRequest(STANDBY_URL, 'Standby');
+
+            } else {
+                // FIRST CLICK: Trigger Subtitle Toggle immediately and set up the 'On' timer
+
+                // A. Immediate Action: Toggle Subtitles
+                toggleSubtitles(); 
+
+                // B. Delayed Action: Set up Single-Click Timer (On Request & Navigate)
+
+                // Clear any previous timer just in case
+                if (contextMenuTimer) {
+                     clearTimeout(contextMenuTimer);
+                }
+
+                // Set a timer for the single-click action
+                contextMenuTimer = setTimeout(async () => {
+                    // This executes if a second click does NOT happen in time (single-click confirmed)
+                    console.log('Single-click confirmed. Triggering ON and Navigation.');
+                    await sendRequest(ON_URL, 'On');
+
+                    console.log(`Navigating to: ${NAVIGATE_TO_URL}`);
+                    window.location.href = NAVIGATE_TO_URL;
+
+                    // Reset the timer and timestamp after execution
+                    contextMenuTimer = null;
+                    lastContextMenuTimestamp = 0;
+                }, DOUBLE_CLICK_TIME_MS);
+
+                // Update the timestamp for the first click
+                lastContextMenuTimestamp = currentTime;
+            }
+        }
+
+        // --- Attach the new master handler to the document's contextmenu event ---
+        document.addEventListener("contextmenu", handleContextMenu);
+
+        // --- Original Functions Follow ---
+
         async function loadChannelOrder() {
+            // ... (Rest of function)
             try {
                 const response = await fetch('channelorder.json');
                 if (!response.ok) throw new Error('Channel order load error');
@@ -75,6 +170,7 @@
         }
 
         async function loadChannelLinkMap() {
+            // ... (Rest of function)
             try {
                 const response = await fetch(channelSource);
                 if (!response.ok) throw new Error('Link map load error');
@@ -88,19 +184,20 @@
         }
 
         function getUrlParameter(name) {
+            // ... (Rest of function)
             const regex = new RegExp('[?&]' + name + '=([^&#]*)');
             const result = regex.exec(location.search);
             return result ? decodeURIComponent(result[1]) : '';
         }
 
         function getUrlParameterCheck(name, url) {
+            // ... (Rest of function)
             const base = 'https://goddardduncan.github.io/epg/';
             return url.slice(url.indexOf(base) + base.length);
         }
 
         async function loadAndPlayStream(url) {
-            const video = document.getElementById('video');
-
+            // ... (Rest of function)
             if (Hls.isSupported()) {
                 const hls = new Hls();
                 hls.loadSource(url);
@@ -115,7 +212,7 @@
         }
 
         function disableSubtitles() {
-            const video = document.getElementById('video');
+            // ... (Rest of function)
             const tracks = video.textTracks;
             let found = false;
 
@@ -136,8 +233,6 @@
             const urlParameter = getUrlParameter('url');
             const streamKey = getUrlParameter('stream');
             const urlCheck = getUrlParameterCheck('url', location.href);
-
-            const video = document.getElementById('video');
 
             if (urlParameter) {
                 loadAndPlayStream(urlParameter);
@@ -185,14 +280,8 @@
 
             localStorage.setItem("Matchey", String(isMatch));
 
-            video.addEventListener("contextmenu", ev => {
-                ev.preventDefault();
-                const tracks = video.textTracks;
-                for (let t of tracks) {
-                    if (t.kind === 'subtitles' || t.kind === 'captions')
-                        t.mode = t.mode === 'showing' ? 'hidden' : 'showing';
-                }
-            });
+            // REMOVED: The old video.addEventListener("contextmenu", ...) for subtitles
+            // because the new handleContextMenu handles it at the document level.
 
             window.addEventListener("keydown", ev => {
 
@@ -250,7 +339,7 @@
                     .then(t => new DOMParser().parseFromString(t, "text/xml"))
                     .then(xml => {
                         const now = new Date();
-                        now.setMinutes(now.getMinutes() + now.getTimezoneOffset());
+                        now.setMinutes(now.getMinutes() + now.getTimezoneOffset()); 
 
                         const progs = xml.getElementsByTagName("programme");
                         for (const p of progs) {
