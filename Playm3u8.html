@@ -67,7 +67,6 @@
         const DOUBLE_CLICK_TIME_MS = 500; // 0.5 seconds time window
         const STANDBY_URL = 'https://dj.dunc.app/control/standby';
         const ON_URL = 'https://dj.dunc.app/control/epg';
-        const NAVIGATE_TO_URL = 'https://epg.dunc.app/';
 
         // --- NEW CLICK LOGIC STATE VARIABLES ---
         let lastContextMenuTimestamp = 0;
@@ -126,7 +125,7 @@
                 // A. Immediate Action: Toggle Subtitles
                 toggleSubtitles(); 
 
-                // B. Delayed Action: Set up Single-Click Timer (On Request & Navigate)
+                // B. Delayed Action: Set up Single-Click Timer (On Request)
 
                 // Clear any previous timer just in case
                 if (contextMenuTimer) {
@@ -136,11 +135,8 @@
                 // Set a timer for the single-click action
                 contextMenuTimer = setTimeout(async () => {
                     // This executes if a second click does NOT happen in time (single-click confirmed)
-                    console.log('Single-click confirmed. Triggering ON and Navigation.');
+                    console.log('Single-click confirmed. Triggering ON.');
                     await sendRequest(ON_URL, 'On');
-
-                    console.log(`Navigating to: ${NAVIGATE_TO_URL}`);
-                    window.location.href = NAVIGATE_TO_URL;
 
                     // Reset the timer and timestamp after execution
                     contextMenuTimer = null;
