@@ -14,6 +14,9 @@
             height: 100%;
             overflow: hidden;
             position: relative;
+            background-color: #000;
+            /* Prevents mobile browser "swipe to go back" gestures from interfering */
+            touch-action: none; 
         }
 
         #video {
@@ -34,9 +37,9 @@
             font-family: 'Roboto', sans-serif;
             box-sizing: border-box;
             display: none;
+            pointer-events: none; /* Let touches pass through to the container */
         }
 
-        /* Optional small debug label (disabled by default) */
         #channel-source-debug {
             position: absolute;
             top: 5px;
@@ -52,9 +55,8 @@
 </head>
 <body>
     <div id="video-container">
-        <video id="video" autoplay controls></video>
+        <video id="video" autoplay controls playsinline></video>
         <div id="video-description"></div>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -63,17 +65,37 @@
         const channelSourceKey = 'channelSource';
         const channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
 
-        // --- NEW CLICK LOGIC & SUBTITLE CONFIGURATION ---
-        const DOUBLE_CLICK_TIME_MS = 500; // 0.5 seconds time window
+        const DOUBLE_CLICK_TIME_MS = 500;
         const STANDBY_URL = 'https://dj.dunc.app/control/standby';
         const ON_URL = 'https://dj.dunc.app/control/epg';
+        const SWIPE_THRESHOLD = 70; // Minimum pixels to trigger a channel change
 
-        // --- NEW CLICK LOGIC STATE VARIABLES ---
         let lastContextMenuTimestamp = 0;
         let contextMenuTimer = null;
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
         const video = document.getElementById('video');
+        const videoContainer = document.getElementById('video-container');
 
-        // --- Subtitle Toggle Function (Now separate) ---
+        // --- Shared Channel Change Logic ---
+        function changeChannel(direction, channelsOrder, currentIndex, channelLinkMap) {
+            let idx;
+            if (direction === 'prev') {
+                idx = currentIndex - 1;
+                if (idx < 0) idx = channelsOrder.length - 1;
+            } else {
+                idx = (currentIndex + 1) % channelsOrder.length;
+            }
+            
+            const target = channelsOrder[idx];
+            if (target && channelLinkMap[target.id]) {
+                localStorage.setItem('selectedChannel', target.id);
+                location.href = channelLinkMap[target.id];
+            }
+        }
+
+        // --- Subtitle Toggle ---
         function toggleSubtitles() {
             const tracks = video.textTracks;
             for (let t of tracks) {
@@ -83,117 +105,72 @@
             }
         }
 
-        // --- ON/STANDBY Request Sender Function ---
+        // --- Request Sender ---
         async function sendRequest(url, commandName) {
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                });
-                if (response.ok) {
-                    console.log(`${commandName} command sent successfully.`);
-                } else {
-                    console.error(`Failed to send ${commandName} command. Status: ${response.status}`);
-                }
+                const response = await fetch(url, { method: 'POST' });
+                if (response.ok) console.log(`${commandName} command sent.`);
             } catch (error) {
-                console.error(`Error sending ${commandName} request:`, error);
+                console.error(`Error sending ${commandName}:`, error);
             }
         }
 
-        // --- Context Menu Handler (Master Logic) ---
+        // --- Context Menu (Subtitles/Standby/On) ---
         async function handleContextMenu(event) {
-            // 1. Always prevent the default browser context menu
             event.preventDefault();
-
             const currentTime = Date.now();
             const timeSinceLastClick = currentTime - lastContextMenuTimestamp;
 
-            // 2. Check for **Double-Click** (Standby)
             if (timeSinceLastClick < DOUBLE_CLICK_TIME_MS) {
-                // DOUBLE-CLICK DETECTED: Fire Standby Command
-
-                // Clear the pending single-click (On) action
                 clearTimeout(contextMenuTimer);
                 contextMenuTimer = null;
-                lastContextMenuTimestamp = 0; // Reset timestamp
-
-                console.log('Double-click detected. Triggering Standby.');
+                lastContextMenuTimestamp = 0;
                 await sendRequest(STANDBY_URL, 'Standby');
-
             } else {
-                // FIRST CLICK: Trigger Subtitle Toggle immediately and set up the 'On' timer
-
-                // A. Immediate Action: Toggle Subtitles
                 toggleSubtitles(); 
-
-                // B. Delayed Action: Set up Single-Click Timer (On Request)
-
-                // Clear any previous timer just in case
-                if (contextMenuTimer) {
-                     clearTimeout(contextMenuTimer);
-                }
-
-                // Set a timer for the single-click action
+                if (contextMenuTimer) clearTimeout(contextMenuTimer);
                 contextMenuTimer = setTimeout(async () => {
-                    // This executes if a second click does NOT happen in time (single-click confirmed)
-                    console.log('Single-click confirmed. Triggering ON.');
                     await sendRequest(ON_URL, 'On');
-
-                    // Reset the timer and timestamp after execution
                     contextMenuTimer = null;
                     lastContextMenuTimestamp = 0;
                 }, DOUBLE_CLICK_TIME_MS);
-
-                // Update the timestamp for the first click
                 lastContextMenuTimestamp = currentTime;
             }
         }
 
-        // --- Attach the new master handler to the document's contextmenu event ---
         document.addEventListener("contextmenu", handleContextMenu);
 
-        // --- Original Functions Follow ---
-
+        // --- Core Data Loaders ---
         async function loadChannelOrder() {
-            // ... (Rest of function)
             try {
                 const response = await fetch('channelorder.json');
-                if (!response.ok) throw new Error('Channel order load error');
                 return await response.json();
             } catch (e) {
-                console.error('Failed to load channelorder.json:', e);
                 return [];
             }
         }
 
         async function loadChannelLinkMap() {
-            // ... (Rest of function)
             try {
                 const response = await fetch(channelSource);
-                if (!response.ok) throw new Error('Link map load error');
-                const map = await response.json();
-                console.log('Loaded links from', channelSource);
-                return map;
+                return await response.json();
             } catch (e) {
-                console.error('Failed to load channel link map:', e);
                 return {};
             }
         }
 
         function getUrlParameter(name) {
-            // ... (Rest of function)
             const regex = new RegExp('[?&]' + name + '=([^&#]*)');
             const result = regex.exec(location.search);
             return result ? decodeURIComponent(result[1]) : '';
         }
 
         function getUrlParameterCheck(name, url) {
-            // ... (Rest of function)
             const base = 'https://goddardduncan.github.io/epg/';
-            return url.slice(url.indexOf(base) + base.length);
+            return url.includes(base) ? url.slice(url.indexOf(base) + base.length) : url;
         }
 
         async function loadAndPlayStream(url) {
-            // ... (Rest of function)
             if (Hls.isSupported()) {
                 const hls = new Hls();
                 hls.loadSource(url);
@@ -202,16 +179,12 @@
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
                 video.play();
-            } else {
-                alert("HLS playback not supported.");
             }
         }
 
         function disableSubtitles() {
-            // ... (Rest of function)
             const tracks = video.textTracks;
             let found = false;
-
             for (let t of tracks) {
                 if (t.kind === 'subtitles' || t.kind === 'captions') {
                     t.mode = 'hidden';
@@ -221,8 +194,8 @@
             return found;
         }
 
+        // --- Initialization ---
         document.addEventListener("DOMContentLoaded", async () => {
-
             const channelsOrder = await loadChannelOrder();
             const channelLinkMap = await loadChannelLinkMap();
 
@@ -232,14 +205,11 @@
 
             if (urlParameter) {
                 loadAndPlayStream(urlParameter);
-
             } else if (streamKey) {
                 const stored = JSON.parse(localStorage.getItem('m3u8Files') || '{}');
                 if (stored[streamKey]) {
                     const blob = new Blob([stored[streamKey]], { type: 'application/vnd.apple.mpegurl' });
                     loadAndPlayStream(URL.createObjectURL(blob));
-                } else {
-                    alert("Stream not found in localStorage.");
                 }
             }
 
@@ -251,19 +221,13 @@
             }, 500);
 
             let selectedChannel = localStorage.getItem('selectedChannel');
-            let isMatch = false;
-
-            if (selectedChannel && channelLinkMap[selectedChannel] === urlCheck) {
-                isMatch = true;
-            }
-
-            if (!isMatch && urlCheck) {
-                for (const id in channelLinkMap) {
-                    if (channelLinkMap[id] === urlCheck) {
-                        selectedChannel = id;
-                        localStorage.setItem('selectedChannel', id);
-                        break;
-                    }
+            
+            // Sync current channel ID based on URL
+            for (const id in channelLinkMap) {
+                if (channelLinkMap[id] === urlCheck) {
+                    selectedChannel = id;
+                    localStorage.setItem('selectedChannel', id);
+                    break;
                 }
             }
 
@@ -274,50 +238,48 @@
             const currentChannelObj = channelsOrder.find(c => c.id === selectedChannel);
             document.title = currentChannelObj ? currentChannelObj.name : "Live TV";
 
-            localStorage.setItem("Matchey", String(isMatch));
+            // --- TOUCH GESTURE LISTENERS ---
+            videoContainer.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
 
-            // REMOVED: The old video.addEventListener("contextmenu", ...) for subtitles
-            // because the new handleContextMenu handles it at the document level.
+            videoContainer.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                const swipeDistance = touchEndX - touchStartX;
 
+                if (Math.abs(swipeDistance) > SWIPE_THRESHOLD) {
+                    if (swipeDistance > 0) {
+                        // Swiped Right -> Previous
+                        changeChannel('prev', channelsOrder, currentIndex, channelLinkMap);
+                    } else {
+                        // Swiped Left -> Next
+                        changeChannel('next', channelsOrder, currentIndex, channelLinkMap);
+                    }
+                }
+            }, { passive: true });
+
+            // --- KEYBOARD LISTENERS ---
             window.addEventListener("keydown", ev => {
-
                 if (ev.key === "Enter") {
                     video.play();
                 }
-
-                else if (ev.key === "Escape" ||
-                        (ev.key === "ArrowLeft" && ev.metaKey)) {
+                else if (ev.key === "Escape" || (ev.key === "ArrowLeft" && ev.metaKey)) {
                     ev.preventDefault();
                     const back = channelsOrder[prevIndex];
-                    if (!back) return;
-                    localStorage.setItem('prevChannel', back.id);
-                    location.href = channelLinkMap[back.id];
+                    if (back) location.href = channelLinkMap[back.id];
                 }
-
                 else if (ev.key === "ArrowLeft") {
-                    let idx = currentIndex - 1;
-                    if (idx < 0) idx = channelsOrder.length - 1;
-                    const prev = channelsOrder[idx];
-                    localStorage.setItem('selectedChannel', prev.id);
-                    location.href = channelLinkMap[prev.id];
+                    changeChannel('prev', channelsOrder, currentIndex, channelLinkMap);
                 }
-
                 else if (ev.key === "ArrowRight") {
-                    let idx = (currentIndex + 1) % channelsOrder.length;
-                    const next = channelsOrder[idx];
-                    localStorage.setItem('selectedChannel', next.id);
-                    location.href = channelLinkMap[next.id];
+                    changeChannel('next', channelsOrder, currentIndex, channelLinkMap);
                 }
-
                 else if (ev.key === "ArrowUp") {
                     const desc = document.getElementById('video-description');
                     desc.style.display = desc.style.display === 'block' ? 'none' : 'block';
                 }
-
                 else if (ev.key === "ArrowDown") {
                     video.muted = !video.muted;
-
-                    // Auto enable subtitles if muted
                     const tracks = video.textTracks;
                     for (let t of tracks) {
                         if (t.kind === 'subtitles' || t.kind === 'captions') {
@@ -327,28 +289,23 @@
                 }
             });
 
-            const xmlUrl = "https://epg.dunc.app/epg.xml";
-
+            // --- EPG LOADING ---
             if (selectedChannel) {
-                fetch(xmlUrl)
+                fetch("https://epg.dunc.app/epg.xml")
                     .then(r => r.text())
                     .then(t => new DOMParser().parseFromString(t, "text/xml"))
                     .then(xml => {
                         const now = new Date();
                         now.setMinutes(now.getMinutes() + now.getTimezoneOffset()); 
-
                         const progs = xml.getElementsByTagName("programme");
                         for (const p of progs) {
                             if (p.getAttribute("channel") !== selectedChannel) continue;
-
                             const start = parseEpgDate(p.getAttribute("start"));
                             const stop  = parseEpgDate(p.getAttribute("stop"));
-
                             if (now >= start && now <= stop) {
                                 const desc = p.getElementsByTagName("desc")[0];
                                 const text = desc ? desc.textContent : "No description available";
                                 document.getElementById("video-description").innerText = text;
-                                localStorage.setItem("descripto", text);
                                 break;
                             }
                         }
@@ -356,11 +313,7 @@
             }
 
             function parseEpgDate(str) {
-                return new Date(
-                    str.replace(" +0000", "")
-                       .replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/,
-                                "$1-$2-$3T$4:$5:$6")
-                );
+                return new Date(str.replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
             }
         });
     </script>
