@@ -66,6 +66,7 @@
         const channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
 
         const DOUBLE_CLICK_TIME_MS = 500;
+        const TRIPLE_TAP_TIME_MS = 600; // Time window for triple tap detection
         const STANDBY_URL = 'https://dj.dunc.app/control/standby';
         const ON_URL = 'https://dj.dunc.app/control/epg';
         const SWIPE_THRESHOLD = 70; // Minimum pixels to trigger a channel change
@@ -74,6 +75,10 @@
         let contextMenuTimer = null;
         let touchStartX = 0;
         let touchEndX = 0;
+        
+        // Triple tap tracking
+        let tapCount = 0;
+        let tapTimer = null;
         
         const video = document.getElementById('video');
         const videoContainer = document.getElementById('video-container');
@@ -247,13 +252,30 @@
                 touchEndX = e.changedTouches[0].screenX;
                 const swipeDistance = touchEndX - touchStartX;
 
+                // 1. Check for Swipe
                 if (Math.abs(swipeDistance) > SWIPE_THRESHOLD) {
+                    // Reset tap count on swipe
+                    tapCount = 0;
+                    clearTimeout(tapTimer);
+
                     if (swipeDistance > 0) {
                         // Swiped Right -> Previous
                         changeChannel('prev', channelsOrder, currentIndex, channelLinkMap);
                     } else {
                         // Swiped Left -> Next
                         changeChannel('next', channelsOrder, currentIndex, channelLinkMap);
+                    }
+                } else {
+                    // 2. Check for Triple Tap (on minimal movement)
+                    tapCount++;
+                    if (tapCount === 1) {
+                        tapTimer = setTimeout(() => {
+                            tapCount = 0;
+                        }, TRIPLE_TAP_TIME_MS);
+                    } else if (tapCount === 3) {
+                        clearTimeout(tapTimer);
+                        tapCount = 0;
+                        window.location.href = 'index.html';
                     }
                 }
             }, { passive: true });
