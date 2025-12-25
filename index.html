@@ -265,6 +265,8 @@
                     <span>Enable standby request</span>
                     <label class="switch">
                         <input type="checkbox" id="standbyToggle">
+                        <input type="checkbox" id="showBlockToggle"> Show "The Block" Row</p>
+                        <input type="checkbox" id="showTreenflixToggle"> Show "TreenFlix" Row</p>
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -293,11 +295,16 @@
             // --- Global settings for channel source and standby behavior ---
             const channelSourceKey = 'channelSource';
             const standbyEnabledKey = 'standbyEnabled';
+            const blockEnabledKey = 'showBlockRow';
+            const treenflixEnabledKey = 'showTreenflixRow';
 
             let channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
 
             const standbyStored = localStorage.getItem(standbyEnabledKey);
             let standbyEnabled = standbyStored === null ? true : (standbyStored === 'true');
+            let showBlockRow = localStorage.getItem(blockEnabledKey) === 'true';
+            let showTreenflixRow = localStorage.getItem(treenflixEnabledKey) === 'true';
+            
 
             let blockUrl; // Global variable for blockUrl
 
@@ -305,6 +312,9 @@
 
             function openSettingsModal() {
                 const modal = document.getElementById('settings-modal');
+                document.getElementById('showBlockToggle').checked = showBlockRow;
+                document.getElementById('showTreenflixToggle').checked = showTreenflixRow;
+                modal.style.display = 'block';
                 if (!modal) return;
 
                 // Set current channel source radio
@@ -348,9 +358,13 @@
 
                         const standbyToggle = document.getElementById('standbyToggle');
                         const newStandbyEnabled = standbyToggle ? standbyToggle.checked : true;
+                        const newShowBlock = document.getElementById('showBlockToggle').checked;
+                        const newShowTreenflix = document.getElementById('showTreenflixToggle').checked;
 
                         localStorage.setItem(channelSourceKey, newChannelSource);
                         localStorage.setItem(standbyEnabledKey, newStandbyEnabled ? 'true' : 'false');
+                        localStorage.setItem(blockEnabledKey, newShowBlock);
+                        localStorage.setItem(treenflixEnabledKey, newShowTreenflix);
 
                         channelSource = newChannelSource;
                         standbyEnabled = newStandbyEnabled;
@@ -958,8 +972,12 @@ console.error(`Error sending ${label} request:`, err);
 
                 // Load the latest Block episode after loading the guide
                 setTimeout(async () => {
-                    await loadBlockEpisode();
-                    await loadTreenFlix();
+                    if (showBlockRow) {
+                        await loadBlockEpisode();
+                    }
+                    if (showTreenflixRow) {
+                        await loadTreenFlix();
+                    }
                 //    await loadTreenFlixReset();
                 }, 50); // Adding a delay
             }
