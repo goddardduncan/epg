@@ -313,6 +313,7 @@
             const standbyEnabledKey = 'standbyEnabled';
             const blockEnabledKey = 'showBlockRow';
             const treenflixEnabledKey = 'showTreenflixRow';
+            const FALLBACK_IMAGE = "https://i.redd.it/6w3zd8ozw2k21.jpg";
 
             let channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
 
@@ -894,6 +895,10 @@ console.error(`Error sending ${label} request:`, err);
                                     const iconImg = document.createElement("img");
                                     iconImg.setAttribute('class', 'icon');
                                     iconImg.src = icon;
+                                    iconImg.onerror = function() {
+                                        this.src = "https://i.redd.it/6w3zd8ozw2k21.jpg";
+                                        this.onerror = null; 
+                                    };
                                     iconImg.addEventListener("click", function() {
                                         window.location.href = mappedChannelLink;
                                         localStorage.setItem('prevChannel', channelID);
