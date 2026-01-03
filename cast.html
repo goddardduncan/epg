@@ -6,16 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live TV</title>
 
-    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-
     <style>
-        html, body, #video-container {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; position: relative; background-color: #000; touch-action: none; 
-        }
-        #video { width: 100%; height: 100%; }
-
-        /* --- SUBTLE & SMART CAST BUTTON --- */
         google-cast-launcher {
             display: inline-block !important;
             position: fixed !important;
@@ -52,36 +43,98 @@
             opacity: 0;
         }
 
+        html, body, #video-container {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            background-color: #000;
+            touch-action: none; 
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+        }
+
         /* Legacy full-screen description box (Arrow Up) */
         #video-description {
-            position: absolute; bottom: 20px; left: 0; width: 100%;
-            background-color: rgba(0,0,0,0.6); color: #fff; padding: 20px;
-            text-align: center; font-size: 1.5em; font-family: 'Roboto', sans-serif;
-            box-sizing: border-box; display: none; pointer-events: none; z-index: 10;
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0,0,0,0.6);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-family: 'Roboto', sans-serif;
+            box-sizing: border-box;
+            display: none;
+            pointer-events: none;
+            z-index: 10;
         }
 
         /* --- MINI OVERLAY STYLES --- */
         #mini-info-bar {
-            position: fixed; bottom: 50px; left: 50px; display: flex; align-items: center;
-            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); color: white;
-            padding: 25px; border-radius: 15px; transition: all 0.5s ease;
-            opacity: 0; transform: translateY(20px); z-index: 9999;
-            border-left: 6px solid #00aaff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            pointer-events: none; font-family: 'Segoe UI', Roboto, sans-serif; max-width: 700px;
+            position: fixed;
+            bottom: 50px;
+            left: 50px;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            z-index: 9999;
+            border-left: 6px solid #00aaff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            pointer-events: none;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            max-width: 700px;
         }
-        #mini-info-bar.visible { opacity: 1; transform: translateY(0); }
-        .info-image { width: 160px; height: 90px; object-fit: cover; border-radius: 8px; margin-right: 25px; background: #222; }
+
+        #mini-info-bar.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .info-image {
+            width: 160px; 
+            height: 90px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            margin-right: 25px;
+            background: #222;
+        }
+
         .info-content { display: flex; flex-direction: column; flex: 1; }
         .info-channel { font-size: 0.85rem; text-transform: uppercase; color: #00aaff; font-weight: bold; letter-spacing: 1.5px; }
         .info-title { font-size: 1.6rem; font-weight: 600; margin: 2px 0; }
         .info-time { font-size: 1rem; color: #00aaff; margin-bottom: 8px; font-weight: 500; }
-        .info-mini-desc { font-size: 0.95rem; color: #ccc; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* New Integrated Description */
+        .info-mini-desc { 
+            font-size: 0.95rem; 
+            color: #ccc; 
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Limit to 2 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
-<body id="main-body">
-
+<body>
     <div id="video-container">
-        <google-cast-launcher id="cast-button"></google-cast-launcher>
+	<google-cast-launcher id="cast-button"></google-cast-launcher>
         <video id="video" autoplay controls playsinline></video>
         <div id="video-description"></div>
     </div>
@@ -98,12 +151,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
-    <script>
         // --- CAST SDK LOGIC ---
         window.__onGCastApiAvailable = function(isAvailable) {
             if (isAvailable) { initializeCastApi(); }
         };
-
+    <script>
         function initializeCastApi() {
             const context = cast.framework.CastContext.getInstance();
             context.setOptions({
@@ -131,7 +183,6 @@
             const request = new chrome.cast.media.LoadRequest(mediaInfo);
             session.loadMedia(request).then(() => video.pause(), (err) => console.error(err));
         }
-
         // --- FULLSCREEN HIDER ---
         document.addEventListener('fullscreenchange', handleFullscreen);
         document.addEventListener('webkitfullscreenchange', handleFullscreen);
@@ -143,33 +194,55 @@
             }
         }
 
-        // --- ORIGINAL PLAYER & EPG LOGIC ---
+    </script>
+    <script>
+        // --- Globals (Legacy Var Support) ---
         var channelSourceKey = 'channelSource';
         var channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
+
         var DOUBLE_CLICK_TIME_MS = 500;
         var TRIPLE_TAP_TIME_MS = 600;
         var STANDBY_URL = 'https://dj.dunc.app/control/standby';
         var ON_URL = 'https://dj.dunc.app/control/epg';
         var SWIPE_THRESHOLD = 70;
+
         var lastContextMenuTimestamp = 0;
         var contextMenuTimer = null;
-        var touchStartX = 0, touchEndX = 0, tapCount = 0, tapTimer = null;
+        var touchStartX = 0;
+        var touchEndX = 0;
+        var tapCount = 0;
+        var tapTimer = null;
+        
         var video = document.getElementById('video');
         var videoContainer = document.getElementById('video-container');
 
+        // --- Helpers ---
+        
+        // Fixed to handle squashed regional names like 5NSW
         function cleanTitle(str) {
             if (!str) return "";
-            return str.toUpperCase().replace(/DMG|VIC|MEL|NSW|SYD|SBST/gi, '').replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+            return str.toUpperCase()
+                .replace(/DMG|VIC|MEL|NSW|SYD|SBST/gi, '')
+                .replace(/-/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
         }
 
         function changeChannel(direction, channelsOrder, currentIndex, channelLinkMap) {
-            var idx = (direction === 'prev') ? currentIndex - 1 : currentIndex + 1;
-            if (idx < 0) idx = channelsOrder.length - 1;
-            if (idx >= channelsOrder.length) idx = 0;
+            var idx;
+            if (direction === 'prev') {
+                idx = currentIndex - 1;
+                if (idx < 0) idx = channelsOrder.length - 1;
+            } else {
+                idx = (currentIndex + 1) % channelsOrder.length;
+            }
             var target = channelsOrder[idx];
             if (target && channelLinkMap[target.id]) {
                 localStorage.setItem('selectedChannel', target.id);
-                if (channelsOrder[currentIndex]) localStorage.setItem('prevChannel', channelsOrder[currentIndex].id);
+                // Save current as previous before leaving
+                if (channelsOrder[currentIndex]) {
+                    localStorage.setItem('prevChannel', channelsOrder[currentIndex].id);
+                }
                 window.location.href = channelLinkMap[target.id];
             }
         }
@@ -184,23 +257,32 @@
         }
 
         function disableSubtitles() {
-            var tracks = video.textTracks, found = false;
+            var tracks = video.textTracks;
+            var found = false;
             for (var i = 0; i < tracks.length; i++) {
                 if (tracks[i].kind === 'subtitles' || tracks[i].kind === 'captions') {
-                    tracks[i].mode = 'hidden'; found = true;
+                    tracks[i].mode = 'hidden';
+                    found = true;
                 }
             }
             return found;
         }
 
         function sendRequest(url, commandName) {
-            fetch(url, { method: 'POST' }).catch(e => console.error(commandName, e));
+            fetch(url, { method: 'POST' })
+                .then(function(response) { if (response.ok) console.log(commandName + " sent."); })
+                .catch(function(error) { console.error("Error sending " + commandName, error); });
         }
 
         function getUrlParameter(name) {
             var regex = new RegExp('[?&]' + name + '=([^&#]*)');
             var result = regex.exec(window.location.search);
             return result ? decodeURIComponent(result[1]) : '';
+        }
+
+        function getUrlParameterCheck(name, url) {
+            var base = 'https://goddardduncan.github.io/epg/';
+            return url.indexOf(base) !== -1 ? url.slice(url.indexOf(base) + base.length) : url;
         }
 
         function parseEpgDate(str) {
@@ -215,90 +297,193 @@
 
         function fetchEPGData(selectedChannel) {
             fetch("https://epg.dunc.app/epg.xml")
-                .then(r => r.text())
-                .then(t => {
+                .then(function(r) { return r.text(); })
+                .then(function(t) {
                     var xml = new DOMParser().parseFromString(t, "text/xml");
                     var now = new Date();
                     var progs = xml.getElementsByTagName("programme");
+
                     for (var i = 0; i < progs.length; i++) {
                         var p = progs[i];
                         if (p.getAttribute("channel") !== selectedChannel) continue;
-                        var start = parseEpgDate(p.getAttribute("start")), stop = parseEpgDate(p.getAttribute("stop"));
+                        
+                        var start = parseEpgDate(p.getAttribute("start"));
+                        var stop = parseEpgDate(p.getAttribute("stop"));
+                        
                         if (now >= start && now <= stop) {
-                            var title = p.getElementsByTagName("title")[0]?.textContent || "Loading...";
-                            var icon = p.getElementsByTagName("icon")[0]?.getAttribute("src") || "";
-                            var desc = p.getElementsByTagName("desc")[0]?.textContent || "No description available";
+                            var titleEl = p.getElementsByTagName("title")[0];
+                            var iconEl = p.getElementsByTagName("icon")[0];
+                            var descEl = p.getElementsByTagName("desc")[0];
+
+                            var title = titleEl ? titleEl.textContent : "Loading...";
+                            var icon = iconEl ? iconEl.getAttribute("src") : "";
+                            var desc = descEl ? descEl.textContent : "No description available";
+                            
                             document.getElementById('info-ch-name').innerText = cleanTitle(selectedChannel);
                             document.getElementById('info-program').innerText = title;
-                            document.getElementById('info-img').src = icon;
+                            document.getElementById('info-img').src = icon || "";
                             document.getElementById('info-duration').innerText = formatTime(start) + " - " + formatTime(stop);
+                            
+                            // Update the mini-bar description and the legacy full-screen description
                             document.getElementById('info-desc-text').innerText = desc;
                             document.getElementById("video-description").innerText = desc;
+
                             var bar = document.getElementById('mini-info-bar');
                             bar.classList.add('visible');
-                            setTimeout(() => bar.classList.remove('visible'), 5000);
+                            setTimeout(function() { bar.classList.remove('visible'); }, 5000);
                             break;
                         }
                     }
-                });
+                }).catch(function(e) { console.error("EPG error", e); });
         }
 
+        // --- Main Initialization ---
         document.addEventListener("DOMContentLoaded", function() {
-            var channelsOrder = []; var channelLinkMap = {};
-            fetch('channelorder.json').then(r => r.json()).then(data => {
-                channelsOrder = data; return fetch(channelSource).then(r => r.json());
-            }).then(data => {
-                channelLinkMap = data; runPlayer(channelsOrder, channelLinkMap);
-            });
+            var channelsOrder = [];
+            var channelLinkMap = {};
+
+            fetch('channelorder.json')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    channelsOrder = data;
+                    return fetch(channelSource).then(function(r) { return r.json(); });
+                })
+                .then(function(data) {
+                    channelLinkMap = data;
+                    runPlayer(channelsOrder, channelLinkMap);
+                })
+                .catch(function(err) { console.error("Load error", err); });
         });
 
         function runPlayer(channelsOrder, channelLinkMap) {
             var urlParameter = getUrlParameter('url');
-            var urlCheck = window.location.href.split('epg/')[1] || window.location.href;
+            var streamKey = getUrlParameter('stream');
+            var urlCheck = getUrlParameterCheck('url', window.location.href);
+
+            // Stream Loading Logic
             if (urlParameter) {
                 if (Hls.isSupported()) {
-                    var hls = new Hls(); hls.loadSource(urlParameter); hls.attachMedia(video);
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+                    var hls = new Hls();
+                    hls.loadSource(urlParameter);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play(); });
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = urlParameter; video.play();
+                    video.src = urlParameter;
+                    video.play();
+                }
+            } else if (streamKey) {
+                var stored = JSON.parse(localStorage.getItem('m3u8Files') || '{}');
+                if (stored[streamKey]) {
+                    var blob = new Blob([stored[streamKey]], { type: 'application/vnd.apple.mpegurl' });
+                    var blobUrl = URL.createObjectURL(blob);
+                    if (Hls.isSupported()) {
+                        var hls = new Hls();
+                        hls.loadSource(blobUrl);
+                        hls.attachMedia(video);
+                    } else { video.src = blobUrl; video.play(); }
                 }
             }
-            setInterval(() => { if (disableSubtitles()) clearInterval(); }, 500);
-            var selectedChannel = localStorage.getItem('selectedChannel');
-            for (var id in channelLinkMap) { if (channelLinkMap[id].includes(urlCheck)) { selectedChannel = id; localStorage.setItem('selectedChannel', id); break; } }
-            var currentIndex = channelsOrder.findIndex(c => c.id === selectedChannel);
-            var prevIndex = channelsOrder.findIndex(c => c.id === localStorage.getItem('prevChannel'));
-            if (currentIndex !== -1) { document.title = channelsOrder[currentIndex].name; fetchEPGData(selectedChannel); }
 
-            document.addEventListener("contextmenu", (e) => {
-                e.preventDefault(); var now = Date.now();
+            // Subtitle cleanup logic
+            var subtitleInterval = setInterval(function() {
+                if (disableSubtitles()) {
+                    setTimeout(disableSubtitles, 2000);
+                    clearInterval(subtitleInterval);
+                }
+            }, 500);
+
+            // Channel identification logic
+            var selectedChannel = localStorage.getItem('selectedChannel');
+            for (var id in channelLinkMap) {
+                if (channelLinkMap[id] === urlCheck) {
+                    selectedChannel = id;
+                    localStorage.setItem('selectedChannel', id);
+                    break;
+                }
+            }
+
+            // Find current and previous indices for navigation
+            var currentIndex = -1;
+            for (var i = 0; i < channelsOrder.length; i++) {
+                if (channelsOrder[i].id === selectedChannel) { currentIndex = i; break; }
+            }
+
+            var prevId = localStorage.getItem('prevChannel');
+            var prevIndex = -1;
+            for (var j = 0; j < channelsOrder.length; j++) {
+                if (channelsOrder[j].id === prevId) { prevIndex = j; break; }
+            }
+
+            if (currentIndex !== -1) {
+                document.title = channelsOrder[currentIndex].name;
+            }
+
+            if (selectedChannel) fetchEPGData(selectedChannel);
+
+            // --- Control Event Listeners ---
+
+            // Right Click / Context Menu logic (Subtitles / On / Standby)
+            document.addEventListener("contextmenu", function(e) {
+                e.preventDefault();
+                var now = Date.now();
                 if (now - lastContextMenuTimestamp < DOUBLE_CLICK_TIME_MS) {
-                    clearTimeout(contextMenuTimer); sendRequest(STANDBY_URL, 'Standby');
+                    clearTimeout(contextMenuTimer);
+                    sendRequest(STANDBY_URL, 'Standby');
                 } else {
                     toggleSubtitles();
-                    contextMenuTimer = setTimeout(() => sendRequest(ON_URL, 'On'), DOUBLE_CLICK_TIME_MS);
+                    contextMenuTimer = setTimeout(function() { sendRequest(ON_URL, 'On'); }, DOUBLE_CLICK_TIME_MS);
                 }
                 lastContextMenuTimestamp = now;
             });
 
-            videoContainer.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
-            videoContainer.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX; var dist = touchEndX - touchStartX;
-                if (Math.abs(dist) > SWIPE_THRESHOLD) changeChannel(dist > 0 ? 'prev' : 'next', channelsOrder, currentIndex, channelLinkMap);
-                else {
-                    tapCount++; clearTimeout(tapTimer);
-                    tapTimer = setTimeout(() => { if (tapCount === 3) window.location.href = 'index.html'; tapCount = 0; }, TRIPLE_TAP_TIME_MS);
+            // Touch Gestures (Swipe to change / Triple Tap to home)
+            videoContainer.addEventListener('touchstart', function(e) { 
+                touchStartX = e.changedTouches[0].screenX; 
+            }, {passive: true});
+
+            videoContainer.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                var dist = touchEndX - touchStartX;
+                if (Math.abs(dist) > SWIPE_THRESHOLD) {
+                    tapCount = 0; clearTimeout(tapTimer);
+                    changeChannel(dist > 0 ? 'prev' : 'next', channelsOrder, currentIndex, channelLinkMap);
+                } else {
+                    tapCount++;
+                    clearTimeout(tapTimer);
+                    tapTimer = setTimeout(function() {
+                        if (tapCount === 3) window.location.href = 'index.html';
+                        tapCount = 0;
+                    }, TRIPLE_TAP_TIME_MS);
                 }
             }, {passive: true});
 
-            window.addEventListener("keydown", (ev) => {
-                if (ev.key === "Enter") video.play();
-                else if (ev.key === "ArrowLeft") changeChannel('prev', channelsOrder, currentIndex, channelLinkMap);
-                else if (ev.key === "ArrowRight") changeChannel('next', channelsOrder, currentIndex, channelLinkMap);
-                else if (ev.key === "ArrowUp") { var d = document.getElementById('video-description'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; }
-                else if (ev.key === "ArrowDown") video.muted = !video.muted;
-                else if (ev.key.toLowerCase() === 'i') fetchEPGData(selectedChannel);
-                else if (ev.key === "Escape" && prevIndex !== -1) window.location.href = channelLinkMap[channelsOrder[prevIndex].id];
+            // Keyboard Controls
+            window.addEventListener("keydown", function(ev) {
+                if (ev.key === "Enter") {
+                    video.play();
+                } else if (ev.key === "Escape" || (ev.key === "ArrowLeft" && ev.metaKey)) {
+                    ev.preventDefault();
+                    if (prevIndex !== -1) {
+                        window.location.href = channelLinkMap[channelsOrder[prevIndex].id];
+                    }
+                } else if (ev.key === "ArrowLeft") {
+                    changeChannel('prev', channelsOrder, currentIndex, channelLinkMap);
+                } else if (ev.key === "ArrowRight") {
+                    changeChannel('next', channelsOrder, currentIndex, channelLinkMap);
+                } else if (ev.key === "ArrowUp") {
+                    var desc = document.getElementById('video-description');
+                    desc.style.display = desc.style.display === 'block' ? 'none' : 'block';
+                } else if (ev.key === "ArrowDown") {
+                    video.muted = !video.muted;
+                    var tracks = video.textTracks;
+                    for (var k = 0; k < tracks.length; k++) {
+                        if (tracks[k].kind === 'subtitles' || tracks[k].kind === 'captions') {
+                            tracks[k].mode = video.muted ? 'showing' : 'hidden';
+                        }
+                    }
+                } else if (ev.key.toLowerCase() === 'i') {
+                    fetchEPGData(selectedChannel);
+                }
             });
         }
     </script>
