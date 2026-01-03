@@ -121,7 +121,7 @@
         function cleanTitle(str) {
             if (!str) return "";
             return str.replace(/-/g, ' ')
-                      .replace(/\b(DMG|VIC|MEL)\b/gi, '')
+                      .replace(/\b(DMG|VIC|MEL|NSW|SYD|SBST)\b/gi, '')
                       .replace(/\s+/g, ' ')
                       .trim()
                       .toUpperCase();
