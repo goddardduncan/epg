@@ -97,97 +97,96 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <script>
-        const channelSourceKey = 'channelSource';
-        const channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
+        // --- Globals (Legacy Var) ---
+        var channelSourceKey = 'channelSource';
+        var channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
 
-        const DOUBLE_CLICK_TIME_MS = 500;
-        const TRIPLE_TAP_TIME_MS = 600;
-        const STANDBY_URL = 'https://dj.dunc.app/control/standby';
-        const ON_URL = 'https://dj.dunc.app/control/epg';
-        const SWIPE_THRESHOLD = 70;
+        var DOUBLE_CLICK_TIME_MS = 500;
+        var TRIPLE_TAP_TIME_MS = 600;
+        var STANDBY_URL = 'https://dj.dunc.app/control/standby';
+        var ON_URL = 'https://dj.dunc.app/control/epg';
+        var SWIPE_THRESHOLD = 70;
 
-        let lastContextMenuTimestamp = 0;
-        let contextMenuTimer = null;
-        let touchStartX = 0;
-        let touchEndX = 0;
-        let tapCount = 0;
-        let tapTimer = null;
+        var lastContextMenuTimestamp = 0;
+        var contextMenuTimer = null;
+        var touchStartX = 0;
+        var touchEndX = 0;
+        var tapCount = 0;
+        var tapTimer = null;
         
-        const video = document.getElementById('video');
-        const videoContainer = document.getElementById('video-container');
+        var video = document.getElementById('video');
+        var videoContainer = document.getElementById('video-container');
 
-        // --- Helper: Clean Titles ---
+        // --- Helpers ---
         function cleanTitle(str) {
             if (!str) return "";
-            // Removes DMG, VIC, MEL (case insensitive) and cleans up extra dashes/spaces
-            return str
-                .replace(/-/g, ' ')
-                .replace(/\b(DMG|VIC|MEL)\b/gi, '')
-                .replace(/\s+/g, ' ')
-                .trim()
-                .toUpperCase();
+            return str.replace(/-/g, ' ')
+                      .replace(/\b(DMG|VIC|MEL)\b/gi, '')
+                      .replace(/\s+/g, ' ')
+                      .trim()
+                      .toUpperCase();
         }
 
-        // --- Shared Logic ---
         function changeChannel(direction, channelsOrder, currentIndex, channelLinkMap) {
-            let idx;
+            var idx;
             if (direction === 'prev') {
                 idx = currentIndex - 1;
                 if (idx < 0) idx = channelsOrder.length - 1;
             } else {
                 idx = (currentIndex + 1) % channelsOrder.length;
             }
-            const target = channelsOrder[idx];
+            var target = channelsOrder[idx];
             if (target && channelLinkMap[target.id]) {
                 localStorage.setItem('selectedChannel', target.id);
-                location.href = channelLinkMap[target.id];
+                // Save current as previous before leaving
+                if (channelsOrder[currentIndex]) {
+                    localStorage.setItem('prevChannel', channelsOrder[currentIndex].id);
+                }
+                window.location.href = channelLinkMap[target.id];
             }
         }
 
         function toggleSubtitles() {
-            const tracks = video.textTracks;
-            for (let t of tracks) {
-                if (t.kind === 'subtitles' || t.kind === 'captions') {
-                    t.mode = t.mode === 'showing' ? 'hidden' : 'showing';
+            var tracks = video.textTracks;
+            for (var i = 0; i < tracks.length; i++) {
+                if (tracks[i].kind === 'subtitles' || tracks[i].kind === 'captions') {
+                    tracks[i].mode = (tracks[i].mode === 'showing' ? 'hidden' : 'showing');
                 }
             }
         }
 
         function disableSubtitles() {
-            const tracks = video.textTracks;
-            let found = false;
-            for (let t of tracks) {
-                if (t.kind === 'subtitles' || t.kind === 'captions') {
-                    t.mode = 'hidden';
+            var tracks = video.textTracks;
+            var found = false;
+            for (var i = 0; i < tracks.length; i++) {
+                if (tracks[i].kind === 'subtitles' || tracks[i].kind === 'captions') {
+                    tracks[i].mode = 'hidden';
                     found = true;
                 }
             }
             return found;
         }
 
-        async function sendRequest(url, commandName) {
-            try {
-                const response = await fetch(url, { method: 'POST' });
-                if (response.ok) console.log(`${commandName} command sent.`);
-            } catch (error) { console.error(`Error sending ${commandName}:`, error); }
+        function sendRequest(url, commandName) {
+            fetch(url, { method: 'POST' })
+                .then(function(response) { if (response.ok) console.log(commandName + " sent."); })
+                .catch(function(error) { console.error("Error sending " + commandName, error); });
         }
 
         function getUrlParameter(name) {
-            const regex = new RegExp('[?&]' + name + '=([^&#]*)');
-            const result = regex.exec(location.search);
+            var regex = new RegExp('[?&]' + name + '=([^&#]*)');
+            var result = regex.exec(window.location.search);
             return result ? decodeURIComponent(result[1]) : '';
         }
 
         function getUrlParameterCheck(name, url) {
-            const base = 'https://goddardduncan.github.io/epg/';
-            return url.includes(base) ? url.slice(url.indexOf(base) + base.length) : url;
+            var base = 'https://goddardduncan.github.io/epg/';
+            return url.indexOf(base) !== -1 ? url.slice(url.indexOf(base) + base.length) : url;
         }
 
         function parseEpgDate(str) {
-            // EPG format: 20260103134511 +0000
-            const y = str.substr(0, 4), m = str.substr(4, 2) - 1, d = str.substr(6, 2);
-            const hh = str.substr(8, 2), mm = str.substr(10, 2), ss = str.substr(12, 2);
-            // This creates a Date object interpreted as UTC
+            var y = str.substr(0, 4), m = str.substr(4, 2) - 1, d = str.substr(6, 2);
+            var hh = str.substr(8, 2), mm = str.substr(10, 2), ss = str.substr(12, 2);
             return new Date(Date.UTC(y, m, d, hh, mm, ss));
         }
 
@@ -195,81 +194,103 @@
             return date.toLocaleTimeString("en-AU", { hour: 'numeric', minute: '2-digit', hour12: false });
         }
 
-        // --- Overlay Logic ---
-        async function fetchEPGData(selectedChannel) {
-            try {
-                const r = await fetch("https://epg.dunc.app/epg.xml");
-                const t = await r.text();
-                const xml = new DOMParser().parseFromString(t, "text/xml");
-                const now = new Date(); // Local time
-                const progs = xml.getElementsByTagName("programme");
+        function fetchEPGData(selectedChannel) {
+            fetch("https://epg.dunc.app/epg.xml")
+                .then(function(r) { return r.text(); })
+                .then(function(t) {
+                    var xml = new DOMParser().parseFromString(t, "text/xml");
+                    var now = new Date();
+                    var progs = xml.getElementsByTagName("programme");
 
-                for (const p of progs) {
-                    if (p.getAttribute("channel") !== selectedChannel) continue;
-                    const start = parseEpgDate(p.getAttribute("start"));
-                    const stop = parseEpgDate(p.getAttribute("stop"));
-                    
-                    if (now >= start && now <= stop) {
-                        const title = p.getElementsByTagName("title")[0].textContent;
-                        const icon = p.getElementsByTagName("icon")[0]?.getAttribute("src");
-                        const desc = p.getElementsByTagName("desc")[0]?.textContent || "No description available";
+                    for (var i = 0; i < progs.length; i++) {
+                        var p = progs[i];
+                        if (p.getAttribute("channel") !== selectedChannel) continue;
+                        
+                        var start = parseEpgDate(p.getAttribute("start"));
+                        var stop = parseEpgDate(p.getAttribute("stop"));
+                        
+                        if (now >= start && now <= stop) {
+                            var titleEl = p.getElementsByTagName("title")[0];
+                            var iconEl = p.getElementsByTagName("icon")[0];
+                            var descEl = p.getElementsByTagName("desc")[0];
 
-                        document.getElementById('info-ch-name').innerText = cleanTitle(selectedChannel);
-                        document.getElementById('info-program').innerText = title;
-                        document.getElementById('info-img').src = icon || "";
-                        document.getElementById('info-duration').innerText = `${formatTime(start)} - ${formatTime(stop)}`;
-                        document.getElementById("video-description").innerText = desc;
+                            var title = titleEl ? titleEl.textContent : "Loading...";
+                            var icon = iconEl ? iconEl.getAttribute("src") : "";
+                            var desc = descEl ? descEl.textContent : "No description available";
 
-                        const bar = document.getElementById('mini-info-bar');
-                        bar.classList.add('visible');
-                        setTimeout(() => bar.classList.remove('visible'), 7000);
-                        break;
+                            document.getElementById('info-ch-name').innerText = cleanTitle(selectedChannel);
+                            document.getElementById('info-program').innerText = title;
+                            document.getElementById('info-img').src = icon || "";
+                            document.getElementById('info-duration').innerText = formatTime(start) + " - " + formatTime(stop);
+                            document.getElementById("video-description").innerText = desc;
+
+                            var bar = document.getElementById('mini-info-bar');
+                            bar.classList.add('visible');
+                            setTimeout(function() { bar.classList.remove('visible'); }, 7000);
+                            break;
+                        }
                     }
-                }
-            } catch (e) { console.error(e); }
+                }).catch(function(e) { console.error("EPG error", e); });
         }
 
-        // --- Initialization ---
-        document.addEventListener("DOMContentLoaded", async () => {
-            const channelsOrder = await fetch('channelorder.json').then(r => r.json()).catch(() => []);
-            const channelLinkMap = await fetch(channelSource).then(r => r.json()).catch(() => ({}));
+        // --- Main Init ---
+        document.addEventListener("DOMContentLoaded", function() {
+            var channelsOrder = [];
+            var channelLinkMap = {};
 
-            const urlParameter = getUrlParameter('url');
-            const streamKey = getUrlParameter('stream');
-            const urlCheck = getUrlParameterCheck('url', location.href);
+            fetch('channelorder.json')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    channelsOrder = data;
+                    return fetch(channelSource).then(function(r) { return r.json(); });
+                })
+                .then(function(data) {
+                    channelLinkMap = data;
+                    runPlayer(channelsOrder, channelLinkMap);
+                })
+                .catch(function(err) { console.error("Load error", err); });
+        });
 
+        function runPlayer(channelsOrder, channelLinkMap) {
+            var urlParameter = getUrlParameter('url');
+            var streamKey = getUrlParameter('stream');
+            var urlCheck = getUrlParameterCheck('url', window.location.href);
+
+            // Stream Loading Logic
             if (urlParameter) {
                 if (Hls.isSupported()) {
-                    const hls = new Hls();
+                    var hls = new Hls();
                     hls.loadSource(urlParameter);
                     hls.attachMedia(video);
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play(); });
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                     video.src = urlParameter;
                     video.play();
                 }
             } else if (streamKey) {
-                const stored = JSON.parse(localStorage.getItem('m3u8Files') || '{}');
+                var stored = JSON.parse(localStorage.getItem('m3u8Files') || '{}');
                 if (stored[streamKey]) {
-                    const blob = new Blob([stored[streamKey]], { type: 'application/vnd.apple.mpegurl' });
-                    const blobUrl = URL.createObjectURL(blob);
+                    var blob = new Blob([stored[streamKey]], { type: 'application/vnd.apple.mpegurl' });
+                    var blobUrl = URL.createObjectURL(blob);
                     if (Hls.isSupported()) {
-                        const hls = new Hls();
+                        var hls = new Hls();
                         hls.loadSource(blobUrl);
                         hls.attachMedia(video);
                     } else { video.src = blobUrl; video.play(); }
                 }
             }
 
-            const subtitleInterval = setInterval(() => {
+            // Subtitle cleanup logic
+            var subtitleInterval = setInterval(function() {
                 if (disableSubtitles()) {
                     setTimeout(disableSubtitles, 2000);
                     clearInterval(subtitleInterval);
                 }
             }, 500);
 
-            let selectedChannel = localStorage.getItem('selectedChannel');
-            for (const id in channelLinkMap) {
+            // Channel identification
+            var selectedChannel = localStorage.getItem('selectedChannel');
+            for (var id in channelLinkMap) {
                 if (channelLinkMap[id] === urlCheck) {
                     selectedChannel = id;
                     localStorage.setItem('selectedChannel', id);
@@ -277,71 +298,88 @@
                 }
             }
 
-            const currentIndex = channelsOrder.findIndex(c => c.id === selectedChannel);
-            const prevId = localStorage.getItem('prevChannel');
-            const prevIndex = channelsOrder.findIndex(c => c.id === prevId);
-            const currentObj = channelsOrder.find(c => c.id === selectedChannel);
-            
-            // Set document title without the technical suffixes
-            if (currentObj) document.title = cleanTitle(currentObj.name);
+            // Find current and previous indices
+            var currentIndex = -1;
+            for (var i = 0; i < channelsOrder.length; i++) {
+                if (channelsOrder[i].id === selectedChannel) { currentIndex = i; break; }
+            }
+
+            var prevId = localStorage.getItem('prevChannel');
+            var prevIndex = -1;
+            for (var j = 0; j < channelsOrder.length; j++) {
+                if (channelsOrder[j].id === prevId) { prevIndex = j; break; }
+            }
+
+            if (currentIndex !== -1) {
+                document.title = cleanTitle(channelsOrder[currentIndex].name);
+            }
 
             if (selectedChannel) fetchEPGData(selectedChannel);
 
-            document.addEventListener("contextmenu", async (e) => {
+            // Right Click / Context Menu
+            document.addEventListener("contextmenu", function(e) {
                 e.preventDefault();
-                const now = Date.now();
+                var now = Date.now();
                 if (now - lastContextMenuTimestamp < DOUBLE_CLICK_TIME_MS) {
                     clearTimeout(contextMenuTimer);
-                    await sendRequest(STANDBY_URL, 'Standby');
+                    sendRequest(STANDBY_URL, 'Standby');
                 } else {
                     toggleSubtitles();
-                    contextMenuTimer = setTimeout(() => sendRequest(ON_URL, 'On'), DOUBLE_CLICK_TIME_MS);
+                    contextMenuTimer = setTimeout(function() { sendRequest(ON_URL, 'On'); }, DOUBLE_CLICK_TIME_MS);
                 }
                 lastContextMenuTimestamp = now;
             });
 
-            videoContainer.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, {passive: true});
-            videoContainer.addEventListener('touchend', e => {
+            // Touch Gestures
+            videoContainer.addEventListener('touchstart', function(e) { 
+                touchStartX = e.changedTouches[0].screenX; 
+            }, {passive: true});
+
+            videoContainer.addEventListener('touchend', function(e) {
                 touchEndX = e.changedTouches[0].screenX;
-                const dist = touchEndX - touchStartX;
+                var dist = touchEndX - touchStartX;
                 if (Math.abs(dist) > SWIPE_THRESHOLD) {
                     tapCount = 0; clearTimeout(tapTimer);
                     changeChannel(dist > 0 ? 'prev' : 'next', channelsOrder, currentIndex, channelLinkMap);
                 } else {
                     tapCount++;
                     clearTimeout(tapTimer);
-                    tapTimer = setTimeout(() => {
+                    tapTimer = setTimeout(function() {
                         if (tapCount === 3) window.location.href = 'index.html';
                         tapCount = 0;
                     }, TRIPLE_TAP_TIME_MS);
                 }
             }, {passive: true});
 
-            window.addEventListener("keydown", ev => {
-                if (ev.key === "Enter") video.play();
-                else if (ev.key === "Escape" || (ev.key === "ArrowLeft" && ev.metaKey)) {
+            // Keyboard Controls
+            window.addEventListener("keydown", function(ev) {
+                if (ev.key === "Enter") {
+                    video.play();
+                } else if (ev.key === "Escape" || (ev.key === "ArrowLeft" && ev.metaKey)) {
                     ev.preventDefault();
-                    const back = channelsOrder[prevIndex];
-                    if (back) location.href = channelLinkMap[back.id];
-                }
-                else if (ev.key === "ArrowLeft") changeChannel('prev', channelsOrder, currentIndex, channelLinkMap);
-                else if (ev.key === "ArrowRight") changeChannel('next', channelsOrder, currentIndex, channelLinkMap);
-                else if (ev.key === "ArrowUp") {
-                    const desc = document.getElementById('video-description');
+                    if (prevIndex !== -1) {
+                        window.location.href = channelLinkMap[channelsOrder[prevIndex].id];
+                    }
+                } else if (ev.key === "ArrowLeft") {
+                    changeChannel('prev', channelsOrder, currentIndex, channelLinkMap);
+                } else if (ev.key === "ArrowRight") {
+                    changeChannel('next', channelsOrder, currentIndex, channelLinkMap);
+                } else if (ev.key === "ArrowUp") {
+                    var desc = document.getElementById('video-description');
                     desc.style.display = desc.style.display === 'block' ? 'none' : 'block';
-                }
-                else if (ev.key === "ArrowDown") {
+                } else if (ev.key === "ArrowDown") {
                     video.muted = !video.muted;
-                    const tracks = video.textTracks;
-                    for (let t of tracks) {
-                        if (t.kind === 'subtitles' || t.kind === 'captions') {
-                            t.mode = video.muted ? 'showing' : 'hidden';
+                    var tracks = video.textTracks;
+                    for (var k = 0; k < tracks.length; k++) {
+                        if (tracks[k].kind === 'subtitles' || tracks[k].kind === 'captions') {
+                            tracks[k].mode = video.muted ? 'showing' : 'hidden';
                         }
                     }
+                } else if (ev.key.toLowerCase() === 'i') {
+                    fetchEPGData(selectedChannel);
                 }
-                else if (ev.key.toLowerCase() === 'i') fetchEPGData(selectedChannel);
             });
-        });
+        }
     </script>
 </body>
 </html>
