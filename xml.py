@@ -49,7 +49,7 @@ REPLACEMENT_RULES = [
   # Channel 7 channels
   {'from': '96100auepg.com.au', 'to': 'dmg-seven-mel'},
   {'from': '410799auepg.com.au', 'to': 'dmg-7two-mel'},
-  {'from': '388547auepg.com.au', 'to': 'dmg-7mate-mel'},
+  {'from': '432003auepg.com.au', 'to': 'dmg-7mate-mel'},
   {'from': '431544auepg.com.au', 'to': 'dmg-7flix-mel'},
 
   # Channel 9 channels
