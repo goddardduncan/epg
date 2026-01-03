@@ -94,6 +94,17 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        @media screen and (max-width: 500px) {
+        #mini-info-bar {
+            display: none !important;
+        }
+    
+        /* Optional: Also hide the legacy description if it's too big for small screens */
+        #video-description {
+            font-size: 1rem;
+            padding: 10px;
+        }
+    }
     </style>
 </head>
 <body>
