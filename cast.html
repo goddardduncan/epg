@@ -25,25 +25,23 @@
             height: 100%;
         }
 
-        /* --- CAST BUTTON STYLING --- */
-        #cast-button {
-            position: absolute;
-            top: 25px;
-            right: 25px;
+        /* --- ALWAYS VISIBLE CAST BUTTON --- */
+        google-cast-launcher {
+            display: inline-block !important; /* Forces visibility */
+            position: fixed !important;
+            top: 20px;
+            right: 20px;
             width: 44px;
             height: 44px;
-            z-index: 10000;
+            z-index: 2147483647 !important; /* Max z-index to stay on top */
             cursor: pointer;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 50%;
-            padding: 5px;
-            transition: background 0.3s ease;
+            padding: 4px;
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             --connected-color: #00aaff;
             --disconnected-color: #ffffff;
-        }
-
-        #cast-button:hover {
-            background: rgba(0, 170, 255, 0.2);
         }
 
         /* Legacy full-screen description box (Arrow Up) */
@@ -140,7 +138,7 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <script>
-        // --- Cast Initialization ---
+        // --- Cast SDK Logic ---
         window.__onGCastApiAvailable = function(isAvailable) {
             if (isAvailable) {
                 initializeCastApi();
@@ -173,7 +171,7 @@
             metadata.subtitle = document.getElementById('info-ch-name').innerText;
             
             const iconSrc = document.getElementById('info-img').src;
-            if (iconSrc && !iconSrc.includes(window.location.hostname === '')) {
+            if (iconSrc && iconSrc.startsWith('http')) {
                 metadata.images = [{ url: iconSrc }];
             }
 
@@ -181,14 +179,18 @@
             const request = new chrome.cast.media.LoadRequest(mediaInfo);
             
             session.loadMedia(request).then(
-                function() { video.pause(); },
+                function() { 
+                    console.log('Casting started');
+                    video.pause(); 
+                },
                 function(err) { console.error('Cast Error: ', err); }
             );
         }
 
-        // --- Globals ---
+        // --- Original Globals ---
         var channelSourceKey = 'channelSource';
         var channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
+
         var DOUBLE_CLICK_TIME_MS = 500;
         var TRIPLE_TAP_TIME_MS = 600;
         var STANDBY_URL = 'https://dj.dunc.app/control/standby';
@@ -205,7 +207,7 @@
         var video = document.getElementById('video');
         var videoContainer = document.getElementById('video-container');
 
-        // --- Helpers ---
+        // --- Original Helpers ---
         function cleanTitle(str) {
             if (!str) return "";
             return str.toUpperCase()
@@ -309,6 +311,7 @@
                             document.getElementById('info-program').innerText = title;
                             document.getElementById('info-img').src = icon || "";
                             document.getElementById('info-duration').innerText = formatTime(start) + " - " + formatTime(stop);
+                            
                             document.getElementById('info-desc-text').innerText = desc;
                             document.getElementById("video-description").innerText = desc;
 
@@ -400,7 +403,7 @@
 
             if (selectedChannel) fetchEPGData(selectedChannel);
 
-            // --- Control Event Listeners ---
+            // --- Event Listeners ---
             document.addEventListener("contextmenu", function(e) {
                 e.preventDefault();
                 var now = Date.now();
