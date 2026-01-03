@@ -121,14 +121,15 @@
         function cleanTitle(str) {
         if (!str) return "";
         return str
-            // 1. Remove specific tags and hyphens
-            .replace(/\b(DMG|VIC|MEL|NSW|SYD|SBST)\b/gi, '')
-            // 2. Replace all hyphens with spaces
+            // 1. Convert to Uppercase first for easier matching
+            .toUpperCase()
+            // 2. Remove tags even if they are squashed (e.g., 5NSW -> 5)
+            .replace(/DMG|VIC|MEL|NSW|SYD|SBST/gi, '')
+            // 3. Replace hyphens with spaces
             .replace(/-/g, ' ')
-            // 3. Clean up extra spaces
+            // 4. Collapse multiple spaces into one
             .replace(/\s+/g, ' ')
-            .trim()
-            .toUpperCase();
+            .trim();
         }
 
         function changeChannel(direction, channelsOrder, currentIndex, channelLinkMap) {
