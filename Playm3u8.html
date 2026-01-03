@@ -334,7 +334,7 @@
             }
 
             if (currentIndex !== -1) {
-                document.title = cleanTitle(channelsOrder[currentIndex].name);
+                document.title = channelsOrder[currentIndex].name;
             }
 
             if (selectedChannel) fetchEPGData(selectedChannel);
