@@ -237,8 +237,8 @@
                             var title = titleEl ? titleEl.textContent : "Loading...";
                             var icon = iconEl ? iconEl.getAttribute("src") : "";
                             var desc = descEl ? descEl.textContent : "No description available";
-
-                            document.getElementById('info-ch-name').innerText = channelsOrder[currentIndex].name;
+                            
+                            document.getElementById('info-ch-name').innerText = cleanTitle(selectedChannel);
                             document.getElementById('info-program').innerText = title;
                             document.getElementById('info-img').src = icon || "";
                             document.getElementById('info-duration').innerText = formatTime(start) + " - " + formatTime(stop);
