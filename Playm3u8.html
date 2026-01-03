@@ -23,14 +23,15 @@
             height: 100%;
         }
 
+        /* Legacy full-screen description box (Arrow Up) */
         #video-description {
             position: absolute;
             bottom: 20px;
             left: 0;
             width: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0,0,0,0.6);
             color: #fff;
-            padding: 10px;
+            padding: 20px;
             text-align: center;
             font-size: 1.5em;
             font-family: 'Roboto', sans-serif;
@@ -50,7 +51,7 @@
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(10px);
             color: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
             transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
             opacity: 0;
@@ -60,23 +61,39 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             pointer-events: none;
             font-family: 'Segoe UI', Roboto, sans-serif;
+            max-width: 700px;
         }
+
         #mini-info-bar.visible {
             opacity: 1;
             transform: translateY(0);
         }
+
         .info-image {
-            width: 140px; 
-            height: 80px; 
+            width: 160px; 
+            height: 90px; 
             object-fit: cover; 
             border-radius: 8px; 
-            margin-right: 20px;
+            margin-right: 25px;
             background: #222;
         }
-        .info-content { display: flex; flex-direction: column; }
+
+        .info-content { display: flex; flex-direction: column; flex: 1; }
         .info-channel { font-size: 0.85rem; text-transform: uppercase; color: #00aaff; font-weight: bold; letter-spacing: 1.5px; }
         .info-title { font-size: 1.6rem; font-weight: 600; margin: 2px 0; }
-        .info-time { font-size: 0.95rem; color: #bbb; }
+        .info-time { font-size: 1rem; color: #00aaff; margin-bottom: 8px; font-weight: 500; }
+        
+        /* New Integrated Description */
+        .info-mini-desc { 
+            font-size: 0.95rem; 
+            color: #ccc; 
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Limit to 2 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body>
@@ -91,13 +108,14 @@
             <div id="info-ch-name" class="info-channel">LIVE STREAM</div>
             <div id="info-program" class="info-title">Loading...</div>
             <div id="info-duration" class="info-time">--:-- - --:--</div>
+            <div id="info-desc-text" class="info-mini-desc"></div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <script>
-        // --- Globals (Legacy Var) ---
+        // --- Globals (Legacy Var Support) ---
         var channelSourceKey = 'channelSource';
         var channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
 
@@ -118,18 +136,15 @@
         var videoContainer = document.getElementById('video-container');
 
         // --- Helpers ---
+        
+        // Fixed to handle squashed regional names like 5NSW
         function cleanTitle(str) {
-        if (!str) return "";
-        return str
-            // 1. Convert to Uppercase first for easier matching
-            .toUpperCase()
-            // 2. Remove tags even if they are squashed (e.g., 5NSW -> 5)
-            .replace(/DMG|VIC|MEL|NSW|SYD|SBST/gi, '')
-            // 3. Replace hyphens with spaces
-            .replace(/-/g, ' ')
-            // 4. Collapse multiple spaces into one
-            .replace(/\s+/g, ' ')
-            .trim();
+            if (!str) return "";
+            return str.toUpperCase()
+                .replace(/DMG|VIC|MEL|NSW|SYD|SBST/gi, '')
+                .replace(/-/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
         }
 
         function changeChannel(direction, channelsOrder, currentIndex, channelLinkMap) {
@@ -227,18 +242,21 @@
                             document.getElementById('info-program').innerText = title;
                             document.getElementById('info-img').src = icon || "";
                             document.getElementById('info-duration').innerText = formatTime(start) + " - " + formatTime(stop);
+                            
+                            // Update the mini-bar description and the legacy full-screen description
+                            document.getElementById('info-desc-text').innerText = desc;
                             document.getElementById("video-description").innerText = desc;
 
                             var bar = document.getElementById('mini-info-bar');
                             bar.classList.add('visible');
-                            setTimeout(function() { bar.classList.remove('visible'); }, 7000);
+                            setTimeout(function() { bar.classList.remove('visible'); }, 8000);
                             break;
                         }
                     }
                 }).catch(function(e) { console.error("EPG error", e); });
         }
 
-        // --- Main Init ---
+        // --- Main Initialization ---
         document.addEventListener("DOMContentLoaded", function() {
             var channelsOrder = [];
             var channelLinkMap = {};
@@ -293,7 +311,7 @@
                 }
             }, 500);
 
-            // Channel identification
+            // Channel identification logic
             var selectedChannel = localStorage.getItem('selectedChannel');
             for (var id in channelLinkMap) {
                 if (channelLinkMap[id] === urlCheck) {
@@ -303,7 +321,7 @@
                 }
             }
 
-            // Find current and previous indices
+            // Find current and previous indices for navigation
             var currentIndex = -1;
             for (var i = 0; i < channelsOrder.length; i++) {
                 if (channelsOrder[i].id === selectedChannel) { currentIndex = i; break; }
@@ -321,7 +339,9 @@
 
             if (selectedChannel) fetchEPGData(selectedChannel);
 
-            // Right Click / Context Menu
+            // --- Control Event Listeners ---
+
+            // Right Click / Context Menu logic (Subtitles / On / Standby)
             document.addEventListener("contextmenu", function(e) {
                 e.preventDefault();
                 var now = Date.now();
@@ -335,7 +355,7 @@
                 lastContextMenuTimestamp = now;
             });
 
-            // Touch Gestures
+            // Touch Gestures (Swipe to change / Triple Tap to home)
             videoContainer.addEventListener('touchstart', function(e) { 
                 touchStartX = e.changedTouches[0].screenX; 
             }, {passive: true});
