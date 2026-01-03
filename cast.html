@@ -15,34 +15,41 @@
         }
         #video { width: 100%; height: 100%; }
 
-        /* --- DISCREET TRANSPARENT GREY CAST BUTTON --- */
+        /* --- SUBTLE & SMART CAST BUTTON --- */
         google-cast-launcher {
             display: inline-block !important;
             position: fixed !important;
-            top: 20px;
-            right: 20px;
-            width: 44px;
-            height: 44px;
-            z-index: 2147483647 !important; /* Always on top */
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            z-index: 2147483647 !important;
             cursor: pointer;
             
-            /* Visual Style */
-            background: rgba(255, 255, 255, 0.15) !important; 
-            backdrop-filter: blur(8px); /* Frosted glass effect */
-            -webkit-backdrop-filter: blur(8px);
+            /* Mostly Invisible State */
+            background: rgba(255, 255, 255, 0.05) !important; 
+            opacity: 0.3;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             border-radius: 50%;
-            padding: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: background 0.3s ease, transform 0.2s ease;
+            padding: 2px;
+            transition: opacity 0.4s ease, background 0.4s ease, visibility 0.3s;
             
             /* Icon Colors */
             --connected-color: #00aaff;
-            --disconnected-color: rgba(255, 255, 255, 0.7);
+            --disconnected-color: rgba(255, 255, 255, 0.5);
         }
 
+        /* Hover makes it slightly more visible */
         google-cast-launcher:hover {
-            background: rgba(255, 255, 255, 0.25) !important;
-            transform: scale(1.05);
+            opacity: 0.8;
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        /* Logic for hiding during Fullscreen */
+        .fullscreen-active google-cast-launcher {
+            visibility: hidden;
+            opacity: 0;
         }
 
         /* Legacy full-screen description box (Arrow Up) */
@@ -62,7 +69,6 @@
             border-left: 6px solid #00aaff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             pointer-events: none; font-family: 'Segoe UI', Roboto, sans-serif; max-width: 700px;
         }
-
         #mini-info-bar.visible { opacity: 1; transform: translateY(0); }
         .info-image { width: 160px; height: 90px; object-fit: cover; border-radius: 8px; margin-right: 25px; background: #222; }
         .info-content { display: flex; flex-direction: column; flex: 1; }
@@ -72,7 +78,7 @@
         .info-mini-desc { font-size: 0.95rem; color: #ccc; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
     </style>
 </head>
-<body>
+<body id="main-body">
 
     <div id="video-container">
         <google-cast-launcher id="cast-button"></google-cast-launcher>
@@ -95,10 +101,7 @@
     <script>
         // --- CAST SDK LOGIC ---
         window.__onGCastApiAvailable = function(isAvailable) {
-            if (isAvailable) {
-                console.log("✅ Cast API Available");
-                initializeCastApi();
-            }
+            if (isAvailable) { initializeCastApi(); }
         };
 
         function initializeCastApi() {
@@ -108,45 +111,39 @@
                 autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
                 resumeSavedSession: true
             });
-
-            context.addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED, function(event) {
-                console.log("📡 Cast State:", event.castState);
-            });
-
             context.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, function(event) {
-                if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
-                    loadMediaOnChromecast();
-                }
+                if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) { loadMediaOnChromecast(); }
             });
         }
 
         function loadMediaOnChromecast() {
             const streamUrl = getUrlParameter('url');
             if (!streamUrl) return;
-
             const session = cast.framework.CastContext.getInstance().getCurrentSession();
             const mediaInfo = new chrome.cast.media.MediaInfo(streamUrl, 'application/x-mpegurl');
             mediaInfo.streamType = chrome.cast.media.StreamType.LIVE;
-            
             const metadata = new chrome.cast.media.GenericMediaMetadata();
             metadata.title = document.getElementById('info-program').innerText;
             metadata.subtitle = document.getElementById('info-ch-name').innerText;
-            
             const iconSrc = document.getElementById('info-img').src;
-            if (iconSrc && iconSrc.startsWith('http')) {
-                metadata.images = [{ url: iconSrc }];
-            }
-
+            if (iconSrc && iconSrc.startsWith('http')) { metadata.images = [{ url: iconSrc }]; }
             mediaInfo.metadata = metadata;
             const request = new chrome.cast.media.LoadRequest(mediaInfo);
-            
-            session.loadMedia(request).then(
-                function() { video.pause(); },
-                function(err) { console.error('Cast Error: ', err); }
-            );
+            session.loadMedia(request).then(() => video.pause(), (err) => console.error(err));
         }
 
-        // --- GLOBAL VARIABLES ---
+        // --- FULLSCREEN HIDER ---
+        document.addEventListener('fullscreenchange', handleFullscreen);
+        document.addEventListener('webkitfullscreenchange', handleFullscreen);
+        function handleFullscreen() {
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                document.body.classList.add('fullscreen-active');
+            } else {
+                document.body.classList.remove('fullscreen-active');
+            }
+        }
+
+        // --- ORIGINAL PLAYER & EPG LOGIC ---
         var channelSourceKey = 'channelSource';
         var channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
         var DOUBLE_CLICK_TIME_MS = 500;
@@ -154,14 +151,12 @@
         var STANDBY_URL = 'https://dj.dunc.app/control/standby';
         var ON_URL = 'https://dj.dunc.app/control/epg';
         var SWIPE_THRESHOLD = 70;
-
         var lastContextMenuTimestamp = 0;
         var contextMenuTimer = null;
         var touchStartX = 0, touchEndX = 0, tapCount = 0, tapTimer = null;
         var video = document.getElementById('video');
         var videoContainer = document.getElementById('video-container');
 
-        // --- EPG & UI HELPERS ---
         function cleanTitle(str) {
             if (!str) return "";
             return str.toUpperCase().replace(/DMG|VIC|MEL|NSW|SYD|SBST/gi, '').replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
@@ -171,7 +166,6 @@
             var idx = (direction === 'prev') ? currentIndex - 1 : currentIndex + 1;
             if (idx < 0) idx = channelsOrder.length - 1;
             if (idx >= channelsOrder.length) idx = 0;
-            
             var target = channelsOrder[idx];
             if (target && channelLinkMap[target.id]) {
                 localStorage.setItem('selectedChannel', target.id);
@@ -200,7 +194,7 @@
         }
 
         function sendRequest(url, commandName) {
-            fetch(url, { method: 'POST' }).catch(e => console.error(commandName + " error", e));
+            fetch(url, { method: 'POST' }).catch(e => console.error(commandName, e));
         }
 
         function getUrlParameter(name) {
@@ -249,7 +243,6 @@
                 });
         }
 
-        // --- MAIN INITIALIZATION ---
         document.addEventListener("DOMContentLoaded", function() {
             var channelsOrder = []; var channelLinkMap = {};
             fetch('channelorder.json').then(r => r.json()).then(data => {
@@ -262,7 +255,6 @@
         function runPlayer(channelsOrder, channelLinkMap) {
             var urlParameter = getUrlParameter('url');
             var urlCheck = window.location.href.split('epg/')[1] || window.location.href;
-
             if (urlParameter) {
                 if (Hls.isSupported()) {
                     var hls = new Hls(); hls.loadSource(urlParameter); hls.attachMedia(video);
@@ -271,28 +263,13 @@
                     video.src = urlParameter; video.play();
                 }
             }
-
             setInterval(() => { if (disableSubtitles()) clearInterval(); }, 500);
-
             var selectedChannel = localStorage.getItem('selectedChannel');
-            for (var id in channelLinkMap) {
-                if (channelLinkMap[id].includes(urlCheck)) {
-                    selectedChannel = id;
-                    localStorage.setItem('selectedChannel', id);
-                    break;
-                }
-            }
-
+            for (var id in channelLinkMap) { if (channelLinkMap[id].includes(urlCheck)) { selectedChannel = id; localStorage.setItem('selectedChannel', id); break; } }
             var currentIndex = channelsOrder.findIndex(c => c.id === selectedChannel);
-            var prevId = localStorage.getItem('prevChannel');
-            var prevIndex = channelsOrder.findIndex(c => c.id === prevId);
+            var prevIndex = channelsOrder.findIndex(c => c.id === localStorage.getItem('prevChannel'));
+            if (currentIndex !== -1) { document.title = channelsOrder[currentIndex].name; fetchEPGData(selectedChannel); }
 
-            if (currentIndex !== -1) {
-                document.title = channelsOrder[currentIndex].name;
-                fetchEPGData(selectedChannel);
-            }
-
-            // Controls
             document.addEventListener("contextmenu", (e) => {
                 e.preventDefault(); var now = Date.now();
                 if (now - lastContextMenuTimestamp < DOUBLE_CLICK_TIME_MS) {
