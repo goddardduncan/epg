@@ -184,7 +184,11 @@
         }
 
         function parseEpgDate(str) {
-            return new Date(str.replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
+            // EPG format: 20260103134511 +0000
+            const y = str.substr(0, 4), m = str.substr(4, 2) - 1, d = str.substr(6, 2);
+            const hh = str.substr(8, 2), mm = str.substr(10, 2), ss = str.substr(12, 2);
+            // This creates a Date object interpreted as UTC
+            return new Date(Date.UTC(y, m, d, hh, mm, ss));
         }
 
         function formatTime(date) {
@@ -197,9 +201,7 @@
                 const r = await fetch("https://epg.dunc.app/epg.xml");
                 const t = await r.text();
                 const xml = new DOMParser().parseFromString(t, "text/xml");
-                
-                const now = new Date();
-                now.setMinutes(now.getMinutes() + now.getTimezoneOffset());
+                const now = new Date(); // Local time
                 const progs = xml.getElementsByTagName("programme");
 
                 for (const p of progs) {
@@ -212,10 +214,9 @@
                         const icon = p.getElementsByTagName("icon")[0]?.getAttribute("src");
                         const desc = p.getElementsByTagName("desc")[0]?.textContent || "No description available";
 
-                        // Apply the cleaner to the channel name
                         document.getElementById('info-ch-name').innerText = cleanTitle(selectedChannel);
                         document.getElementById('info-program').innerText = title;
-                        document.getElementById('info-img').src = icon || "https://i.redd.it/6w3zd8ozw2k21.jpg";
+                        document.getElementById('info-img').src = icon || "";
                         document.getElementById('info-duration').innerText = `${formatTime(start)} - ${formatTime(stop)}`;
                         document.getElementById("video-description").innerText = desc;
 
@@ -225,7 +226,7 @@
                         break;
                     }
                 }
-            } catch (e) { console.error("EPG error", e); }
+            } catch (e) { console.error(e); }
         }
 
         // --- Initialization ---
