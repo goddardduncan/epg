@@ -15,43 +15,61 @@
         }
         #video { width: 100%; height: 100%; }
 
-        /* --- TANK-PROOF CAST BUTTON --- */
+        /* --- DISCREET TRANSPARENT GREY CAST BUTTON --- */
         google-cast-launcher {
             display: inline-block !important;
             position: fixed !important;
-            top: 20px; right: 20px;
-            width: 50px; height: 50px;
-            z-index: 2147483647 !important;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            z-index: 2147483647 !important; /* Always on top */
             cursor: pointer;
-            background: rgba(0, 0, 0, 0.75) !important;
+            
+            /* Visual Style */
+            background: rgba(255, 255, 255, 0.15) !important; 
+            backdrop-filter: blur(8px); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 50%;
-            box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.3s ease, transform 0.2s ease;
+            
+            /* Icon Colors */
             --connected-color: #00aaff;
-            --disconnected-color: #ffffff;
+            --disconnected-color: rgba(255, 255, 255, 0.7);
         }
 
-        /* Legacy & Mini-Bar Styles preserved */
+        google-cast-launcher:hover {
+            background: rgba(255, 255, 255, 0.25) !important;
+            transform: scale(1.05);
+        }
+
+        /* Legacy full-screen description box (Arrow Up) */
         #video-description {
             position: absolute; bottom: 20px; left: 0; width: 100%;
             background-color: rgba(0,0,0,0.6); color: #fff; padding: 20px;
             text-align: center; font-size: 1.5em; font-family: 'Roboto', sans-serif;
             box-sizing: border-box; display: none; pointer-events: none; z-index: 10;
         }
+
+        /* --- MINI OVERLAY STYLES --- */
         #mini-info-bar {
             position: fixed; bottom: 50px; left: 50px; display: flex; align-items: center;
             background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); color: white;
-            padding: 25px; border-radius: 15px; z-index: 9999; border-left: 6px solid #00aaff;
-            opacity: 0; transform: translateY(20px); transition: all 0.5s ease;
+            padding: 25px; border-radius: 15px; transition: all 0.5s ease;
+            opacity: 0; transform: translateY(20px); z-index: 9999;
+            border-left: 6px solid #00aaff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             pointer-events: none; font-family: 'Segoe UI', Roboto, sans-serif; max-width: 700px;
         }
+
         #mini-info-bar.visible { opacity: 1; transform: translateY(0); }
         .info-image { width: 160px; height: 90px; object-fit: cover; border-radius: 8px; margin-right: 25px; background: #222; }
         .info-content { display: flex; flex-direction: column; flex: 1; }
-        .info-channel { font-size: 0.85rem; text-transform: uppercase; color: #00aaff; font-weight: bold; }
+        .info-channel { font-size: 0.85rem; text-transform: uppercase; color: #00aaff; font-weight: bold; letter-spacing: 1.5px; }
         .info-title { font-size: 1.6rem; font-weight: 600; margin: 2px 0; }
-        .info-time { font-size: 1rem; color: #00aaff; margin-bottom: 8px; }
-        .info-mini-desc { font-size: 0.95rem; color: #ccc; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .info-time { font-size: 1rem; color: #00aaff; margin-bottom: 8px; font-weight: 500; }
+        .info-mini-desc { font-size: 0.95rem; color: #ccc; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
     </style>
 </head>
 <body>
@@ -75,40 +93,28 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <script>
-        // --- 1. CAST SDK INITIALIZATION & LOGGING ---
+        // --- CAST SDK LOGIC ---
         window.__onGCastApiAvailable = function(isAvailable) {
             if (isAvailable) {
                 console.log("✅ Cast API Available");
                 initializeCastApi();
-            } else {
-                console.warn("❌ Cast API Not Available - Check HTTPS or Browser Compatibility");
             }
         };
 
         function initializeCastApi() {
             const context = cast.framework.CastContext.getInstance();
-            
             context.setOptions({
                 receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
                 autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
                 resumeSavedSession: true
             });
 
-            // Discovery Logger
             context.addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED, function(event) {
-                let state = "UNKNOWN";
-                switch(event.castState) {
-                    case cast.framework.CastState.NO_DEVICES_AVAILABLE: state = "NO DEVICES FOUND"; break;
-                    case cast.framework.CastState.NOT_CONNECTED: state = "DEVICE(S) FOUND - READY TO CAST"; break;
-                    case cast.framework.CastState.CONNECTING: state = "CONNECTING..."; break;
-                    case cast.framework.CastState.CONNECTED: state = "CONNECTED TO DEVICE"; break;
-                }
-                console.log("📡 Cast Discovery State: " + state);
+                console.log("📡 Cast State:", event.castState);
             });
 
             context.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, function(event) {
                 if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
-                    console.log("🚀 Session Started - Sending Stream...");
                     loadMediaOnChromecast();
                 }
             });
@@ -140,10 +146,7 @@
             );
         }
 
-        // --- 2. EXISTING EPG & PLAYER LOGIC (Unchanged) ---
-        // [Internal functions: cleanTitle, changeChannel, toggleSubtitles, disableSubtitles, sendRequest, getUrlParameter, getUrlParameterCheck, parseEpgDate, formatTime, fetchEPGData, runPlayer]
-        // (Full logic from your previous request preserved here...)
-
+        // --- GLOBAL VARIABLES ---
         var channelSourceKey = 'channelSource';
         var channelSource = localStorage.getItem(channelSourceKey) || 'channels.json';
         var DOUBLE_CLICK_TIME_MS = 500;
@@ -151,25 +154,24 @@
         var STANDBY_URL = 'https://dj.dunc.app/control/standby';
         var ON_URL = 'https://dj.dunc.app/control/epg';
         var SWIPE_THRESHOLD = 70;
+
         var lastContextMenuTimestamp = 0;
         var contextMenuTimer = null;
         var touchStartX = 0, touchEndX = 0, tapCount = 0, tapTimer = null;
         var video = document.getElementById('video');
         var videoContainer = document.getElementById('video-container');
 
+        // --- EPG & UI HELPERS ---
         function cleanTitle(str) {
             if (!str) return "";
             return str.toUpperCase().replace(/DMG|VIC|MEL|NSW|SYD|SBST/gi, '').replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
         }
 
         function changeChannel(direction, channelsOrder, currentIndex, channelLinkMap) {
-            var idx;
-            if (direction === 'prev') {
-                idx = currentIndex - 1;
-                if (idx < 0) idx = channelsOrder.length - 1;
-            } else {
-                idx = (currentIndex + 1) % channelsOrder.length;
-            }
+            var idx = (direction === 'prev') ? currentIndex - 1 : currentIndex + 1;
+            if (idx < 0) idx = channelsOrder.length - 1;
+            if (idx >= channelsOrder.length) idx = 0;
+            
             var target = channelsOrder[idx];
             if (target && channelLinkMap[target.id]) {
                 localStorage.setItem('selectedChannel', target.id);
@@ -198,20 +200,13 @@
         }
 
         function sendRequest(url, commandName) {
-            fetch(url, { method: 'POST' })
-                .then(function(response) { if (response.ok) console.log(commandName + " sent."); })
-                .catch(function(error) { console.error("Error sending " + commandName, error); });
+            fetch(url, { method: 'POST' }).catch(e => console.error(commandName + " error", e));
         }
 
         function getUrlParameter(name) {
             var regex = new RegExp('[?&]' + name + '=([^&#]*)');
             var result = regex.exec(window.location.search);
             return result ? decodeURIComponent(result[1]) : '';
-        }
-
-        function getUrlParameterCheck(name, url) {
-            var base = 'https://goddardduncan.github.io/epg/';
-            return url.indexOf(base) !== -1 ? url.slice(url.indexOf(base) + base.length) : url;
         }
 
         function parseEpgDate(str) {
@@ -226,8 +221,8 @@
 
         function fetchEPGData(selectedChannel) {
             fetch("https://epg.dunc.app/epg.xml")
-                .then(function(r) { return r.text(); })
-                .then(function(t) {
+                .then(r => r.text())
+                .then(t => {
                     var xml = new DOMParser().parseFromString(t, "text/xml");
                     var now = new Date();
                     var progs = xml.getElementsByTagName("programme");
@@ -236,24 +231,25 @@
                         if (p.getAttribute("channel") !== selectedChannel) continue;
                         var start = parseEpgDate(p.getAttribute("start")), stop = parseEpgDate(p.getAttribute("stop"));
                         if (now >= start && now <= stop) {
-                            var title = p.getElementsByTagName("title")[0] ? p.getElementsByTagName("title")[0].textContent : "Loading...";
-                            var icon = p.getElementsByTagName("icon")[0] ? p.getElementsByTagName("icon")[0].getAttribute("src") : "";
-                            var desc = p.getElementsByTagName("desc")[0] ? p.getElementsByTagName("desc")[0].textContent : "No description available";
+                            var title = p.getElementsByTagName("title")[0]?.textContent || "Loading...";
+                            var icon = p.getElementsByTagName("icon")[0]?.getAttribute("src") || "";
+                            var desc = p.getElementsByTagName("desc")[0]?.textContent || "No description available";
                             document.getElementById('info-ch-name').innerText = cleanTitle(selectedChannel);
                             document.getElementById('info-program').innerText = title;
-                            document.getElementById('info-img').src = icon || "";
+                            document.getElementById('info-img').src = icon;
                             document.getElementById('info-duration').innerText = formatTime(start) + " - " + formatTime(stop);
                             document.getElementById('info-desc-text').innerText = desc;
                             document.getElementById("video-description").innerText = desc;
                             var bar = document.getElementById('mini-info-bar');
                             bar.classList.add('visible');
-                            setTimeout(function() { bar.classList.remove('visible'); }, 5000);
+                            setTimeout(() => bar.classList.remove('visible'), 5000);
                             break;
                         }
                     }
                 });
         }
 
+        // --- MAIN INITIALIZATION ---
         document.addEventListener("DOMContentLoaded", function() {
             var channelsOrder = []; var channelLinkMap = {};
             fetch('channelorder.json').then(r => r.json()).then(data => {
@@ -264,7 +260,9 @@
         });
 
         function runPlayer(channelsOrder, channelLinkMap) {
-            var urlParameter = getUrlParameter('url'), streamKey = getUrlParameter('stream'), urlCheck = getUrlParameterCheck('url', window.location.href);
+            var urlParameter = getUrlParameter('url');
+            var urlCheck = window.location.href.split('epg/')[1] || window.location.href;
+
             if (urlParameter) {
                 if (Hls.isSupported()) {
                     var hls = new Hls(); hls.loadSource(urlParameter); hls.attachMedia(video);
@@ -273,17 +271,36 @@
                     video.src = urlParameter; video.play();
                 }
             }
-            setInterval(() => { if (disableSubtitles()) clearInterval(); }, 500);
-            var selectedChannel = localStorage.getItem('selectedChannel');
-            for (var id in channelLinkMap) { if (channelLinkMap[id] === urlCheck) { selectedChannel = id; localStorage.setItem('selectedChannel', id); break; } }
-            var currentIndex = channelsOrder.findIndex(c => c.id === selectedChannel);
-            var prevIndex = channelsOrder.findIndex(c => c.id === localStorage.getItem('prevChannel'));
-            if (currentIndex !== -1) { document.title = channelsOrder[currentIndex].name; fetchEPGData(selectedChannel); }
 
+            setInterval(() => { if (disableSubtitles()) clearInterval(); }, 500);
+
+            var selectedChannel = localStorage.getItem('selectedChannel');
+            for (var id in channelLinkMap) {
+                if (channelLinkMap[id].includes(urlCheck)) {
+                    selectedChannel = id;
+                    localStorage.setItem('selectedChannel', id);
+                    break;
+                }
+            }
+
+            var currentIndex = channelsOrder.findIndex(c => c.id === selectedChannel);
+            var prevId = localStorage.getItem('prevChannel');
+            var prevIndex = channelsOrder.findIndex(c => c.id === prevId);
+
+            if (currentIndex !== -1) {
+                document.title = channelsOrder[currentIndex].name;
+                fetchEPGData(selectedChannel);
+            }
+
+            // Controls
             document.addEventListener("contextmenu", (e) => {
                 e.preventDefault(); var now = Date.now();
-                if (now - lastContextMenuTimestamp < DOUBLE_CLICK_TIME_MS) { clearTimeout(contextMenuTimer); sendRequest(STANDBY_URL, 'Standby'); }
-                else { toggleSubtitles(); contextMenuTimer = setTimeout(() => sendRequest(ON_URL, 'On'), DOUBLE_CLICK_TIME_MS); }
+                if (now - lastContextMenuTimestamp < DOUBLE_CLICK_TIME_MS) {
+                    clearTimeout(contextMenuTimer); sendRequest(STANDBY_URL, 'Standby');
+                } else {
+                    toggleSubtitles();
+                    contextMenuTimer = setTimeout(() => sendRequest(ON_URL, 'On'), DOUBLE_CLICK_TIME_MS);
+                }
                 lastContextMenuTimestamp = now;
             });
 
@@ -291,7 +308,10 @@
             videoContainer.addEventListener('touchend', e => {
                 touchEndX = e.changedTouches[0].screenX; var dist = touchEndX - touchStartX;
                 if (Math.abs(dist) > SWIPE_THRESHOLD) changeChannel(dist > 0 ? 'prev' : 'next', channelsOrder, currentIndex, channelLinkMap);
-                else { tapCount++; clearTimeout(tapTimer); tapTimer = setTimeout(() => { if (tapCount === 3) window.location.href = 'index.html'; tapCount = 0; }, TRIPLE_TAP_TIME_MS); }
+                else {
+                    tapCount++; clearTimeout(tapTimer);
+                    tapTimer = setTimeout(() => { if (tapCount === 3) window.location.href = 'index.html'; tapCount = 0; }, TRIPLE_TAP_TIME_MS);
+                }
             }, {passive: true});
 
             window.addEventListener("keydown", (ev) => {
@@ -299,8 +319,9 @@
                 else if (ev.key === "ArrowLeft") changeChannel('prev', channelsOrder, currentIndex, channelLinkMap);
                 else if (ev.key === "ArrowRight") changeChannel('next', channelsOrder, currentIndex, channelLinkMap);
                 else if (ev.key === "ArrowUp") { var d = document.getElementById('video-description'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; }
-                else if (ev.key === "ArrowDown") { video.muted = !video.muted; }
+                else if (ev.key === "ArrowDown") video.muted = !video.muted;
                 else if (ev.key.toLowerCase() === 'i') fetchEPGData(selectedChannel);
+                else if (ev.key === "Escape" && prevIndex !== -1) window.location.href = channelLinkMap[channelsOrder[prevIndex].id];
             });
         }
     </script>
