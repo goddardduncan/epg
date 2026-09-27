@@ -15,7 +15,7 @@
             overflow: hidden;
             position: relative;
             background-color: #000;
-            touch-action: none; 
+            touch-action: none;
         }
 
         #video {
@@ -70,10 +70,10 @@
         }
 
         .info-image {
-            width: 160px; 
-            height: 90px; 
-            object-fit: cover; 
-            border-radius: 8px; 
+            width: 160px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
             margin-right: 25px;
             background: #222;
         }
@@ -82,11 +82,11 @@
         .info-channel { font-size: 0.85rem; text-transform: uppercase; color: #00aaff; font-weight: bold; letter-spacing: 1.5px; }
         .info-title { font-size: 1.6rem; font-weight: 600; margin: 2px 0; }
         .info-time { font-size: 1rem; color: #00aaff; margin-bottom: 8px; font-weight: 500; }
-        
+
         /* New Integrated Description */
-        .info-mini-desc { 
-            font-size: 0.95rem; 
-            color: #ccc; 
+        .info-mini-desc {
+            font-size: 0.95rem;
+            color: #ccc;
             line-height: 1.4;
             display: -webkit-box;
             -webkit-line-clamp: 2; /* Limit to 2 lines */
@@ -98,7 +98,7 @@
         #mini-info-bar {
             display: none !important;
         }
-    
+
         /* Optional: Also hide the legacy description if it's too big for small screens */
         #video-description {
             font-size: 1rem;
@@ -142,12 +142,97 @@
         var touchEndX = 0;
         var tapCount = 0;
         var tapTimer = null;
-        
+
         var video = document.getElementById('video');
         var videoContainer = document.getElementById('video-container');
 
+        // --- Guide data: epg.ass (EPG2) from epg.josh.red, cached in IndexedDB ---
+        // Same database, key and record shape as index.html, so the two pages share one download.
+        var EPG_ASS_URL = 'https://epg.josh.red/epg.ass';
+        var EPG_MAX_AGE_MS = 6 * 60 * 60 * 1000;
+        // Index = the channel number in epg.ass (dj's tdj/channels.zig order).
+        // If that order ever changes the file's magic changes and parseEpgAss refuses it.
+        var EPG_CHANNELS = [
+            'dmg-abc-vic', 'dmg-seven-mel', 'dmg-channel-9-vic', 'dmg-10-vic', 'dmg-c31', 'dmg-sbs-sbst',
+            'dmg-abc-news', 'dmg-abc-kids', 'dmg-abc-me',
+            'dmg-7two-mel', 'dmg-7flix-mel', null /* 7Bravo */, 'dmg-7mate-mel', null /* Racing */, null /* TVSN */,
+            'dmg-life-vic', 'dmg-gem-vic', 'dmg-go-vic', null /* 9Extra */, 'dmg-rush-vic',
+            'dmg-10peach-vic', 'dmg-10shake-vic', 'dmg-10bold-vic', null /* you.tv */, null /* gecko */,
+            'dmg-sbs-4syd', 'dmg-sbs-2syd', 'dmg-sbs-3syd', 'dmg-sbs-5nsw', null /* SBS World */
+        ];
+        var infoImgUrl = null;
+
+        // u64 read as two u32 halves, so no BigInt is needed.
+        function readSeconds(dv, p) {
+            return dv.getUint32(p, true) + dv.getUint32(p + 4, true) * 4294967296;
+        }
+
+        function parseEpgAss(buf) {
+            var dv = new DataView(buf);
+            if (buf.byteLength < 16 || dv.getUint32(0, true) !== 0x32475045) throw new Error('epg.ass: not EPG2');
+            if (dv.getUint32(4, true) !== EPG_CHANNELS.length) throw new Error('epg.ass: channel count changed');
+            var count = dv.getUint32(8, true);
+            var pool = 16 + 20000 * 40;
+            if (buf.byteLength !== pool + dv.getUint32(12, true)) throw new Error('epg.ass: size mismatch');
+            var td = new TextDecoder();
+            var out = [];
+            for (var i = 0; i < count; i++) {
+                var p = 16 + i * 40;
+                var imageLen = dv.getUint32(p + 28, true);
+                out.push({
+                    start: readSeconds(dv, p) * 1000,
+                    stop: readSeconds(dv, p + 8) * 1000,
+                    title: td.decode(new Uint8Array(buf, pool + dv.getUint32(p + 16, true), dv.getUint32(p + 20, true))),
+                    image: imageLen ? new Uint8Array(buf, pool + dv.getUint32(p + 24, true), imageLen) : null,
+                    channel: EPG_CHANNELS[dv.getUint16(p + 32, true)]
+                });
+            }
+            return out;
+        }
+
+        function epgStore(mode, fn) {
+            return new Promise(function(resolve, reject) {
+                var open = indexedDB.open('epg', 1);
+                open.onupgradeneeded = function() { open.result.createObjectStore('files'); };
+                open.onerror = function() { reject(open.error); };
+                open.onsuccess = function() {
+                    var tx = open.result.transaction('files', mode);
+                    var req = fn(tx.objectStore('files'));
+                    tx.oncomplete = function() { resolve(req.result); };
+                    tx.onerror = function() { reject(tx.error); };
+                };
+            });
+        }
+
+        // Fresh cache -> use it. Stale or missing -> fetch; if the fetch fails, fall back to stale.
+        function loadEpgAss() {
+            var cached = null;
+            return epgStore('readonly', function(s) { return s.get('epg.ass'); })
+                .catch(function(e) { console.error(e); return null; })
+                .then(function(c) {
+                    cached = c;
+                    if (cached && Date.now() - cached.fetchedAt < EPG_MAX_AGE_MS) return parseEpgAss(cached.buf);
+                    return fetch(EPG_ASS_URL)
+                        .then(function(res) {
+                            if (!res.ok) throw new Error('epg.ass: HTTP ' + res.status);
+                            return res.arrayBuffer();
+                        })
+                        .then(function(buf) {
+                            var programmes = parseEpgAss(buf); // never cache a file we can't read
+                            return epgStore('readwrite', function(s) { return s.put({ buf: buf, fetchedAt: Date.now() }, 'epg.ass'); })
+                                .catch(function(e) { console.error(e); })
+                                .then(function() { return programmes; });
+                        })
+                        .catch(function(e) {
+                            if (!cached) throw e;
+                            console.warn('Using stale epg.ass:', e);
+                            return parseEpgAss(cached.buf);
+                        });
+                });
+        }
+
         // --- Helpers ---
-        
+
         // Fixed to handle squashed regional names like 5NSW
         function cleanTitle(str) {
             if (!str) return "";
@@ -215,54 +300,42 @@
             return url.indexOf(base) !== -1 ? url.slice(url.indexOf(base) + base.length) : url;
         }
 
-        function parseEpgDate(str) {
-            var y = str.substr(0, 4), m = str.substr(4, 2) - 1, d = str.substr(6, 2);
-            var hh = str.substr(8, 2), mm = str.substr(10, 2), ss = str.substr(12, 2);
-            return new Date(Date.UTC(y, m, d, hh, mm, ss));
-        }
-
         function formatTime(date) {
             return date.toLocaleTimeString("en-AU", { hour: 'numeric', minute: '2-digit', hour12: false });
         }
 
         function fetchEPGData(selectedChannel) {
-            fetch("https://epg.dunc.app/epg.xml")
-                .then(function(r) { return r.text(); })
-                .then(function(t) {
-                    var xml = new DOMParser().parseFromString(t, "text/xml");
-                    var now = new Date();
-                    var progs = xml.getElementsByTagName("programme");
+            loadEpgAss()
+                .then(function(programmes) {
+                    var now = Date.now();
+                    var list = programmes
+                        .filter(function(p) { return p.channel === selectedChannel; })
+                        .sort(function(a, b) { return a.start - b.start; });
 
-                    for (var i = 0; i < progs.length; i++) {
-                        var p = progs[i];
-                        if (p.getAttribute("channel") !== selectedChannel) continue;
-                        
-                        var start = parseEpgDate(p.getAttribute("start"));
-                        var stop = parseEpgDate(p.getAttribute("stop"));
-                        
-                        if (now >= start && now <= stop) {
-                            var titleEl = p.getElementsByTagName("title")[0];
-                            var iconEl = p.getElementsByTagName("icon")[0];
-                            var descEl = p.getElementsByTagName("desc")[0];
+                    for (var i = 0; i < list.length; i++) {
+                        var p = list[i];
+                        if (now < p.start || now >= p.stop) continue;
 
-                            var title = titleEl ? titleEl.textContent : "Loading...";
-                            var icon = iconEl ? iconEl.getAttribute("src") : "";
-                            var desc = descEl ? descEl.textContent : "No description available";
-                            
-                            document.getElementById('info-ch-name').innerText = cleanTitle(selectedChannel);
-                            document.getElementById('info-program').innerText = title;
-                            document.getElementById('info-img').src = icon || "";
-                            document.getElementById('info-duration').innerText = formatTime(start) + " - " + formatTime(stop);
-                            
-                            // Update the mini-bar description and the legacy full-screen description
-                            document.getElementById('info-desc-text').innerText = desc;
-                            document.getElementById("video-description").innerText = desc;
+                        // epg.ass carries no synopsis, so the description slot says what is on next.
+                        var next = list[i + 1];
+                        var desc = next ? "Next: " + next.title + " at " + formatTime(new Date(next.start)) : "";
 
-                            var bar = document.getElementById('mini-info-bar');
-                            bar.classList.add('visible');
-                            setTimeout(function() { bar.classList.remove('visible'); }, 5000);
-                            break;
-                        }
+                        if (infoImgUrl) URL.revokeObjectURL(infoImgUrl);
+                        infoImgUrl = p.image ? URL.createObjectURL(new Blob([p.image], { type: 'image/jpeg' })) : null;
+
+                        document.getElementById('info-ch-name').innerText = cleanTitle(selectedChannel);
+                        document.getElementById('info-program').innerText = p.title;
+                        document.getElementById('info-img').src = infoImgUrl || "";
+                        document.getElementById('info-duration').innerText = formatTime(new Date(p.start)) + " - " + formatTime(new Date(p.stop));
+
+                        // Update the mini-bar description and the legacy full-screen description
+                        document.getElementById('info-desc-text').innerText = desc;
+                        document.getElementById("video-description").innerText = p.title + (desc ? " — " + desc : "");
+
+                        var bar = document.getElementById('mini-info-bar');
+                        bar.classList.add('visible');
+                        setTimeout(function() { bar.classList.remove('visible'); }, 5000);
+                        break;
                     }
                 }).catch(function(e) { console.error("EPG error", e); });
         }
@@ -367,8 +440,8 @@
             });
 
             // Touch Gestures (Swipe to change / Triple Tap to home)
-            videoContainer.addEventListener('touchstart', function(e) { 
-                touchStartX = e.changedTouches[0].screenX; 
+            videoContainer.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
             }, {passive: true});
 
             videoContainer.addEventListener('touchend', function(e) {
