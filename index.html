@@ -325,6 +325,76 @@
 
             let blockUrl; // Global variable for blockUrl
 
+            // --- Guide data: epg.ass (EPG2) from epg.josh.red, cached in IndexedDB ---
+            const EPG_ASS_URL = 'https://epg.josh.red/epg.ass';
+            const EPG_MAX_AGE_MS = 6 * 60 * 60 * 1000;
+            // Index = the channel number in epg.ass (dj's tdj/channels.zig order).
+            // If that order ever changes the file's magic changes and parseEpgAss refuses it.
+            const EPG_CHANNELS = [
+                'dmg-abc-vic', 'dmg-seven-mel', 'dmg-channel-9-vic', 'dmg-10-vic', 'dmg-c31', 'dmg-sbs-sbst',
+                'dmg-abc-news', 'dmg-abc-kids', 'dmg-abc-me',
+                'dmg-7two-mel', 'dmg-7flix-mel', null /* 7Bravo */, 'dmg-7mate-mel', null /* Racing */, null /* TVSN */,
+                'dmg-life-vic', 'dmg-gem-vic', 'dmg-go-vic', null /* 9Extra */, 'dmg-rush-vic',
+                'dmg-10peach-vic', 'dmg-10shake-vic', 'dmg-10bold-vic', null /* you.tv */, null /* gecko */,
+                'dmg-sbs-4syd', 'dmg-sbs-2syd', 'dmg-sbs-3syd', 'dmg-sbs-5nsw', null /* SBS World */,
+            ];
+
+            function parseEpgAss(buf) {
+                const dv = new DataView(buf);
+                if (buf.byteLength < 16 || dv.getUint32(0, true) !== 0x32475045) throw new Error('epg.ass: not EPG2');
+                if (dv.getUint32(4, true) !== EPG_CHANNELS.length) throw new Error('epg.ass: channel count changed');
+                const count = dv.getUint32(8, true);
+                const pool = 16 + 20000 * 40;
+                if (buf.byteLength !== pool + dv.getUint32(12, true)) throw new Error('epg.ass: size mismatch');
+                const td = new TextDecoder();
+                const out = [];
+                for (let i = 0; i < count; i++) {
+                    const p = 16 + i * 40;
+                    const imageLen = dv.getUint32(p + 28, true);
+                    out.push({
+                        start: Number(dv.getBigUint64(p, true)) * 1000,
+                        stop: Number(dv.getBigUint64(p + 8, true)) * 1000,
+                        title: td.decode(new Uint8Array(buf, pool + dv.getUint32(p + 16, true), dv.getUint32(p + 20, true))),
+                        image: imageLen ? new Uint8Array(buf, pool + dv.getUint32(p + 24, true), imageLen) : null,
+                        channel: EPG_CHANNELS[dv.getUint16(p + 32, true)],
+                    });
+                }
+                return out;
+            }
+
+            function epgStore(mode, fn) {
+                return new Promise((resolve, reject) => {
+                    const open = indexedDB.open('epg', 1);
+                    open.onupgradeneeded = () => open.result.createObjectStore('files');
+                    open.onerror = () => reject(open.error);
+                    open.onsuccess = () => {
+                        const tx = open.result.transaction('files', mode);
+                        const req = fn(tx.objectStore('files'));
+                        tx.oncomplete = () => resolve(req.result);
+                        tx.onerror = () => reject(tx.error);
+                    };
+                });
+            }
+
+            // Fresh cache -> use it. Stale or missing -> fetch; if the fetch fails, fall back to stale.
+            async function loadEpgAss() {
+                let cached = null;
+                try { cached = await epgStore('readonly', s => s.get('epg.ass')); } catch (e) { console.error(e); }
+                if (cached && Date.now() - cached.fetchedAt < EPG_MAX_AGE_MS) return parseEpgAss(cached.buf);
+                try {
+                    const res = await fetch(EPG_ASS_URL);
+                    if (!res.ok) throw new Error(`epg.ass: HTTP ${res.status}`);
+                    const buf = await res.arrayBuffer();
+                    const programmes = parseEpgAss(buf); // never cache a file we can't read
+                    await epgStore('readwrite', s => s.put({ buf, fetchedAt: Date.now() }, 'epg.ass')).catch(console.error);
+                    return programmes;
+                } catch (e) {
+                    if (!cached) throw e;
+                    console.warn('Using stale epg.ass:', e);
+                    return parseEpgAss(cached.buf);
+                }
+            }
+
             // --- Settings modal helpers ---
 
             function openSettingsModal() {
@@ -549,31 +619,20 @@
                 }
             }
 
-            function createProgressBar(adjustedStart, adjustedEnd, cell) {
-                try {
-                    const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
-                    const currentTimeUTC = new Date(new Date().getTime() + timezoneOffsetInMinutes * 60 * 1000);
+            function createProgressBar(start, end, cell) {
+                const now = Date.now();
+                if (now < start || now > end) return;
+                const remainingTime = Math.floor((end - now) / (1000 * 60)); // minutes
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressBar.style.left = ((now - start) / (end - start)) * 100 + '%';
+                cell.style.position = 'relative';
 
-                    if (currentTimeUTC >= adjustedStart && currentTimeUTC <= adjustedEnd) {
-                        const duration = adjustedEnd - adjustedStart;
-                        const remainingTime = Math.floor((adjustedEnd - currentTimeUTC) / (1000 * 60)); // Remaining time in minutes
-                        const progressPercentage = ((currentTimeUTC - adjustedStart) / duration) * 100;
-                        const progressBar = document.createElement('div');
-                        progressBar.className = 'progress-bar';
-                        progressBar.style.left = progressPercentage + '%';
-                        cell.style.position = 'relative';
-
-                        const knob = document.createElement('div');
-                        knob.className = 'knob';
-                        knob.innerText = `${remainingTime} minutes remain`;
-                        progressBar.appendChild(knob);
-                        cell.appendChild(progressBar);
-                    } else {
-                        console.log('Current time is outside the program time range');
-                    }
-                } catch (error) {
-                    console.error('Error creating progress bar:', error);
-                }
+                const knob = document.createElement('div');
+                knob.className = 'knob';
+                knob.innerText = `${remainingTime} minutes remain`;
+                progressBar.appendChild(knob);
+                cell.appendChild(progressBar);
             }
 
             async function loadTreenFlix() {
@@ -855,102 +914,75 @@ console.error(`Error sending ${label} request:`, err);
                 }
 
                 const table = document.querySelector('table');
-                const xmlData = "https://epg.dunc.app/epg.xml";
-                const timezoneOffsetInMinutes = new Date().getTimezoneOffset();
+                const options = { hour12: true, hour: "numeric", minute: "numeric" };
+                const timeText = ms => document.createTextNode(new Date(ms).toLocaleTimeString("en-AU", options));
 
-                fetch(xmlData)
-                    .then(response => response.text())
-                    .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
-                    .then(data => {
-                        const programs = data.getElementsByTagName("programme");
-                        const currentTime = new Date();
-                        currentTime.setTime(currentTime.getTime() + (timezoneOffsetInMinutes * 60 * 1000));
-                        const options = { hour12: true, hour: "numeric", minute: "numeric" };
+                loadEpgAss()
+                    .then(programmes => {
+                        const now = Date.now();
+                        const byChannel = {};
+                        programmes.forEach(p => { if (p.channel) (byChannel[p.channel] ||= []).push(p); });
 
-                        const sortedChannels = Object.keys(channelMap).sort((a, b) => {
-                            return Object.keys(channelMap).indexOf(a) - Object.keys(channelMap).indexOf(b);
-                        });
+                        Object.keys(channelMap).forEach(channelID => {
+                            const channelPrograms = (byChannel[channelID] || []).sort((a, b) => a.start - b.start);
+                            const index = channelPrograms.findIndex(p => p.start <= now && now < p.stop);
+                            if (index === -1) return;
+                            const program = channelPrograms[index];
+                            const nextProgram = channelPrograms[index + 1];
 
-                        sortedChannels.forEach(channelID => {
-                            const channelPrograms = Array.from(programs).filter(program => program.getAttribute("channel") === channelID);
+                            const mappedChannel = channelMap[channelID] || channelID;
+                            const mappedChannelLink = channelLinkMap[channelID] || channelID;
 
-                            channelPrograms.forEach((program, index) => {
-                                const channel = channelID;
-                                const title = program.getElementsByTagName("title")[0].childNodes[0].nodeValue;
-                                const start = new Date(program.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-                                const end = new Date(program.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-                                const icon = program.getElementsByTagName("icon")[0].getAttribute("src");
+                            const row = document.createElement("tr");
 
-                                const mappedChannel = channelMap[channel] || channel;
-                                const mappedChannelLink = channelLinkMap[channel] || channel;
+                            const channelCell = document.createElement("td");
+                            channelCell.appendChild(document.createTextNode(mappedChannel));
+                            row.appendChild(channelCell);
 
-                                if (currentTime >= start && currentTime <= end) {
-                                    const row = document.createElement("tr");
-
-                                    const channelCell = document.createElement("td");
-                                    channelCell.appendChild(document.createTextNode(mappedChannel));
-                                    row.appendChild(channelCell);
-
-                                    const iconCell = document.createElement("td");
-                                    const iconImg = document.createElement("img");
-                                    iconImg.setAttribute('class', 'icon');
-                                    iconImg.src = icon;
-                                    iconImg.onerror = function() {
-                                        this.src = "https://i.redd.it/6w3zd8ozw2k21.jpg";
-                                        this.onerror = null; 
-                                    };
-                                    iconImg.addEventListener("click", function() {
-                                        window.location.href = mappedChannelLink;
-                                        localStorage.setItem('prevChannel', channelID);
-                                        localStorage.setItem('selectedChannel', channelID);
-                                    });
-                                    iconImg.dataset.channelLink = mappedChannelLink;
-                                    iconImg.dataset.channelId = channel;
-                                    iconCell.appendChild(iconImg);
-                                    row.appendChild(iconCell);
-
-                                    const titleCell = document.createElement("td");
-                                    titleCell.appendChild(document.createTextNode(title));
-
-                                    setTimeout(() => {
-                                        createProgressBar(start, end, titleCell);
-                                    }, 0);
-                                    row.appendChild(titleCell);
-
-                                    const startCell = document.createElement("td");
-                                    const adjustedStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60 * 1000);
-                                    startCell.appendChild(document.createTextNode(adjustedStart.toLocaleTimeString("en-AU", options)));
-                                    row.appendChild(startCell);
-
-                                    const endCell = document.createElement("td");
-                                    const adjustedEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60 * 1000);
-                                    endCell.appendChild(document.createTextNode(adjustedEnd.toLocaleTimeString("en-AU", options)));
-                                    row.appendChild(endCell);
-
-                                    const nextProgram = channelPrograms[index + 1];
-                                    if (nextProgram) {
-                                        const Ntitle = nextProgram.getElementsByTagName("title")[0].childNodes[0].nodeValue;
-                                        const Nstart = new Date(nextProgram.getAttribute("start").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-                                        const Nend = new Date(nextProgram.getAttribute("stop").replace(" +0000", "").replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$1-$2-$3T$4:$5:$6"));
-
-                                        const NtitleCell = document.createElement("td");
-                                        NtitleCell.appendChild(document.createTextNode(Ntitle));
-                                        row.appendChild(NtitleCell);
-
-                                        const nextStartCell = document.createElement("td");
-                                        const adjustedNextStart = new Date(Nstart.getTime() - timezoneOffsetInMinutes * 60 * 1000);
-                                        nextStartCell.appendChild(document.createTextNode(adjustedNextStart.toLocaleTimeString("en-AU", options)));
-                                        row.appendChild(nextStartCell);
-
-                                        const nextEndCell = document.createElement("td");
-                                        const adjustedNextEnd = new Date(Nend.getTime() - timezoneOffsetInMinutes * 60 * 1000);
-                                        nextEndCell.appendChild(document.createTextNode(adjustedNextEnd.toLocaleTimeString("en-AU", options)));
-                                        row.appendChild(nextEndCell);
-                                    }
-
-                                    table.appendChild(row);
-                                }
+                            const iconCell = document.createElement("td");
+                            const iconImg = document.createElement("img");
+                            iconImg.setAttribute('class', 'icon');
+                            iconImg.src = program.image
+                                ? URL.createObjectURL(new Blob([program.image], { type: 'image/jpeg' }))
+                                : FALLBACK_IMAGE;
+                            iconImg.addEventListener("click", function() {
+                                window.location.href = mappedChannelLink;
+                                localStorage.setItem('prevChannel', channelID);
+                                localStorage.setItem('selectedChannel', channelID);
                             });
+                            iconImg.dataset.channelLink = mappedChannelLink;
+                            iconImg.dataset.channelId = channelID;
+                            iconCell.appendChild(iconImg);
+                            row.appendChild(iconCell);
+
+                            const titleCell = document.createElement("td");
+                            titleCell.appendChild(document.createTextNode(program.title));
+                            createProgressBar(program.start, program.stop, titleCell);
+                            row.appendChild(titleCell);
+
+                            const startCell = document.createElement("td");
+                            startCell.appendChild(timeText(program.start));
+                            row.appendChild(startCell);
+
+                            const endCell = document.createElement("td");
+                            endCell.appendChild(timeText(program.stop));
+                            row.appendChild(endCell);
+
+                            if (nextProgram) {
+                                const NtitleCell = document.createElement("td");
+                                NtitleCell.appendChild(document.createTextNode(nextProgram.title));
+                                row.appendChild(NtitleCell);
+
+                                const nextStartCell = document.createElement("td");
+                                nextStartCell.appendChild(timeText(nextProgram.start));
+                                row.appendChild(nextStartCell);
+
+                                const nextEndCell = document.createElement("td");
+                                nextEndCell.appendChild(timeText(nextProgram.stop));
+                                row.appendChild(nextEndCell);
+                            }
+
+                            table.appendChild(row);
                         });
 
                         table.querySelector('tr').classList.add("selected");
@@ -958,18 +990,21 @@ console.error(`Error sending ${label} request:`, err);
                         scrollSelectedRowIntoView();
 
                         const storedChannel = localStorage.getItem('selectedChannel');
-                        if (storedChannel) {
-                            const storedChannelRow = table.querySelector(`img[data-channel-id="${storedChannel}"]`).parentNode.parentNode;
+                        const storedImg = storedChannel && table.querySelector(`img[data-channel-id="${storedChannel}"]`);
+                        if (storedImg) {
+                            const storedChannelRow = storedImg.parentNode.parentNode;
                             const rows = table.querySelectorAll('tr');
                             rows.forEach((row, index) => {
                                 if (row === storedChannelRow) {
+                                    rows[selectedRowIndex].classList.remove("selected");
                                     row.classList.add("selected");
                                     selectedRowIndex = index;
                                 }
                             });
                             scrollSelectedRowIntoView();
                         }
-                    });
+                    })
+                    .catch(error => console.error('Failed to load the guide:', error));
 
                 let wakeLock = null;
 
